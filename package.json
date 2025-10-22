@@ -1,0 +1,64 @@
+{
+  "name": "eslint-plugin-oxfmt",
+  "type": "module",
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.19.0",
+  "description": "__TODO__",
+  "keywords": [],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "homepage": "https://github.com/ntnyq/eslint-plugin-oxfmt#readme",
+  "repository": "ntnyq/eslint-plugin-oxfmt",
+  "bugs": {
+    "url": "https://github.com/ntnyq/eslint-plugin-oxfmt/issues"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "lint": "eslint",
+    "prepare": "husky",
+    "prepublishOnly": "pnpm run build",
+    "release": "run-s release:check release:version",
+    "release:check": "run-s lint typecheck test",
+    "release:version": "bumpp",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@ntnyq/eslint-config": "^5.6.0",
+    "@ntnyq/prettier-config": "^3.0.1",
+    "@types/node": "^24.9.1",
+    "bumpp": "^10.3.1",
+    "eslint": "^9.38.0",
+    "husky": "^9.1.7",
+    "nano-staged": "^0.8.0",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.6.2",
+    "tsdown": "^0.15.9",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "nano-staged": {
+    "*.{js,ts,mjs,cjs,md,vue,yml,yaml,toml,json}": "eslint --fix",
+    "*.{css,scss,html}": "prettier -uw"
+  }
+}
