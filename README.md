@@ -5,7 +5,7 @@
 [![NPM DOWNLOADS](https://img.shields.io/npm/dy/eslint-plugin-oxfmt.svg)](https://www.npmjs.com/package/eslint-plugin-oxfmt)
 [![LICENSE](https://img.shields.io/github/license/ntnyq/eslint-plugin-oxfmt.svg)](https://github.com/ntnyq/eslint-plugin-oxfmt/blob/main/LICENSE)
 
-A starter template for node projects.
+An ESLint plugin that format code via oxfmt.
 
 ## Install
 
@@ -19,6 +19,33 @@ yarn add eslint-plugin-oxfmt
 
 ```shell
 pnpm add eslint-plugin-oxfmt
+```
+
+## Usage
+
+```ts
+// eslint.config.mjs
+
+import pluginOxfmt from 'eslint-plugin-oxfmt'
+import { defineConfig } from 'eslint/config'
+
+export default defineConfig([
+  {
+    ...pluginOxfmt.configs.recommended,
+    files: ['**/*.{js,ts,mjs,cjs,jsx,tsx}'],
+    rules: {
+      'oxfmt/oxfmt': [
+        'error',
+        {
+          semi: false,
+          useTabs: true,
+          singleAttributePerLine: true,
+          trailingComma: 'all',
+        },
+      ],
+    },
+  },
+])
 ```
 
 ## License

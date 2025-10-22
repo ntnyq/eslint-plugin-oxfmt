@@ -2,9 +2,16 @@
   "name": "eslint-plugin-oxfmt",
   "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@10.19.0",
-  "description": "__TODO__",
-  "keywords": [],
+  "packageManager": "pnpm@10.26.1",
+  "description": "An ESLint plugin that format code via oxfmt.",
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "oxc",
+    "oxfmt",
+    "oxlint",
+    "prettier"
+  ],
   "license": "MIT",
   "author": {
     "name": "ntnyq",
@@ -18,44 +25,67 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./rule-options": {
+      "types": "./dts/rule-options.d.ts"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
-    "dist"
+    "dist",
+    "dts",
+    "workers"
   ],
   "publishConfig": {
     "access": "public"
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsdown",
+    "build": "pnpm run update:rule-options && tsdown",
     "dev": "tsdown --watch",
     "lint": "eslint",
     "prepare": "husky",
     "prepublishOnly": "pnpm run build",
     "release": "run-s release:check release:version",
-    "release:check": "run-s lint typecheck test",
+    "release:check": "run-s lint typecheck test build",
     "release:version": "bumpp",
     "test": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit",
+    "update:rule-options": "tsx scripts/udpateRuleOptions.ts"
+  },
+  "peerDependencies": {
+    "eslint": "^9.5.0"
+  },
+  "dependencies": {
+    "generate-differences": "^0.1.0",
+    "oxfmt": "^0.19.0",
+    "synckit": "^0.11.11"
   },
   "devDependencies": {
-    "@ntnyq/eslint-config": "^5.6.0",
+    "@ntnyq/eslint-config": "^5.8.0",
     "@ntnyq/prettier-config": "^3.0.1",
-    "@types/node": "^24.9.1",
-    "bumpp": "^10.3.1",
-    "eslint": "^9.38.0",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^25.0.3",
+    "@typescript/native-preview": "7.0.0-dev.20251204.1",
+    "bumpp": "^10.3.2",
+    "eslint": "^9.39.2",
+    "eslint-parser-plain": "^0.1.1",
+    "eslint-typegen": "^2.3.0",
+    "eslint-vitest-rule-tester": "^3.0.1",
     "husky": "^9.1.7",
-    "nano-staged": "^0.8.0",
+    "json-schema": "^0.4.0",
+    "nano-staged": "^0.9.0",
     "npm-run-all2": "^8.0.4",
-    "prettier": "^3.6.2",
-    "tsdown": "^0.15.9",
+    "prettier": "^3.7.4",
+    "show-invisibles": "^0.0.1",
+    "tinyglobby": "^0.2.15",
+    "tsdown": "^0.18.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.16"
   },
   "nano-staged": {
     "*.{js,ts,mjs,cjs,md,vue,yml,yaml,toml,json}": "eslint --fix",

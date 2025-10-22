@@ -1,0 +1,150 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should lint work > ts.ts 1`] = `
+[
+  {
+    "column": 1,
+    "endColumn": 31,
+    "endLine": 7,
+    "fix": {
+      "range": [
+        81,
+        111,
+      ],
+      "text": "console.log("hello world");",
+    },
+    "line": 7,
+    "message": "Replace \`····console.log('hello·world')\` with \`console.log("hello·world");\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 14,
+    "endColumn": 22,
+    "endLine": 10,
+    "fix": {
+      "range": [
+        141,
+        149,
+      ],
+      "text": ""foobar"",
+    },
+    "line": 10,
+    "message": "Replace \`'foobar'\` with \`"foobar"\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 21,
+    "endColumn": 65,
+    "endLine": 13,
+    "fix": {
+      "range": [
+        190,
+        234,
+      ],
+      "text": " omgSoManyParameters(), IShouldRefactorThis(), ",
+    },
+    "line": 13,
+    "message": "Replace \`omgSoManyParameters(),IShouldRefactorThis(),\` with \`·omgSoManyParameters(),·IShouldRefactorThis(),·\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 33,
+    "endColumn": 33,
+    "endLine": 16,
+    "fix": {
+      "range": [
+        322,
+        322,
+      ],
+      "text": ";",
+    },
+    "line": 16,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 9,
+    "endColumn": 17,
+    "endLine": 20,
+    "fix": {
+      "range": [
+        371,
+        379,
+      ],
+      "text": ""foobar"",
+    },
+    "line": 20,
+    "message": "Replace \`'foobar'\` with \`"foobar"\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 2,
+    "endColumn": 2,
+    "endLine": 22,
+    "fix": {
+      "range": [
+        394,
+        394,
+      ],
+      "text": ";",
+    },
+    "line": 22,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 3,
+    "endColumn": 19,
+    "endLine": 26,
+    "fix": {
+      "range": [
+        442,
+        458,
+      ],
+      "text": "name: "foobar",",
+    },
+    "line": 26,
+    "message": "Replace \`'name':·'foobar'\` with \`name:·"foobar",\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 2,
+    "endColumn": 2,
+    "endLine": 27,
+    "fix": {
+      "range": [
+        460,
+        460,
+      ],
+      "text": ";",
+    },
+    "line": 27,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
