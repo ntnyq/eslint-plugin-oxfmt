@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-oxfmt",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "packageManager": "pnpm@10.26.1",
   "description": "An ESLint plugin that format code via oxfmt.",
   "keywords": [
