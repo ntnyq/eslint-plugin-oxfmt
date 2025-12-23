@@ -121,6 +121,10 @@ export const oxfmt: Rule.RuleModule = {
               type: 'string',
             },
           },
+          insertFinalNewline: {
+            description: `Whether to insert a final newline at the end of the file. (Default: true)`,
+            type: 'boolean',
+          },
           jsxSingleQuote: {
             description: `Use single quotes instead of double quotes in JSX. (Default: false)`,
             type: 'boolean',

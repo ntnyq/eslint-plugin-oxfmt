@@ -47,6 +47,8 @@ export type OxfmtOxfmt = []|[{
   
   ignorePatterns?: string[]
   
+  insertFinalNewline?: boolean
+  
   jsxSingleQuote?: boolean
   
   objectWrap?: ("preserve" | "collapse" | "always")
