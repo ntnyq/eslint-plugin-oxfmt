@@ -3,14 +3,16 @@ import { createSyncFn } from 'synckit'
 import { dirWorkers } from '../dir'
 import { messages, reportDifferences } from '../reporter'
 import type { Rule } from 'eslint'
+import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
 import type { format, FormatOptions } from 'oxfmt'
 
 type FormatResult = Awaited<ReturnType<typeof format>>
+type Options = FormatOptions & LoadOxfmtConfigOptions
 
 let formatViaOxfmt: (
   filename: string,
   sourceText: string,
-  options?: FormatOptions,
+  options?: Options,
 ) => FormatResult
 
 export const oxfmt: Rule.RuleModule = {
@@ -184,6 +186,7 @@ export const oxfmt: Rule.RuleModule = {
         try {
           const formatResult = formatViaOxfmt(context.filename, sourceText, {
             ...context.options?.[0],
+            cwd: context.cwd,
           })
 
           if (formatResult.errors?.length) {

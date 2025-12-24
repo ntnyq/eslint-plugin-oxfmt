@@ -2,7 +2,7 @@
   "name": "eslint-plugin-oxfmt",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "pnpm@10.26.2",
   "description": "An ESLint plugin that format code via oxfmt.",
   "keywords": [
     "eslint",
@@ -60,7 +60,8 @@
     "eslint": "^9.5.0"
   },
   "dependencies": {
-    "generate-differences": "^0.1.0",
+    "generate-differences": "^0.1.1",
+    "load-oxfmt-config": "^0.0.2",
     "oxfmt": "^0.20.0",
     "synckit": "^0.11.11"
   },
@@ -78,7 +79,7 @@
     "nano-staged": "^0.9.0",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.7.4",
-    "show-invisibles": "^0.0.1",
+    "show-invisibles": "^0.0.2",
     "tinyglobby": "^0.2.15",
     "tsdown": "^0.18.2",
     "tsx": "^4.21.0",
