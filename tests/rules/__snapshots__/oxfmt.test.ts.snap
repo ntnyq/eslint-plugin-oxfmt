@@ -1,0 +1,334 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`oxfmt > invalid > Invalid #0: Should add semicolon at the end of statements when semi is true (default behavior) 1`] = `
+[
+  {
+    "column": 27,
+    "endColumn": 27,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        26,
+        26,
+      ],
+      "text": ";",
+    },
+    "line": 1,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #1: Should remove semicolon at the end of statements when semi is false 1`] = `
+[
+  {
+    "column": 22,
+    "endColumn": 23,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        21,
+        22,
+      ],
+      "text": "",
+    },
+    "line": 1,
+    "message": "Delete \`;\`",
+    "messageId": "delete",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #2: Should convert double quotes to single quotes when singleQuote is true 1`] = `
+[
+  {
+    "column": 13,
+    "endColumn": 26,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        12,
+        25,
+      ],
+      "text": "'hello world'",
+    },
+    "line": 1,
+    "message": "Replace \`"hello·world"\` with \`'hello·world'\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #3: Should wrap long lines based on printWidth setting (40 characters) 1`] = `
+[
+  {
+    "column": 5,
+    "endColumn": 43,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        4,
+        42,
+      ],
+      "text": "
+  reallyLongArg(),
+  omgSoManyParameters(),
+",
+    },
+    "line": 1,
+    "message": "Replace \`reallyLongArg(),·omgSoManyParameters()\` with \`⏎··reallyLongArg(),⏎··omgSoManyParameters(),⏎\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #4: Should remove parentheses around single arrow function parameter when arrowParens is avoid 1`] = `
+[
+  {
+    "column": 15,
+    "endColumn": 18,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        14,
+        17,
+      ],
+      "text": "n",
+    },
+    "line": 1,
+    "message": "Replace \`(n)\` with \`n\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #5: Should remove trailing commas from object literals when trailingComma is none 1`] = `
+[
+  {
+    "column": 11,
+    "endColumn": 12,
+    "endLine": 3,
+    "fix": {
+      "range": [
+        42,
+        43,
+      ],
+      "text": "",
+    },
+    "line": 3,
+    "message": "Delete \`,\`",
+    "messageId": "delete",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #6: Should remove unnecessary quotes from object property names when quoteProps is as-needed 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 19,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        19,
+        35,
+      ],
+      "text": "name: "foobar",",
+    },
+    "line": 2,
+    "message": "Replace \`"name":·"foobar"\` with \`name:·"foobar",\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #7: Should adjust indentation to 4 spaces per level when tabWidth is 4 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 3,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        20,
+        20,
+      ],
+      "text": "  ",
+    },
+    "line": 2,
+    "message": "Insert \`··\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #8: Should use tab characters for indentation instead of spaces when useTabs is true 1`] = `
+[
+  {
+    "column": 1,
+    "endColumn": 3,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        18,
+        20,
+      ],
+      "text": "	",
+    },
+    "line": 2,
+    "message": "Replace \`··\` with \`↹\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #9: Should remove spaces inside object literal braces when bracketSpacing is false 1`] = `
+[
+  {
+    "column": 14,
+    "endColumn": 30,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        13,
+        29,
+      ],
+      "text": "name: "foobar"",
+    },
+    "line": 1,
+    "message": "Replace \`·name:·"foobar"·\` with \`name:·"foobar"\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #10: Should use CRLF (\\r\\n) line endings instead of LF when endOfLine is crlf 1`] = `
+[
+  {
+    "column": 13,
+    "endColumn": 13,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        12,
+        12,
+      ],
+      "text": "
+",
+    },
+    "line": 1,
+    "message": "Insert \`␍\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #11: Should use single quotes in JSX attributes when jsxSingleQuote is true 1`] = `
+[
+  {
+    "column": 32,
+    "endColumn": 43,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        31,
+        42,
+      ],
+      "text": "'container'",
+    },
+    "line": 1,
+    "message": "Replace \`"container"\` with \`'container'\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #12: Should format JSX tags compactly on one line when possible with bracketSameLine enabled 1`] = `
+[
+  {
+    "column": 21,
+    "endColumn": 1,
+    "endLine": 5,
+    "fix": {
+      "range": [
+        20,
+        55,
+      ],
+      "text": " className="container">Hello",
+    },
+    "line": 1,
+    "message": "Replace \`⏎··className="container"⏎>⏎··Hello⏎\` with \`·className="container">Hello\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #13: Should put each JSX attribute on a separate line when singleAttributePerLine is true 1`] = `
+[
+  {
+    "column": 17,
+    "endColumn": 65,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        16,
+        64,
+      ],
+      "text": "(
+  <div
+    className="container"
+    id="main"
+  >
+    Hello
+  </div>
+)",
+    },
+    "line": 1,
+    "message": "Replace \`<div·className="container"·id="main">Hello</div>\` with \`(⏎··<div⏎····className="container"⏎····id="main"⏎··>⏎····Hello⏎··</div>⏎)\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
