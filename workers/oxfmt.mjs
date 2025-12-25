@@ -5,7 +5,14 @@ import { format } from 'oxfmt'
 import { runAsWorker } from 'synckit'
 
 /**
- * @typedef {import('oxfmt').FormatOptions & {useConfig?: boolean, cwd: string, configPath?: string}} Options
+ * @typedef {object} PluginOptions
+ * @property {boolean} [useConfig] - Whether to use oxfmt configuration file
+ * @property {string} cwd - Current working directory for resolving configuration
+ * @property {string} [configPath] - Custom path to oxfmt configuration file
+ */
+
+/**
+ * @typedef {import('oxfmt').FormatOptions & PluginOptions} Options
  */
 
 runAsWorker(
