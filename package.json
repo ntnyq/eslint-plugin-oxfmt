@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "packageManager": "pnpm@10.26.2",
-  "description": "An ESLint plugin that format code via oxfmt.",
+  "description": "An ESLint plugin for formatting code with oxfmt.",
   "keywords": [
     "eslint",
     "eslint-plugin",
