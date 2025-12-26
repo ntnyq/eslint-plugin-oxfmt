@@ -29,6 +29,7 @@
     "esbuild",
     "lcov",
     "oxfmt",
+    "oxfmtrc",
     "oxlint",
     "pnpm",
     "tsdown",
