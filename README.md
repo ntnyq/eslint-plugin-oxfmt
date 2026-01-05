@@ -150,11 +150,49 @@ All options are optional and default to sensible values.
 
 ### Advanced Options
 
-| Option                        | Type              | Default  | Description                               |
-| ----------------------------- | ----------------- | -------- | ----------------------------------------- |
-| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code         |
-| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration |
-| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting         |
+| Option                        | Type              | Default  | Description                                                |
+| ----------------------------- | ----------------- | -------- | ---------------------------------------------------------- |
+| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code                          |
+| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration                  |
+| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting                          |
+| `experimentalTailwindcss`     | `object`          | -        | Experimental Tailwind CSS class sorting (enable with `{}`) |
+
+#### Tailwind CSS class sorting
+
+Enable experimental Tailwind CSS class sorting powered by `prettier-plugin-tailwindcss` (pass an empty object to turn it on):
+
+```js
+// eslint.config.mjs
+import pluginOxfmt from 'eslint-plugin-oxfmt'
+
+export default [
+  {
+    ...pluginOxfmt.configs.recommended,
+    files: ['**/*.{js,ts,jsx,tsx}'],
+    rules: {
+      'oxfmt/oxfmt': [
+        'error',
+        {
+          experimentalTailwindcss: {},
+        },
+      ],
+    },
+  },
+]
+```
+
+You can pass the Tailwind plugin options to control which attributes/functions are sorted or keep duplicates:
+
+```js
+{
+  experimentalTailwindcss: {
+    attributes: ['class', 'className', ':class'],
+    functions: ['clsx', 'cn'],
+    preserveDuplicates: false,
+    preserveWhitespace: false,
+  },
+}
+```
 
 ## Rules
 

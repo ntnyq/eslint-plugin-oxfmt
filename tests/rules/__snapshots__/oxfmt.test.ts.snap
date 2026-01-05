@@ -332,3 +332,133 @@ exports[`oxfmt > invalid > Invalid #13: Should put each JSX attribute on a separ
   },
 ]
 `;
+
+exports[`oxfmt > invalid > Invalid #14: Should sort Tailwind CSS classes when experimentalTailwindcss is enabled 1`] = `
+[
+  {
+    "column": 33,
+    "endColumn": 61,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        32,
+        60,
+      ],
+      "text": "flex bg-red-500 px-2 text-lg",
+    },
+    "line": 1,
+    "message": "Replace \`text-lg·bg-red-500·flex·px-2\` with \`flex·bg-red-500·px-2·text-lg\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #15: Should sort Tailwind CSS classes when experimentalTailwindcss is true 1`] = `
+[
+  {
+    "column": 1,
+    "endColumn": 1,
+    "endLine": 1,
+    "line": 1,
+    "message": "Failed to parse configuration: Failed to deserialize Oxfmtrc: invalid type: boolean \`true\`, expected struct TailwindcssConfig",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #16: Should sort Tailwind classes for custom attributes when attributes option is provided 1`] = `
+[
+  {
+    "column": 26,
+    "endColumn": 54,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        25,
+        53,
+      ],
+      "text": "flex bg-red-500 px-2 text-lg",
+    },
+    "line": 1,
+    "message": "Replace \`text-lg·bg-red-500·flex·px-2\` with \`flex·bg-red-500·px-2·text-lg\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #17: Should sort Tailwind classes inside custom functions when functions option is provided 1`] = `
+[
+  {
+    "column": 17,
+    "endColumn": 45,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        16,
+        44,
+      ],
+      "text": "flex bg-red-500 px-2 text-lg",
+    },
+    "line": 1,
+    "message": "Replace \`text-lg·bg-red-500·flex·px-2\` with \`flex·bg-red-500·px-2·text-lg\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #18: Should retain duplicate classes when preserveDuplicates is true 1`] = `
+[
+  {
+    "column": 33,
+    "endColumn": 66,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        32,
+        65,
+      ],
+      "text": "flex bg-red-500 px-2 px-2 text-lg",
+    },
+    "line": 1,
+    "message": "Replace \`text-lg·px-2·px-2·bg-red-500·flex\` with \`flex·bg-red-500·px-2·px-2·text-lg\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #19: Should format while respecting whitespace when preserveWhitespace is true 1`] = `
+[
+  {
+    "column": 33,
+    "endColumn": 64,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        32,
+        63,
+      ],
+      "text": "flex   bg-red-500  px-2 text-lg",
+    },
+    "line": 1,
+    "message": "Replace \`text-lg···bg-red-500··flex·px-2\` with \`flex···bg-red-500··px-2·text-lg\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;

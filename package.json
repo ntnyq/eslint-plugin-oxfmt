@@ -54,22 +54,22 @@
     "release:version": "bumpp",
     "test": "vitest",
     "typecheck": "tsgo --noEmit",
-    "update:rule-options": "tsx scripts/udpateRuleOptions.ts"
+    "update:rule-options": "tsx scripts/updateRuleOptions.ts"
   },
   "peerDependencies": {
     "eslint": "^9.5.0"
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "load-oxfmt-config": "^0.0.3",
-    "oxfmt": "^0.21.0",
+    "load-oxfmt-config": "^0.0.4",
+    "oxfmt": "^0.22.0",
     "synckit": "^0.11.11"
   },
   "devDependencies": {
     "@ntnyq/eslint-config": "^5.9.0",
     "@ntnyq/prettier-config": "^3.0.1",
     "@types/node": "^25.0.3",
-    "@typescript/native-preview": "7.0.0-dev.20251204.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260105.1",
     "bumpp": "^10.3.2",
     "eslint": "^9.39.2",
     "eslint-parser-plain": "^0.1.1",
