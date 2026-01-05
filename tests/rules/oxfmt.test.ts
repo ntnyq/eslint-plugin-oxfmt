@@ -381,29 +381,6 @@ run({
     },
     {
       filename: 'test.jsx',
-      name: 'Tailwind sorting with boolean option',
-      code: $`
-        const element = <div className="text-lg bg-red-500 flex px-2">Hello</div>;
-      `,
-      description:
-        'Should sort Tailwind CSS classes when experimentalTailwindcss is true',
-      options: [
-        {
-          experimentalTailwindcss: true,
-          insertFinalNewline: false,
-        },
-      ],
-      errors(errors) {
-        expect(errors).toMatchSnapshot()
-      },
-      output(output) {
-        expect(output).toMatchInlineSnapshot(
-          `"const element = <div className="text-lg bg-red-500 flex px-2">Hello</div>;"`,
-        )
-      },
-    },
-    {
-      filename: 'test.jsx',
       name: 'Tailwind custom attribute option',
       code: $`
         const element = <div tw="text-lg bg-red-500 flex px-2">Hello</div>;

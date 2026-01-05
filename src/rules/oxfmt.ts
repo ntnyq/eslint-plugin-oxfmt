@@ -124,49 +124,41 @@ export const oxfmt: Rule.RuleModule = {
             type: 'boolean',
           },
           experimentalTailwindcss: {
-            description: `Experimental: Enable Tailwind CSS class sorting in JSX class/className attributes.\nWhen enabled, class strings will be collected and passed to a callback for sorting.\nPass "true" or an object with options from "prettier-plugin-tailwindcss".\n(Default: disabled)`,
-            oneOf: [
-              {
-                enum: [true],
-                type: 'boolean',
-              },
-              {
-                additionalProperties: false,
-                type: 'object',
-                properties: {
-                  attributes: {
-                    description: `List of attributes that contain Tailwind CSS classes.\n\nExample: ["myClassProp", ":class"]\n\nDefault: ["class", "className"]`,
-                    type: 'array',
-                    items: {
-                      type: 'string',
-                    },
-                  },
-                  config: {
-                    description: `Path to your Tailwind CSS configuration file (v3).\n\nNote: Paths are resolved relative to the Oxfmt configuration file.\n\nDefault: "./tailwind.config.js"`,
-                    type: 'string',
-                  },
-                  functions: {
-                    description: `List of custom function names that contain Tailwind CSS classes.\n\nExample: ["clsx", "cn", "cva", "tw"]\n\nDefault: []`,
-                    type: 'array',
-                    items: {
-                      type: 'string',
-                    },
-                  },
-                  preserveDuplicates: {
-                    description: `Preserve duplicate classes.\n\nDefault: false`,
-                    type: 'boolean',
-                  },
-                  preserveWhitespace: {
-                    description: `Preserve whitespace around classes.\n\nDefault: false`,
-                    type: 'boolean',
-                  },
-                  stylesheet: {
-                    description: `Path to your Tailwind CSS stylesheet (v4).\n\nNote: Paths are resolved relative to the Oxfmt configuration file.\n\nExample: "./src/app.css"`,
-                    type: 'string',
-                  },
+            additionalProperties: false,
+            description: `Experimental: Enable Tailwind CSS class sorting in JSX class/className attributes.\nWhen enabled, class strings will be collected and passed to a callback for sorting.\nPass an object with options from "prettier-plugin-tailwindcss".\n(Default: disabled)`,
+            type: 'object',
+            properties: {
+              attributes: {
+                description: `List of attributes that contain Tailwind CSS classes.\n\nExample: ["myClassProp", ":class"]\n\nDefault: ["class", "className"]`,
+                type: 'array',
+                items: {
+                  type: 'string',
                 },
               },
-            ],
+              config: {
+                description: `Path to your Tailwind CSS configuration file (v3).\n\nNote: Paths are resolved relative to the Oxfmt configuration file.\n\nDefault: "./tailwind.config.js"`,
+                type: 'string',
+              },
+              functions: {
+                description: `List of custom function names that contain Tailwind CSS classes.\n\nExample: ["clsx", "cn", "cva", "tw"]\n\nDefault: []`,
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+              },
+              preserveDuplicates: {
+                description: `Preserve duplicate classes.\n\nDefault: false`,
+                type: 'boolean',
+              },
+              preserveWhitespace: {
+                description: `Preserve whitespace around classes.\n\nDefault: false`,
+                type: 'boolean',
+              },
+              stylesheet: {
+                description: `Path to your Tailwind CSS stylesheet (v4).\n\nNote: Paths are resolved relative to the Oxfmt configuration file.\n\nExample: "./src/app.css"`,
+                type: 'string',
+              },
+            },
           },
           ignorePatterns: {
             description: `Ignore files matching these glob patterns. Current working directory is used as the root.`,

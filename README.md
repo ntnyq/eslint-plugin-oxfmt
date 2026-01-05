@@ -150,12 +150,12 @@ All options are optional and default to sensible values.
 
 ### Advanced Options
 
-| Option                        | Type              | Default  | Description                                                |
-| ----------------------------- | ----------------- | -------- | ---------------------------------------------------------- |
-| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code                          |
-| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration                  |
-| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting                          |
-| `experimentalTailwindcss`     | `object`          | -        | Experimental Tailwind CSS class sorting (enable with `{}`) |
+| Option                        | Type              | Default  | Description                                                         |
+| ----------------------------- | ----------------- | -------- | ------------------------------------------------------------------- |
+| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code                                   |
+| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration                           |
+| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting                                   |
+| `experimentalTailwindcss`     | `object`          | -        | Experimental Tailwind CSS class sorting (enable with `{}` for defaults) |
 
 #### Tailwind CSS class sorting
 

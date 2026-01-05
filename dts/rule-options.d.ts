@@ -45,7 +45,7 @@ export type OxfmtOxfmt = []|[{
   
   experimentalSortPackageJson?: boolean
   
-  experimentalTailwindcss?: (true | {
+  experimentalTailwindcss?: {
     
     attributes?: string[]
     
@@ -58,7 +58,7 @@ export type OxfmtOxfmt = []|[{
     preserveWhitespace?: boolean
     
     stylesheet?: string
-  })
+  }
   
   ignorePatterns?: string[]
   
