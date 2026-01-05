@@ -356,6 +356,130 @@ run({
         `)
       },
     },
+    {
+      filename: 'test.jsx',
+      name: 'Tailwind class sorting',
+      code: $`
+        const element = <div className="text-lg bg-red-500 flex px-2">Hello</div>;
+      `,
+      description:
+        'Should sort Tailwind CSS classes when experimentalTailwindcss is enabled',
+      options: [
+        {
+          experimentalTailwindcss: {},
+          insertFinalNewline: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"const element = <div className="flex bg-red-500 px-2 text-lg">Hello</div>;"`,
+        )
+      },
+    },
+    {
+      filename: 'test.jsx',
+      name: 'Tailwind custom attribute option',
+      code: $`
+        const element = <div tw="text-lg bg-red-500 flex px-2">Hello</div>;
+      `,
+      description:
+        'Should sort Tailwind classes for custom attributes when attributes option is provided',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalTailwindcss: {
+            attributes: ['tw'],
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"const element = <div tw="flex bg-red-500 px-2 text-lg">Hello</div>;"`,
+        )
+      },
+    },
+    {
+      filename: 'test.js',
+      name: 'Tailwind custom function option',
+      code: $`
+        const cls = cn("text-lg bg-red-500 flex px-2")
+      `,
+      description:
+        'Should sort Tailwind classes inside custom functions when functions option is provided',
+      options: [
+        {
+          insertFinalNewline: false,
+          semi: false,
+          experimentalTailwindcss: {
+            functions: ['cn'],
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"const cls = cn("flex bg-red-500 px-2 text-lg")"`,
+        )
+      },
+    },
+    {
+      filename: 'test.jsx',
+      name: 'Tailwind preserve duplicates option',
+      code: $`
+        const element = <div className="text-lg px-2 px-2 bg-red-500 flex">Hello</div>;
+      `,
+      description:
+        'Should retain duplicate classes when preserveDuplicates is true',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalTailwindcss: {
+            preserveDuplicates: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"const element = <div className="flex bg-red-500 px-2 px-2 text-lg">Hello</div>;"`,
+        )
+      },
+    },
+    {
+      filename: 'test.jsx',
+      name: 'Tailwind preserve whitespace option',
+      code: $`
+        const element = <div className="text-lg   bg-red-500  flex px-2">Hello</div>;
+      `,
+      description:
+        'Should format while respecting whitespace when preserveWhitespace is true',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalTailwindcss: {
+            preserveWhitespace: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"const element = <div className="flex   bg-red-500  px-2 text-lg">Hello</div>;"`,
+        )
+      },
+    },
   ],
   /**
    * @pg valid cases
@@ -681,6 +805,40 @@ run({
           insertFinalNewline: false,
           printWidth: 40,
           singleAttributePerLine: true,
+        },
+      ],
+    },
+    {
+      filename: 'test.jsx',
+      name: 'Tailwind config option (valid)',
+      code: $`
+        const element = <div className="flex bg-red-500 px-2 text-lg">Hello</div>;
+      `,
+      description:
+        'Should remain valid when experimentalTailwindcss uses a custom config path',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalTailwindcss: {
+            config: './tests/fixtures/tailwind.config.js',
+          },
+        },
+      ],
+    },
+    {
+      filename: 'test.jsx',
+      name: 'Tailwind stylesheet option (valid)',
+      code: $`
+        const element = <div className="text-lg bg-red-500 flex px-2">Hello</div>;
+      `,
+      description:
+        'Should remain valid when experimentalTailwindcss uses a custom stylesheet path',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalTailwindcss: {
+            stylesheet: './src/app.css',
+          },
         },
       ],
     },

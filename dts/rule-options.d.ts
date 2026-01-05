@@ -45,6 +45,21 @@ export type OxfmtOxfmt = []|[{
   
   experimentalSortPackageJson?: boolean
   
+  experimentalTailwindcss?: {
+    
+    attributes?: string[]
+    
+    config?: string
+    
+    functions?: string[]
+    
+    preserveDuplicates?: boolean
+    
+    preserveWhitespace?: boolean
+    
+    stylesheet?: string
+  }
+  
   ignorePatterns?: string[]
   
   insertFinalNewline?: boolean

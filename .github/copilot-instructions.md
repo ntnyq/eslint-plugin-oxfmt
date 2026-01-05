@@ -60,7 +60,7 @@ pnpm run release:check # Full QA before release: lint + typecheck + test + build
 
 ### Rule Schema Generation
 
-- [scripts/udpateRuleOptions.ts](../scripts/udpateRuleOptions.ts) auto-generates TypeScript definitions in [dts/rule-options.d.ts](../dts/rule-options.d.ts)
+- [scripts/updateRuleOptions.ts](../scripts/updateRuleOptions.ts) auto-generates TypeScript definitions in [dts/rule-options.d.ts](../dts/rule-options.d.ts)
 - **On every change to rule options schema**: Must run `pnpm run update:rule-options` to regenerate types
 - Uses `eslint-typegen` to extract options from the ESLint rule schema
 
