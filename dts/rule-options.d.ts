@@ -26,7 +26,7 @@ export type OxfmtOxfmt = []|[{
   
   experimentalSortImports?: {
     
-    groups?: string[][]
+    groups?: (string | string[])[]
     
     ignoreCase?: boolean
     

@@ -72,10 +72,17 @@ export const oxfmt: Rule.RuleModule = {
                 description: `Custom groups configuration for organizing imports.\nEach array element represents a group, and multiple group names in the same array are treated as one.\nAccepts both string and string[] as group elements.`,
                 type: 'array',
                 items: {
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                  },
+                  anyOf: [
+                    {
+                      type: 'string',
+                    },
+                    {
+                      type: 'array',
+                      items: {
+                        type: 'string',
+                      },
+                    },
+                  ],
                 },
               },
               ignoreCase: {
