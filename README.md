@@ -26,15 +26,15 @@
 ## Installation
 
 ```bash
-npm install -D eslint-plugin-oxfmt
+npm install -D oxfmt eslint-plugin-oxfmt
 ```
 
 ```bash
-yarn add -D eslint-plugin-oxfmt
+yarn add -D oxfmt eslint-plugin-oxfmt
 ```
 
 ```bash
-pnpm add -D eslint-plugin-oxfmt
+pnpm add -D oxfmt eslint-plugin-oxfmt
 ```
 
 ## Usage
@@ -150,11 +150,11 @@ All options are optional and default to sensible values.
 
 ### Advanced Options
 
-| Option                        | Type              | Default  | Description                                                         |
-| ----------------------------- | ----------------- | -------- | ------------------------------------------------------------------- |
-| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code                                   |
-| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration                           |
-| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting                                   |
+| Option                        | Type              | Default  | Description                                                             |
+| ----------------------------- | ----------------- | -------- | ----------------------------------------------------------------------- |
+| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code                                       |
+| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration                               |
+| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting                                       |
 | `experimentalTailwindcss`     | `object`          | -        | Experimental Tailwind CSS class sorting (enable with `{}` for defaults) |
 
 #### Tailwind CSS class sorting
