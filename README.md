@@ -19,9 +19,7 @@
 ## Requirements
 
 - **ESLint**: `>= 9.0.0` (Only supports ESLint flat config)
-- **Node.js**: `>= 18.0.0`
-
-## Installation
+- **Node.js**: `^20.19.0 || >=22.12.0`
 
 ## Installation
 

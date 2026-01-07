@@ -87,6 +87,9 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "nano-staged": {
     "*.{js,ts,mjs,cjs,md,vue,yml,yaml,toml,json}": "eslint --fix",
     "*.{css,scss,html}": "prettier -uw"
