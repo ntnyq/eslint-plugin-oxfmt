@@ -480,6 +480,98 @@ run({
         )
       },
     },
+    {
+      filename: 'imports.js',
+      name: 'sort imports when enabled',
+      code: $`
+        import z from "z";
+        import a from "a";
+      `,
+      description:
+        'Should reorder imports alphabetically when experimentalSortImports is enabled',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalSortImports: {
+            newlinesBetween: false,
+            order: 'asc',
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "import a from \"a\";\nimport z from \"z\";"
+        `)
+      },
+    },
+    {
+      filename: 'package.json',
+      name: 'sort package json scripts',
+      code: $`
+        {
+          "scripts": {
+            "build": "echo build",
+            "lint": "echo lint",
+            "dev": "echo dev"
+          }
+        }
+      `,
+      description:
+        'Should sort package.json scripts when experimentalSortPackageJson is enabled',
+      options: [
+        {
+          insertFinalNewline: false,
+          experimentalSortPackageJson: {
+            sortScripts: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "{\n  \"scripts\": {\n    \"build\": \"echo build\",\n    \"dev\": \"echo dev\",\n    \"lint\": \"echo lint\"\n  }\n}"
+        `)
+      },
+    },
+    {
+      filename: 'src/foo.test.js',
+      name: 'overrides apply per glob',
+      code: $`
+        const obj = {
+          foo: 1,
+          bar: 2,
+        };
+      `,
+      description:
+        'Should remove trailing comma when override for **/*.test.js sets trailingComma to none',
+      options: [
+        {
+          insertFinalNewline: false,
+          trailingComma: 'all',
+          overrides: [
+            {
+              files: ['**/*.test.js'],
+              options: {
+                trailingComma: 'none',
+              },
+            },
+          ],
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "const obj = {\n  foo: 1,\n  bar: 2\n};"
+        `)
+      },
+    },
   ],
   /**
    * @pg valid cases
@@ -839,6 +931,114 @@ run({
           experimentalTailwindcss: {
             stylesheet: './src/app.css',
           },
+        },
+      ],
+    },
+    {
+      filename: 'notes.md',
+      name: 'prose and embedded formatting options',
+      code: $`
+        # Title
+        
+        Short paragraph that fits.
+      `,
+      description:
+        'Should accept markdown when prose/html formatting controls are provided',
+      options: [
+        {
+          embeddedLanguageFormatting: 'off',
+          htmlWhitespaceSensitivity: 'ignore',
+          insertFinalNewline: false,
+          proseWrap: 'preserve',
+        },
+      ],
+    },
+    {
+      filename: 'component.vue',
+      name: 'vue indent script and style',
+      code: $`
+        <template>
+          <div>
+            <span>Hello</span>
+          </div>
+        </template>
+        <script>
+          export default {
+            name: "App",
+          };
+        </script>
+        <style>
+          .root {
+            color: red;
+          }
+        </style>
+      `,
+      description:
+        'Should accept Vue files when vueIndentScriptAndStyle is true',
+      options: [
+        {
+          insertFinalNewline: false,
+          vueIndentScriptAndStyle: true,
+        },
+      ],
+    },
+    {
+      filename: 'object.js',
+      name: 'object wrap preserve',
+      code: $`
+        const obj = {
+          foo: 1,
+          bar: 2,
+        };
+      `,
+      description:
+        'Should accept multi-line object when objectWrap is set to preserve',
+      options: [
+        {
+          insertFinalNewline: false,
+          objectWrap: 'preserve',
+        },
+      ],
+    },
+    {
+      filename: 'ignored/file.js',
+      name: 'ignored file pattern configured',
+      code: $`
+        export const value = 1;
+      `,
+      description:
+        'Should accept when file matches ignorePatterns and code is already formatted',
+      options: [
+        {
+          ignorePatterns: ['**/ignored/**'],
+          insertFinalNewline: false,
+        },
+      ],
+    },
+    {
+      filename: 'tests/skip.ts',
+      name: 'overrides exclude files',
+      code: $`
+        const obj = {
+          foo: 1,
+          bar: 2
+        };
+      `,
+      description:
+        'Should fall back to base options when file is excluded from override',
+      options: [
+        {
+          insertFinalNewline: false,
+          trailingComma: 'none',
+          overrides: [
+            {
+              excludeFiles: ['**/skip.ts'],
+              files: ['**/*.ts'],
+              options: {
+                trailingComma: 'all',
+              },
+            },
+          ],
         },
       ],
     },
