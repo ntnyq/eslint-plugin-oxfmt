@@ -26,6 +26,13 @@ export type OxfmtOxfmt = []|[{
   
   experimentalSortImports?: {
     
+    customGroups?: {
+      
+      elementNamePattern?: string[]
+      
+      groupName?: string
+    }[]
+    
     groups?: (string | string[])[]
     
     ignoreCase?: boolean
@@ -43,7 +50,10 @@ export type OxfmtOxfmt = []|[{
     sortSideEffects?: boolean
   }
   
-  experimentalSortPackageJson?: boolean
+  experimentalSortPackageJson?: (boolean | {
+    
+    sortScripts?: boolean
+  })
   
   experimentalTailwindcss?: {
     
@@ -60,6 +70,8 @@ export type OxfmtOxfmt = []|[{
     stylesheet?: string
   }
   
+  htmlWhitespaceSensitivity?: ("css" | "ignore" | "strict")
+  
   ignorePatterns?: string[]
   
   insertFinalNewline?: boolean
@@ -69,6 +81,8 @@ export type OxfmtOxfmt = []|[{
   objectWrap?: ("preserve" | "collapse" | "always")
   
   printWidth?: number
+  
+  proseWrap?: ("always" | "never" | "preserve")
   
   quoteProps?: ("as-needed" | "consistent" | "preserve")
   
@@ -83,4 +97,6 @@ export type OxfmtOxfmt = []|[{
   trailingComma?: ("all" | "es5" | "none")
   
   useTabs?: boolean
+  
+  vueIndentScriptAndStyle?: boolean
 }]

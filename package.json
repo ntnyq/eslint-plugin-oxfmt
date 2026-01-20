@@ -58,7 +58,7 @@
   },
   "peerDependencies": {
     "eslint": "^9.5.0",
-    "oxfmt": "^0.24.0"
+    "oxfmt": "^0.26.0"
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
