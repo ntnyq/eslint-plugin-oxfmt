@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { createSyncFn } from 'synckit'
 import { dirWorkers } from '../dir'
 import { messages, reportDifferences } from '../reporter'
+import { sharedSchema } from '../schema'
 import type { Rule } from 'eslint'
 import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
 import type { format, FormatOptions } from 'oxfmt'
@@ -30,189 +31,49 @@ export const oxfmt: Rule.RuleModule = {
       {
         additionalProperties: false,
         type: 'object',
+        definitions: {
+          FormatConfig: {
+            additionalProperties: false,
+            type: 'object',
+            properties: {
+              ...sharedSchema.properties,
+            },
+          },
+          OxfmtOverrideConfig: {
+            additionalProperties: false,
+            required: ['files'],
+            type: 'object',
+            properties: {
+              excludeFiles: {
+                description: `Glob patterns to exclude from this override.`,
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+              },
+              files: {
+                description: `Glob patterns to match files for this override.\nAll patterns are relative to the Oxfmt configuration file.`,
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+              },
+              options: {
+                $ref: '#/definitions/FormatConfig',
+                description: `Format options to apply for matched files.`,
+                type: 'object',
+              },
+            },
+          },
+        },
         properties: {
-          arrowParens: {
-            description: `Include parentheses around a sole arrow function parameter. (Default: "always")`,
-            enum: ['always', 'avoid'],
-            type: 'string',
-          },
-          bracketSameLine: {
-            description: `Put the > of a multi-line JSX element at the end of the last line\ninstead of being alone on the next line. (Default: false)`,
-            type: 'boolean',
-          },
-          bracketSpacing: {
-            description: `Print spaces between brackets in object literals. (Default: true)`,
-            type: 'boolean',
-          },
-          embeddedLanguageFormatting: {
-            description: `Control whether to format embedded parts in the file.\ne.g. JS-in-Vue, CSS-in-JS, etc. (Default: "auto")`,
-            enum: ['auto', 'off'],
-            type: 'string',
-          },
-          endOfLine: {
-            description: `Which end of line characters to apply. (Default: "lf")`,
-            enum: ['lf', 'crlf', 'cr'],
-            type: 'string',
-          },
-          // experimentalTernaries: {
-          //   description: `Experimental: How to format ternary expressions. (Default: "always-multiline")`,
-          //   type: 'string',
-          // },
-          // experimentalOperatorPosition: {
-          //   description: `Experimental: Position of operators in expressions. (Default: \"end\")`,
-          //   enum: ['end'],
-          //   type: 'string',
-          // },
-          experimentalSortImports: {
-            additionalProperties: false,
-            description: `Experimental: Sort import statements. Disabled by default.`,
-            type: 'object',
-            properties: {
-              groups: {
-                description: `Custom groups configuration for organizing imports.\nEach array element represents a group, and multiple group names in the same array are treated as one.\nAccepts both string and string[] as group elements.`,
-                type: 'array',
-                items: {
-                  anyOf: [
-                    {
-                      type: 'string',
-                    },
-                    {
-                      type: 'array',
-                      items: {
-                        type: 'string',
-                      },
-                    },
-                  ],
-                },
-              },
-              ignoreCase: {
-                description: `Ignore case when sorting. (Default: true)`,
-                type: 'boolean',
-              },
-              internalPattern: {
-                description: `Glob patterns to identify internal imports.`,
-                type: 'array',
-                items: {
-                  type: 'string',
-                },
-              },
-              newlinesBetween: {
-                description: `Add newlines between import groups. (Default: true)`,
-                type: 'boolean',
-              },
-              order: {
-                description: `Sort order. (Default: "asc")`,
-                enum: ['asc', 'desc'],
-                type: 'string',
-              },
-              partitionByComment: {
-                description: `Partition imports by comments. (Default: false)`,
-                type: 'boolean',
-              },
-              partitionByNewline: {
-                description: `Partition imports by newlines. (Default: false)`,
-                type: 'boolean',
-              },
-              sortSideEffects: {
-                description: `Sort side-effect imports. (Default: "false")`,
-                type: 'boolean',
-              },
-            },
-          },
-          experimentalSortPackageJson: {
-            description: `Experimental: Sort package.json keys. (Default: true)`,
-            type: 'boolean',
-          },
-          experimentalTailwindcss: {
-            additionalProperties: false,
-            description: `Experimental: Enable Tailwind CSS class sorting in JSX class/className attributes.\nWhen enabled, class strings will be collected and passed to a callback for sorting.\nPass an object with options from "prettier-plugin-tailwindcss".\n(Default: disabled)`,
-            type: 'object',
-            properties: {
-              attributes: {
-                description: `List of attributes that contain Tailwind CSS classes.\n\nExample: ["myClassProp", ":class"]\n\nDefault: ["class", "className"]`,
-                type: 'array',
-                items: {
-                  type: 'string',
-                },
-              },
-              config: {
-                description: `Path to your Tailwind CSS configuration file (v3).\n\nNote: Paths are resolved relative to the Oxfmt configuration file.\n\nDefault: "./tailwind.config.js"`,
-                type: 'string',
-              },
-              functions: {
-                description: `List of custom function names that contain Tailwind CSS classes.\n\nExample: ["clsx", "cn", "cva", "tw"]\n\nDefault: []`,
-                type: 'array',
-                items: {
-                  type: 'string',
-                },
-              },
-              preserveDuplicates: {
-                description: `Preserve duplicate classes.\n\nDefault: false`,
-                type: 'boolean',
-              },
-              preserveWhitespace: {
-                description: `Preserve whitespace around classes.\n\nDefault: false`,
-                type: 'boolean',
-              },
-              stylesheet: {
-                description: `Path to your Tailwind CSS stylesheet (v4).\n\nNote: Paths are resolved relative to the Oxfmt configuration file.\n\nExample: "./src/app.css"`,
-                type: 'string',
-              },
-            },
-          },
-          ignorePatterns: {
-            description: `Ignore files matching these glob patterns. Current working directory is used as the root.`,
+          ...sharedSchema.properties,
+          overrides: {
+            description: `File-specific overrides.\nWhen a file matches multiple overrides, the later override takes precedence (array order matters).\n\n- (Default: [])`,
             type: 'array',
             items: {
-              type: 'string',
+              $ref: '#/definitions/OxfmtOverrideConfig',
             },
-          },
-          insertFinalNewline: {
-            description: `Whether to insert a final newline at the end of the file. (Default: true)`,
-            type: 'boolean',
-          },
-          jsxSingleQuote: {
-            description: `Use single quotes instead of double quotes in JSX. (Default: false)`,
-            type: 'boolean',
-          },
-          objectWrap: {
-            description: `How to wrap object literals when they could fit on one line or span multiple lines. (Default: "preserve")\nNOTE: In addition to Prettier's "preserve" and "collapse", we also support "always".`,
-            enum: ['preserve', 'collapse', 'always'],
-            type: 'string',
-          },
-          printWidth: {
-            description: `The line length that the printer will wrap on. (Default: 100)`,
-            type: 'integer',
-          },
-          quoteProps: {
-            description: `Change when properties in objects are quoted. (Default: "as-needed")`,
-            enum: ['as-needed', 'consistent', 'preserve'],
-            type: 'string',
-          },
-          semi: {
-            description: `Print semicolons at the ends of statements. (Default: true)`,
-            type: 'boolean',
-          },
-          singleAttributePerLine: {
-            description: `Put each attribute on a new line in JSX. (Default: false)`,
-            type: 'boolean',
-          },
-          singleQuote: {
-            description: `Use single quotes instead of double quotes. (Default: false)`,
-            type: 'boolean',
-          },
-          tabWidth: {
-            description: `Number of spaces per indentation level. (Default: 2)`,
-            type: 'integer',
-          },
-          trailingComma: {
-            description: `Print trailing commas wherever possible. (Default: "all")`,
-            enum: ['all', 'es5', 'none'],
-            type: 'string',
-          },
-          useTabs: {
-            description: `Use tabs for indentation or spaces. (Default: false)`,
-            type: 'boolean',
           },
         },
       },
