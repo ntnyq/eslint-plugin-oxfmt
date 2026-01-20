@@ -78,6 +78,9 @@ export default [
           printWidth: 100,
           arrowParens: 'avoid',
 
+          // File handling
+          ignorePatterns: ['**/dist/**', '**/.next/**'],
+
           // JSX specific options
           jsxSingleQuote: false,
           bracketSameLine: false,
@@ -86,10 +89,32 @@ export default [
           // Object formatting
           bracketSpacing: true,
           quoteProps: 'as-needed',
+          objectWrap: 'preserve',
 
           // Line endings
           endOfLine: 'lf',
           insertFinalNewline: true,
+
+          // Prose / HTML
+          embeddedLanguageFormatting: 'auto',
+          htmlWhitespaceSensitivity: 'css',
+          proseWrap: 'preserve',
+
+          // Vue
+          vueIndentScriptAndStyle: false,
+
+          // Experiments
+          experimentalSortImports: {
+            order: 'asc',
+            newlinesBetween: true,
+          },
+          experimentalSortPackageJson: { sortScripts: true },
+          experimentalTailwindcss: {
+            attributes: ['class', 'className', ':class'],
+            functions: ['clsx', 'cn'],
+            preserveDuplicates: false,
+            preserveWhitespace: false,
+          },
         },
       ],
     },
@@ -103,13 +128,14 @@ All options are optional and default to sensible values.
 
 ### Basic Options
 
-| Option        | Type      | Default | Description                                |
-| ------------- | --------- | ------- | ------------------------------------------ |
-| `semi`        | `boolean` | `true`  | Add semicolons at the end of statements    |
-| `singleQuote` | `boolean` | `false` | Use single quotes instead of double quotes |
-| `tabWidth`    | `number`  | `2`     | Number of spaces per indentation level     |
-| `useTabs`     | `boolean` | `false` | Use tabs for indentation                   |
-| `printWidth`  | `number`  | `100`   | Maximum line length for wrapping           |
+| Option           | Type       | Default | Description                                        |
+| ---------------- | ---------- | ------- | -------------------------------------------------- |
+| `semi`           | `boolean`  | `true`  | Add semicolons at the end of statements            |
+| `singleQuote`    | `boolean`  | `false` | Use single quotes instead of double quotes         |
+| `tabWidth`       | `number`   | `2`     | Number of spaces per indentation level             |
+| `useTabs`        | `boolean`  | `false` | Use tabs for indentation                           |
+| `printWidth`     | `number`   | `100`   | Maximum line length for wrapping                   |
+| `ignorePatterns` | `string[]` | `[]`    | Glob patterns (relative to cwd) to skip formatting |
 
 ### Trailing Commas
 
@@ -131,6 +157,12 @@ All options are optional and default to sensible values.
 | `bracketSameLine`        | `boolean` | `false` | Put `>` on the same line in JSX        |
 | `singleAttributePerLine` | `boolean` | `false` | Force single attribute per line in JSX |
 
+### Vue SFC Options
+
+| Option                    | Type      | Default | Description                                      |
+| ------------------------- | --------- | ------- | ------------------------------------------------ |
+| `vueIndentScriptAndStyle` | `boolean` | `false` | Indent code inside `<script>` / `<style>` in Vue |
+
 ### Object Formatting
 
 | Option           | Type                                        | Default       | Description                                      |
@@ -146,14 +178,40 @@ All options are optional and default to sensible values.
 | `endOfLine`          | `'lf' \| 'crlf' \| 'cr'` | `'lf'`  | Line ending character(s)             |
 | `insertFinalNewline` | `boolean`                | `true`  | Insert a newline at the end of files |
 
+### Prose / HTML
+
+| Option                       | Type                                | Default      | Description                                              |
+| ---------------------------- | ----------------------------------- | ------------ | -------------------------------------------------------- |
+| `embeddedLanguageFormatting` | `'auto' \| 'off'`                   | `'auto'`     | Format embedded code blocks (e.g., JS-in-Vue, CSS-in-JS) |
+| `htmlWhitespaceSensitivity`  | `'css' \| 'ignore' \| 'strict'`     | `'css'`      | Global whitespace sensitivity for HTML-like languages    |
+| `proseWrap`                  | `'always' \| 'never' \| 'preserve'` | `'preserve'` | Control prose wrapping in Markdown/MDX                   |
+
 ### Advanced Options
 
-| Option                        | Type              | Default  | Description                                                             |
-| ----------------------------- | ----------------- | -------- | ----------------------------------------------------------------------- |
-| `embeddedLanguageFormatting`  | `'auto' \| 'off'` | `'auto'` | Control formatting of quoted code                                       |
-| `experimentalSortImports`     | `object`          | -        | Experimental import sorting configuration                               |
-| `experimentalSortPackageJson` | `boolean`         | -        | Experimental package.json sorting                                       |
-| `experimentalTailwindcss`     | `object`          | -        | Experimental Tailwind CSS class sorting (enable with `{}` for defaults) |
+| Option                        | Type                | Default  | Description                                                                  |
+| ----------------------------- | ------------------- | -------- | ---------------------------------------------------------------------------- |
+| `experimentalSortImports`     | `object`            | disabled | Experimental import sorting configuration                                    |
+| `experimentalSortPackageJson` | `boolean \| object` | `true`   | Experimental package.json sorting (object form: `{ sortScripts?: boolean }`) |
+| `experimentalTailwindcss`     | `object`            | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
+
+#### Import sorting (`experimentalSortImports`)
+
+Available keys:
+
+- `customGroups`: Ordered custom group definitions `{ elementNamePattern?: string[]; groupName?: string }[]`
+- `groups`: Ordered group list; supports nested arrays to merge groups (see perfectionist docs)
+- `ignoreCase`: Ignore case when sorting (default `true`)
+- `internalPattern`: Glob patterns for internal imports
+- `newlinesBetween`: Insert blank lines between groups (default `true`)
+- `order`: `'asc' | 'desc'` (default `'asc'`)
+- `partitionByComment`: Split groups by comments (default `false`)
+- `partitionByNewline`: Split groups by blank lines (default `false`)
+- `sortSideEffects`: Sort side-effect imports (default `false`)
+
+#### package.json sorting (`experimentalSortPackageJson`)
+
+- Boolean to toggle (default `true`).
+- Object form: `{ sortScripts?: boolean }` (default `false`).
 
 #### Tailwind CSS class sorting
 
@@ -185,11 +243,55 @@ You can pass the Tailwind plugin options to control which attributes/functions a
 {
   experimentalTailwindcss: {
     attributes: ['class', 'className', ':class'],
+    config: './tailwind.config.js',
     functions: ['clsx', 'cn'],
     preserveDuplicates: false,
     preserveWhitespace: false,
+    stylesheet: './src/app.css',
   },
 }
+```
+
+## File-specific overrides
+
+Use `overrides` to apply different oxfmt options per file glob (later entries win on conflicts):
+
+```js
+// eslint.config.mjs
+import pluginOxfmt from 'eslint-plugin-oxfmt'
+
+export default [
+  {
+    ...pluginOxfmt.configs.recommended,
+    files: ['**/*.{js,ts,jsx,tsx}'],
+    rules: {
+      'oxfmt/oxfmt': [
+        'error',
+        {
+          overrides: [
+            {
+              files: ['**/*.test.ts'],
+              excludeFiles: ['**/fixtures/**'],
+              options: {
+                semi: false,
+                trailingComma: 'none',
+              },
+            },
+            {
+              files: ['packages/**/src/**/*.{ts,tsx}'],
+              options: {
+                printWidth: 90,
+                experimentalSortImports: {
+                  newlinesBetween: true,
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
+  },
+]
 ```
 
 ## Rules
