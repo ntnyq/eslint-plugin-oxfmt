@@ -135,7 +135,7 @@ All options are optional and default to sensible values.
 | Option       | Type      | Default | Description                                                                                            |
 | ------------ | --------- | ------- | ------------------------------------------------------------------------------------------------------ |
 | `useConfig`  | `boolean` | `true`  | Load `.oxfmtrc` / config files via `load-oxfmt-config`. Set to `false` to rely only on inline options. |
-| `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                              |
+| `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set. |
 
 > Note: `cwd` is taken from ESLint automatically; you usually do not need to set it manually.
 
