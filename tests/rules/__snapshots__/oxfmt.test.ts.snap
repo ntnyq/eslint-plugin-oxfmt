@@ -447,3 +447,108 @@ exports[`oxfmt > invalid > Invalid #18: Should format while respecting whitespac
   },
 ]
 `;
+
+exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically when experimentalSortImports is enabled 1`] = `
+[
+  {
+    "column": 8,
+    "endColumn": 17,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        7,
+        16,
+      ],
+      "text": "a from "a",
+    },
+    "line": 1,
+    "message": "Replace \`z·from·"z\` with \`a·from·"a\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 8,
+    "endColumn": 17,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        26,
+        35,
+      ],
+      "text": "z from "z",
+    },
+    "line": 2,
+    "message": "Replace \`a·from·"a\` with \`z·from·"z\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #20: Should sort package.json scripts when experimentalSortPackageJson is enabled 1`] = `
+[
+  {
+    "column": 6,
+    "endColumn": 23,
+    "endLine": 4,
+    "fix": {
+      "range": [
+        49,
+        66,
+      ],
+      "text": "dev": "echo dev",
+    },
+    "line": 4,
+    "message": "Replace \`lint":·"echo·lint\` with \`dev":·"echo·dev\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 6,
+    "endColumn": 21,
+    "endLine": 5,
+    "fix": {
+      "range": [
+        74,
+        89,
+      ],
+      "text": "lint": "echo lint",
+    },
+    "line": 5,
+    "message": "Replace \`dev":·"echo·dev\` with \`lint":·"echo·lint\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt > invalid > Invalid #21: Should remove trailing comma when override for **/*.test.js sets trailingComma to none 1`] = `
+[
+  {
+    "column": 9,
+    "endColumn": 10,
+    "endLine": 3,
+    "fix": {
+      "range": [
+        32,
+        33,
+      ],
+      "text": "",
+    },
+    "line": 3,
+    "message": "Delete \`,\`",
+    "messageId": "delete",
+    "nodeType": null,
+    "ruleId": "oxfmt",
+    "severity": 2,
+  },
+]
+`;
