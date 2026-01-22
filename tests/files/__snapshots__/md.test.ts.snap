@@ -1,0 +1,27 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: md > invalid > Invalid #0: # title
+
+-   item
+- item2 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 5,
+    "endLine": 3,
+    "fix": {
+      "range": [
+        11,
+        13,
+      ],
+      "text": "",
+    },
+    "line": 3,
+    "message": "Delete \`··\`",
+    "messageId": "delete",
+    "nodeType": null,
+    "ruleId": "file: md",
+    "severity": 2,
+  },
+]
+`;

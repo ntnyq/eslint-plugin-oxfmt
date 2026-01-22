@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: js > invalid > Invalid #0: const name = "foo"; 1`] = `
+[
+  {
+    "column": 14,
+    "endColumn": 20,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        13,
+        19,
+      ],
+      "text": "'foo'",
+    },
+    "line": 1,
+    "message": "Replace \`"foo";\` with \`'foo'\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "file: js",
+    "severity": 2,
+  },
+]
+`;

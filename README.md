@@ -14,7 +14,7 @@
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
 - 🎨 **Highly Configurable** - Support for all oxfmt formatting options
-- 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and more
+- 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
 
 ## Requirements
 
@@ -317,7 +317,7 @@ This plugin provides a single rule that formats your code using oxfmt.
 - Fixable: Yes (automatically applies formatting)
 - Type: Layout
 
-## Examples
+## Integration
 
 ### Format on Save in VS Code
 
@@ -337,15 +337,9 @@ Add this to your `.vscode/settings.json`:
 }
 ```
 
-### Run from Command Line
+## Suppported languages
 
-```shell
-# Check for formatting issues
-npx eslint .
-
-# Fix formatting issues
-npx eslint . --fix
-```
+- Check [Oxfmt - Supported languages](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
 
 ## Why oxfmt?
 

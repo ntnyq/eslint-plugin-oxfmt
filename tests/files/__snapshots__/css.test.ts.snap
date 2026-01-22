@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: css > invalid > Invalid #0: .btn{color:red} 1`] = `
+[
+  {
+    "column": 5,
+    "endColumn": 15,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        4,
+        14,
+      ],
+      "text": " {
+  color: red;
+",
+    },
+    "line": 1,
+    "message": "Replace \`{color:red\` with \`·{⏎··color:·red;⏎\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "file: css",
+    "severity": 2,
+  },
+]
+`;

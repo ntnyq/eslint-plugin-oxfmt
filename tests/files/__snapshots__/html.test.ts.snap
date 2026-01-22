@@ -1,0 +1,26 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: html > invalid > Invalid #0: <div>
+<p>Hi</p>
+</div> 1`] = `
+[
+  {
+    "column": 1,
+    "endColumn": 1,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        6,
+        6,
+      ],
+      "text": "  ",
+    },
+    "line": 2,
+    "message": "Insert \`··\`",
+    "messageId": "insert",
+    "nodeType": null,
+    "ruleId": "file: html",
+    "severity": 2,
+  },
+]
+`;

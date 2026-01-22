@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: jsx > invalid > Invalid #0: const el = <div className="box"></div> 1`] = `
+[
+  {
+    "column": 27,
+    "endColumn": 39,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        26,
+        38,
+      ],
+      "text": "'box'></div>;",
+    },
+    "line": 1,
+    "message": "Replace \`"box"></div>\` with \`'box'></div>;\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "file: jsx",
+    "severity": 2,
+  },
+]
+`;

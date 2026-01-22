@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: scss > invalid > Invalid #0: .parent{.child{color:red}} 1`] = `
+[
+  {
+    "column": 8,
+    "endColumn": 26,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        7,
+        25,
+      ],
+      "text": " {
+  .child {
+    color: red;
+  }
+",
+    },
+    "line": 1,
+    "message": "Replace \`{.child{color:red}\` with \`·{⏎··.child·{⏎····color:·red;⏎··}⏎\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "file: scss",
+    "severity": 2,
+  },
+]
+`;

@@ -1,0 +1,27 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: less > invalid > Invalid #0: @primary:#fff;.btn{color:@primary} 1`] = `
+[
+  {
+    "column": 10,
+    "endColumn": 34,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        9,
+        33,
+      ],
+      "text": " #fff;
+.btn {
+  color: @primary;
+",
+    },
+    "line": 1,
+    "message": "Replace \`#fff;.btn{color:@primary\` with \`·#fff;⏎.btn·{⏎··color:·@primary;⏎\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "file: less",
+    "severity": 2,
+  },
+]
+`;

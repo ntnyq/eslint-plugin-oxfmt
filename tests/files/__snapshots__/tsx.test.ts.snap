@@ -1,0 +1,32 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`file: tsx > invalid > Invalid #0: const el: JSX.Element = <button type="button" aria-label="submit">Send</button> 1`] = `
+[
+  {
+    "column": 24,
+    "endColumn": 80,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        23,
+        79,
+      ],
+      "text": "
+  (
+    <button
+      type="button"
+      aria-label="submit"
+    >
+      Send
+    </button>
+  );",
+    },
+    "line": 1,
+    "message": "Replace \`·<button·type="button"·aria-label="submit">Send</button>\` with \`⏎··(⏎····<button⏎······type="button"⏎······aria-label="submit"⏎····>⏎······Send⏎····</button>⏎··);\`",
+    "messageId": "replace",
+    "nodeType": null,
+    "ruleId": "file: tsx",
+    "severity": 2,
+  },
+]
+`;
