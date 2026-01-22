@@ -23,15 +23,15 @@
 
 ## Installation
 
-```bash
+```shell
 npm install -D oxfmt eslint-plugin-oxfmt
 ```
 
-```bash
+```shell
 yarn add -D oxfmt eslint-plugin-oxfmt
 ```
 
-```bash
+```shell
 pnpm add -D oxfmt eslint-plugin-oxfmt
 ```
 
@@ -69,6 +69,10 @@ export default [
       'oxfmt/oxfmt': [
         'error',
         {
+          // Plugin options
+          useConfig: false,
+          configPath: 'configs/.oxfmtrc.json',
+
           // Formatting options
           semi: false,
           singleQuote: true,
@@ -125,6 +129,15 @@ export default [
 ## Configuration Options
 
 All options are optional and default to sensible values.
+
+### Plugin Options
+
+| Option       | Type      | Default | Description                                                                                            |
+| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| `useConfig`  | `boolean` | `true`  | Load `.oxfmtrc` / config files via `load-oxfmt-config`. Set to `false` to rely only on inline options. |
+| `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set. |
+
+> Note: `cwd` is taken from ESLint automatically; you usually do not need to set it manually.
 
 ### Basic Options
 
@@ -239,16 +252,16 @@ export default [
 
 You can pass the Tailwind plugin options to control which attributes/functions are sorted or keep duplicates:
 
-```js
+```json
 {
-  experimentalTailwindcss: {
-    attributes: ['class', 'className', ':class'],
-    config: './tailwind.config.js',
-    functions: ['clsx', 'cn'],
-    preserveDuplicates: false,
-    preserveWhitespace: false,
-    stylesheet: './src/app.css',
-  },
+  "experimentalTailwindcss": {
+    "attributes": ["class", "className", ":class"],
+    "config": "./tailwind.config.js",
+    "functions": ["clsx", "cn"],
+    "preserveDuplicates": false,
+    "preserveWhitespace": false,
+    "stylesheet": "./src/app.css"
+  }
 }
 ```
 
@@ -326,7 +339,7 @@ Add this to your `.vscode/settings.json`:
 
 ### Run from Command Line
 
-```bash
+```shell
 # Check for formatting issues
 npx eslint .
 

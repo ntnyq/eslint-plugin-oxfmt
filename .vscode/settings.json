@@ -1,9 +1,9 @@
 {
+  "oxc.enable": true,
   "eslint.enable": true,
-  "prettier.enable": true,
+  "prettier.enable": false,
   "editor.formatOnSave": true,
-  "prettier.configPath": "./prettier.config.mjs",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never",

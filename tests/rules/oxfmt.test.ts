@@ -20,6 +20,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -41,6 +42,7 @@ run({
         {
           insertFinalNewline: false,
           semi: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -62,6 +64,7 @@ run({
         {
           insertFinalNewline: false,
           singleQuote: true,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -83,6 +86,7 @@ run({
         {
           insertFinalNewline: false,
           printWidth: 40,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -109,6 +113,7 @@ run({
         {
           arrowParens: 'avoid',
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -135,6 +140,7 @@ run({
         {
           insertFinalNewline: false,
           trailingComma: 'none',
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -163,6 +169,7 @@ run({
         {
           insertFinalNewline: false,
           quoteProps: 'as-needed',
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -190,6 +197,7 @@ run({
         {
           insertFinalNewline: false,
           tabWidth: 4,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -216,6 +224,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           useTabs: true,
         },
       ],
@@ -242,6 +251,7 @@ run({
         {
           bracketSpacing: false,
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -266,6 +276,7 @@ run({
         {
           endOfLine: 'crlf',
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -287,6 +298,7 @@ run({
         {
           insertFinalNewline: false,
           jsxSingleQuote: true,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -314,6 +326,7 @@ run({
         {
           bracketSameLine: true,
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -338,6 +351,7 @@ run({
           insertFinalNewline: false,
           printWidth: 40,
           singleAttributePerLine: true,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -368,6 +382,7 @@ run({
         {
           experimentalTailwindcss: {},
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
       errors(errors) {
@@ -390,6 +405,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalTailwindcss: {
             attributes: ['tw'],
           },
@@ -416,6 +432,7 @@ run({
         {
           insertFinalNewline: false,
           semi: false,
+          useConfig: false,
           experimentalTailwindcss: {
             functions: ['cn'],
           },
@@ -441,6 +458,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalTailwindcss: {
             preserveDuplicates: true,
           },
@@ -466,6 +484,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalTailwindcss: {
             preserveWhitespace: true,
           },
@@ -492,6 +511,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalSortImports: {
             newlinesBetween: false,
             order: 'asc',
@@ -524,6 +544,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalSortPackageJson: {
             sortScripts: true,
           },
@@ -553,6 +574,7 @@ run({
         {
           insertFinalNewline: false,
           trailingComma: 'all',
+          useConfig: false,
           overrides: [
             {
               files: ['**/*.test.js'],
@@ -588,6 +610,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -603,6 +626,7 @@ run({
         {
           insertFinalNewline: false,
           semi: false,
+          useConfig: false,
         },
       ],
     },
@@ -618,6 +642,7 @@ run({
         {
           insertFinalNewline: false,
           singleQuote: true,
+          useConfig: false,
         },
       ],
     },
@@ -633,6 +658,7 @@ run({
         {
           insertFinalNewline: false,
           singleQuote: false,
+          useConfig: false,
         },
       ],
     },
@@ -651,6 +677,7 @@ run({
         {
           insertFinalNewline: false,
           printWidth: 40,
+          useConfig: false,
         },
       ],
     },
@@ -666,6 +693,7 @@ run({
         {
           arrowParens: 'always',
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -681,6 +709,7 @@ run({
         {
           arrowParens: 'avoid',
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -699,6 +728,7 @@ run({
         {
           insertFinalNewline: false,
           trailingComma: 'all',
+          useConfig: false,
         },
       ],
     },
@@ -717,6 +747,7 @@ run({
         {
           insertFinalNewline: false,
           trailingComma: 'none',
+          useConfig: false,
         },
       ],
     },
@@ -734,6 +765,7 @@ run({
         {
           insertFinalNewline: false,
           quoteProps: 'as-needed',
+          useConfig: false,
         },
       ],
     },
@@ -751,6 +783,7 @@ run({
         {
           insertFinalNewline: false,
           tabWidth: 2,
+          useConfig: false,
         },
       ],
     },
@@ -768,6 +801,7 @@ run({
         {
           insertFinalNewline: false,
           tabWidth: 4,
+          useConfig: false,
         },
       ],
     },
@@ -782,6 +816,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           useTabs: true,
         },
       ],
@@ -798,6 +833,7 @@ run({
         {
           bracketSpacing: true,
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -813,6 +849,7 @@ run({
         {
           bracketSpacing: false,
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -829,6 +866,7 @@ run({
         {
           endOfLine: 'lf',
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -844,6 +882,7 @@ run({
         {
           insertFinalNewline: false,
           jsxSingleQuote: false,
+          useConfig: false,
         },
       ],
     },
@@ -859,6 +898,7 @@ run({
         {
           insertFinalNewline: false,
           jsxSingleQuote: true,
+          useConfig: false,
         },
       ],
     },
@@ -874,6 +914,7 @@ run({
         {
           bracketSameLine: true,
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -897,6 +938,7 @@ run({
           insertFinalNewline: false,
           printWidth: 40,
           singleAttributePerLine: true,
+          useConfig: false,
         },
       ],
     },
@@ -911,6 +953,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalTailwindcss: {
             config: './tests/fixtures/tailwind.config.js',
           },
@@ -928,6 +971,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           experimentalTailwindcss: {
             stylesheet: './src/app.css',
           },
@@ -950,6 +994,7 @@ run({
           htmlWhitespaceSensitivity: 'ignore',
           insertFinalNewline: false,
           proseWrap: 'preserve',
+          useConfig: false,
         },
       ],
     },
@@ -978,6 +1023,7 @@ run({
       options: [
         {
           insertFinalNewline: false,
+          useConfig: false,
           vueIndentScriptAndStyle: true,
         },
       ],
@@ -997,6 +1043,7 @@ run({
         {
           insertFinalNewline: false,
           objectWrap: 'preserve',
+          useConfig: false,
         },
       ],
     },
@@ -1012,6 +1059,7 @@ run({
         {
           ignorePatterns: ['**/ignored/**'],
           insertFinalNewline: false,
+          useConfig: false,
         },
       ],
     },
@@ -1030,6 +1078,7 @@ run({
         {
           insertFinalNewline: false,
           trailingComma: 'none',
+          useConfig: false,
           overrides: [
             {
               excludeFiles: ['**/skip.ts'],
