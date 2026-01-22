@@ -100,6 +100,8 @@ export type OxfmtOxfmt = []|[{
   
   vueIndentScriptAndStyle?: boolean
   
+  configPath?: string
+  
   overrides?: {
     
     excludeFiles?: string[]
@@ -195,4 +197,6 @@ export type OxfmtOxfmt = []|[{
       vueIndentScriptAndStyle?: boolean
     }
   }[]
+  
+  useConfig?: boolean
 }]

@@ -33,6 +33,10 @@ export const oxfmt: Rule.RuleModule = {
         type: 'object',
         properties: {
           ...sharedSchema.properties,
+          configPath: {
+            description: `Path to Oxfmt configuration file.\nIf provide an absolute path, Oxfmt will use it directly.\n If not provided, Oxfmt will search for configuration files starting from the current working directory upwards.\n\n- (Default: undefined)`,
+            type: 'string',
+          },
           overrides: {
             description: `File-specific overrides.\nWhen a file matches multiple overrides, the later override takes precedence (array order matters).\n\n- (Default: [])`,
             type: 'array',
@@ -65,6 +69,10 @@ export const oxfmt: Rule.RuleModule = {
                 },
               },
             },
+          },
+          useConfig: {
+            description: `Whether to load Oxfmt configuration file.\n\n- (Default: true)`,
+            type: 'boolean',
           },
         },
       },
