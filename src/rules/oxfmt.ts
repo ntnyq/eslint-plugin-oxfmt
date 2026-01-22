@@ -34,7 +34,7 @@ export const oxfmt: Rule.RuleModule = {
         properties: {
           ...sharedSchema.properties,
           configPath: {
-            description: `Path to Oxfmt configuration file.\nIf provide an absolute path, Oxfmt will use it directly.\n If not provided, Oxfmt will search for configuration files starting from the current working directory upwards.\n\n- (Default: undefined)`,
+            description: `Path to Oxfmt configuration file.\nIf you provide an absolute path, Oxfmt will use it directly.\n If not provided, Oxfmt will search for configuration files starting from the current working directory upwards.\n\n- (Default: undefined)`,
             type: 'string',
           },
           overrides: {
