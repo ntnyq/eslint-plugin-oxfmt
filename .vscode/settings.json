@@ -22,6 +22,7 @@
     "javascriptreact",
     "typescriptreact"
   ],
+  "typescript.experimental.useTsgo": true,
   "cSpell.words": [
     "bumpp",
     "changelogithub",
