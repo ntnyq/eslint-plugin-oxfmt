@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { createSyncFn } from 'synckit'
 import { dirWorkers } from '../dir'
 import { messages, reportDifferences } from '../reporter'
-import { sharedSchema } from '../schema'
+import { oxfmtRuleSchema } from '../schema'
 import type { Rule } from 'eslint'
 import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
 import type { format, FormatOptions } from 'oxfmt'
@@ -21,62 +21,13 @@ export const oxfmt: Rule.RuleModule = {
     defaultOptions: [],
     fixable: 'code',
     messages,
+    schema: [oxfmtRuleSchema],
     type: 'layout',
     docs: {
       description: 'Format code via oxfmt',
       recommended: true,
       url: 'https://github.com/ntnyq/eslint-plugin-oxfmt',
     },
-    schema: [
-      {
-        additionalProperties: false,
-        type: 'object',
-        properties: {
-          ...sharedSchema.properties,
-          configPath: {
-            description: `Path to Oxfmt configuration file.\nIf you provide an absolute path, Oxfmt will use it directly.\n If not provided, Oxfmt will search for configuration files starting from the current working directory upwards.\n\n- (Default: undefined)`,
-            type: 'string',
-          },
-          overrides: {
-            description: `File-specific overrides.\nWhen a file matches multiple overrides, the later override takes precedence (array order matters).\n\n- (Default: [])`,
-            type: 'array',
-            items: {
-              additionalProperties: false,
-              required: ['files'],
-              type: 'object',
-              properties: {
-                excludeFiles: {
-                  description: `Glob patterns to exclude from this override.`,
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                  },
-                },
-                files: {
-                  description: `Glob patterns to match files for this override.\nAll patterns are relative to the Oxfmt configuration file.`,
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                  },
-                },
-                options: {
-                  additionalProperties: false,
-                  description: `Format options to apply for matched files.`,
-                  type: 'object',
-                  properties: {
-                    ...sharedSchema.properties,
-                  },
-                },
-              },
-            },
-          },
-          useConfig: {
-            description: `Whether to load Oxfmt configuration file.\n\n- (Default: true)`,
-            type: 'boolean',
-          },
-        },
-      },
-    ],
   },
   create(context) {
     if (!formatViaOxfmt) {

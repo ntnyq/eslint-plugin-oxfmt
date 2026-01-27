@@ -1,6 +1,6 @@
 import type { JSONSchema4 } from 'json-schema'
 
-export const sharedSchema: JSONSchema4 = {
+export const oxfmtOptionsSchema: JSONSchema4 = {
   additionalProperties: false,
   type: 'object',
   properties: {
@@ -226,6 +226,63 @@ export const sharedSchema: JSONSchema4 = {
     vueIndentScriptAndStyle: {
       description: `Whether or not to indent the code inside <script> and <style> tags in Vue files.\n\n- (Default: false)`,
       type: 'boolean',
+    },
+  },
+}
+
+export const oxfmtConfigSchema: JSONSchema4 = {
+  additionalProperties: false,
+  type: 'object',
+  properties: {
+    configPath: {
+      description: `Path to Oxfmt configuration file.\nIf you provide an absolute path, Oxfmt will use it directly.\n If not provided, Oxfmt will search for configuration files starting from the current working directory upwards.\n\n- (Default: undefined)`,
+      type: 'string',
+    },
+    useConfig: {
+      description: `Whether to load Oxfmt configuration file.\n\n- (Default: true)`,
+      type: 'boolean',
+    },
+  },
+}
+
+export const oxfmtRuleSchema: JSONSchema4 = {
+  additionalProperties: false,
+  type: 'object',
+  properties: {
+    ...oxfmtOptionsSchema.properties,
+    ...oxfmtConfigSchema.properties,
+    overrides: {
+      description: `File-specific overrides.\nWhen a file matches multiple overrides, the later override takes precedence (array order matters).\n\n- (Default: [])`,
+      type: 'array',
+      items: {
+        additionalProperties: false,
+        required: ['files'],
+        type: 'object',
+        properties: {
+          excludeFiles: {
+            description: `Glob patterns to exclude from this override.`,
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          },
+          files: {
+            description: `Glob patterns to match files for this override.\nAll patterns are relative to the Oxfmt configuration file.`,
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          },
+          options: {
+            additionalProperties: false,
+            description: `Format options to apply for matched files.`,
+            type: 'object',
+            properties: {
+              ...oxfmtOptionsSchema.properties,
+            },
+          },
+        },
+      },
     },
   },
 }
