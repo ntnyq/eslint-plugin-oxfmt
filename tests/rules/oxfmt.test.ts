@@ -568,7 +568,10 @@ run({
       },
       output(output) {
         expect(output).toMatchInlineSnapshot(`
-          "const obj = {\n  foo: 1,\n  bar: 2\n};"
+          "const obj = {
+            foo: 1,
+            bar: 2
+          };"
         `)
       },
     },
