@@ -12,16 +12,11 @@ import { runAsWorker } from 'synckit'
  * @property {string} cwd - Current working directory for resolving configuration
  * @property {string} [configPath] - Custom path to oxfmt configuration file
  */
-
 /**
- * @typedef {object} Override
- * @property {string[]} files - Glob patterns to match files
- * @property {string[]} [excludeFiles] - Glob patterns to exclude files
- * @property {import('oxfmt').FormatOptions} [options] - Format options to apply
+ * @typedef {import('load-oxfmt-config').FormatOptionOverride} Override
  */
-
 /**
- * @typedef {import('oxfmt').FormatOptions & PluginOptions & {overrides?: Override[]}} Options
+ * @typedef {import('load-oxfmt-config').OxfmtOptions & PluginOptions} Options
  */
 
 /**
@@ -109,7 +104,12 @@ runAsWorker(
     }
 
     // Apply overrides based on filename
-    const mergedOptions = applyOverrides(filename, cwd, baseOptions, overrides)
+    const mergedOptions = applyOverrides(
+      filename,
+      cwd,
+      baseOptions,
+      useConfig ? baseOptions.overrides : overrides,
+    )
 
     const formatResult = await format(filename, sourceText, mergedOptions)
     return formatResult

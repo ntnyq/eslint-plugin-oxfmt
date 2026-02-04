@@ -34,10 +34,10 @@ export const oxfmt: Rule.RuleModule = {
       formatViaOxfmt = createSyncFn(join(dirWorkers, 'oxfmt.mjs'))
     }
 
+    const sourceText = context.sourceCode.text
+
     return {
       Program() {
-        const sourceText = context.sourceCode.text
-
         try {
           const formatResult = formatViaOxfmt(context.filename, sourceText, {
             ...context.options?.[0],
