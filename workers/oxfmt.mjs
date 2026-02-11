@@ -44,29 +44,29 @@ function applyOverrides(
   // Get relative path from cwd and normalize to forward slashes for cross-platform compatibility
   const relativePath = relative(cwd, filename).replace(/\\/g, '/')
 
-  let mergedOptions = { ...baseOptions }
+  let mergedOptions = baseOptions
+  let hasOverrides = false
 
   // Apply overrides in order (later overrides take precedence)
   for (const override of overrides) {
     const { excludeFiles, files, options: overrideOptions } = override
 
     // Check if file matches the files patterns
-    const isMatchFiles = picomatch(files)
-    const matches = isMatchFiles(relativePath)
+    const matches = picomatch.isMatch(relativePath, files)
 
     // Check if file is excluded
-    let excluded = false
-    if (excludeFiles && excludeFiles.length > 0) {
-      const isMatchExclude = picomatch(excludeFiles)
-      excluded = isMatchExclude(relativePath)
-    }
+    const excluded =
+      excludeFiles && excludeFiles.length > 0
+        ? picomatch.isMatch(relativePath, excludeFiles)
+        : false
 
     if (matches && !excluded && overrideOptions) {
       mergedOptions = { ...mergedOptions, ...overrideOptions }
+      hasOverrides = true
     }
   }
 
-  return mergedOptions
+  return hasOverrides ? mergedOptions : baseOptions
 }
 
 runAsWorker(
@@ -79,7 +79,7 @@ runAsWorker(
      * @type {string} source text
      */
     sourceText,
-    /**'
+    /**
      * @type {Options} format options
      */
     options,

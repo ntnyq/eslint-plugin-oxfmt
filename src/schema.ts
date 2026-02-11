@@ -18,7 +18,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       type: 'boolean',
     },
     embeddedLanguageFormatting: {
-      description: `Control whether to format embedded parts in the file.\ne.g. JS-in-Vue, CSS-in-JS, etc. (Default: "auto")`,
+      description: `Control whether to format embedded parts (For example, CSS-in-JS, or JS-in-Vue, etc.) in the file.\n\nNOTE: XXX-in-JS support is incomplete.\n\n- (Default: "auto")`,
       enum: ['auto', 'off'],
       type: 'string',
     },
@@ -40,7 +40,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
             type: 'object',
             properties: {
               elementNamePattern: {
-                description: `List of import name prefixes to match for this group.`,
+                description: `List of glob patterns to match import sources for this group.`,
                 type: 'array',
                 items: {
                   type: 'string',
@@ -128,7 +128,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       type: 'object',
       properties: {
         attributes: {
-          description: `List of attributes that contain Tailwind CSS classes.\n\n- (Example: ["myClassProp", ":class"])\n\n- (Default: ["class", "className"])`,
+          description: `List of additional attributes to sort beyond "class" and "className" (exact match).\n\nNOTE: Regex patterns are not yet supported.\n\n- (Default: [])\n- Example: ["myClassProp", ":class"]`,
           type: 'array',
           items: {
             type: 'string',
@@ -139,7 +139,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
           type: 'string',
         },
         functions: {
-          description: `List of custom function names that contain Tailwind CSS classes.\n\nExample: ["clsx", "cn", "cva", "tw"]\n\n- (Default: [])`,
+          description: `List of custom function names whose arguments should be sorted (exact match).\n\nNOTE: Regex patterns are not yet supported.\n\n- (Default: [])\n- Example: ["clsx", "cn", "cva", "tw"]`,
           type: 'array',
           items: {
             type: 'string',
