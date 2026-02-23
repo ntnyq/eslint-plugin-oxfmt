@@ -19,7 +19,6 @@ exports[`file: md > invalid > Invalid #0: # title
     "line": 3,
     "message": "Delete \`··\`",
     "messageId": "delete",
-    "nodeType": null,
     "ruleId": "file: md",
     "severity": 2,
   },

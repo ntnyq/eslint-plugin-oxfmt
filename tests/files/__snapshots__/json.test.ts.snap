@@ -16,7 +16,6 @@ exports[`file: json > invalid > Invalid #0: {"name":"foo","list":[1,2,3]} 1`] = 
     "line": 1,
     "message": "Replace \`"name":"foo","list":[1,2,3]\` with \`·"name":·"foo",·"list":·[1,·2,·3]·\`",
     "messageId": "replace",
-    "nodeType": null,
     "ruleId": "file: json",
     "severity": 2,
   },

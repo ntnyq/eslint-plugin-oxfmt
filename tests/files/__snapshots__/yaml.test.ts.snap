@@ -16,7 +16,6 @@ exports[`file: yaml > invalid > Invalid #0: name:   foo 1`] = `
     "line": 1,
     "message": "Delete \`··\`",
     "messageId": "delete",
-    "nodeType": null,
     "ruleId": "file: yaml",
     "severity": 2,
   },

@@ -24,7 +24,6 @@ exports[`file: tsx > invalid > Invalid #0: const el: JSX.Element = <button type=
     "line": 1,
     "message": "Replace \`·<button·type="button"·aria-label="submit">Send</button>\` with \`⏎··(⏎····<button⏎······type="button"⏎······aria-label="submit"⏎····>⏎······Send⏎····</button>⏎··);\`",
     "messageId": "replace",
-    "nodeType": null,
     "ruleId": "file: tsx",
     "severity": 2,
   },

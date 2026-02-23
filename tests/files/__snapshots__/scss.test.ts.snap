@@ -20,7 +20,6 @@ exports[`file: scss > invalid > Invalid #0: .parent{.child{color:red}} 1`] = `
     "line": 1,
     "message": "Replace \`{.child{color:red}\` with \`·{⏎··.child·{⏎····color:·red;⏎··}⏎\`",
     "messageId": "replace",
-    "nodeType": null,
     "ruleId": "file: scss",
     "severity": 2,
   },

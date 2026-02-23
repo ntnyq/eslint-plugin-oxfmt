@@ -16,7 +16,6 @@ exports[`file: ts > invalid > Invalid #0: const numbers: number[] = [1,2,3] 1`] 
     "line": 1,
     "message": "Replace \`2,\` with \`·2,·\`",
     "messageId": "replace",
-    "nodeType": null,
     "ruleId": "file: ts",
     "severity": 2,
   },

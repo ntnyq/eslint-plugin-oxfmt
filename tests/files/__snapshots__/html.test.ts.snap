@@ -18,7 +18,6 @@ exports[`file: html > invalid > Invalid #0: <div>
     "line": 2,
     "message": "Insert \`··\`",
     "messageId": "insert",
-    "nodeType": null,
     "ruleId": "file: html",
     "severity": 2,
   },

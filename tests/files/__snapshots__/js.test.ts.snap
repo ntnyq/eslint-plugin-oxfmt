@@ -16,7 +16,6 @@ exports[`file: js > invalid > Invalid #0: const name = "foo"; 1`] = `
     "line": 1,
     "message": "Replace \`"foo";\` with \`'foo'\`",
     "messageId": "replace",
-    "nodeType": null,
     "ruleId": "file: js",
     "severity": 2,
   },
