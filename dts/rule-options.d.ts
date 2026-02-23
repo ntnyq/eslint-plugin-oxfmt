@@ -24,52 +24,6 @@ export type OxfmtOxfmt = []|[{
   
   endOfLine?: ("lf" | "crlf" | "cr")
   
-  experimentalSortImports?: {
-    
-    customGroups?: {
-      
-      elementNamePattern?: string[]
-      
-      groupName?: string
-    }[]
-    
-    groups?: (string | string[])[]
-    
-    ignoreCase?: boolean
-    
-    internalPattern?: string[]
-    
-    newlinesBetween?: boolean
-    
-    order?: ("asc" | "desc")
-    
-    partitionByComment?: boolean
-    
-    partitionByNewline?: boolean
-    
-    sortSideEffects?: boolean
-  }
-  
-  experimentalSortPackageJson?: (boolean | {
-    
-    sortScripts?: boolean
-  })
-  
-  experimentalTailwindcss?: {
-    
-    attributes?: string[]
-    
-    config?: string
-    
-    functions?: string[]
-    
-    preserveDuplicates?: boolean
-    
-    preserveWhitespace?: boolean
-    
-    stylesheet?: string
-  }
-  
   htmlWhitespaceSensitivity?: ("css" | "ignore" | "strict")
   
   ignorePatterns?: string[]
@@ -91,6 +45,59 @@ export type OxfmtOxfmt = []|[{
   singleAttributePerLine?: boolean
   
   singleQuote?: boolean
+  
+  sortImports?: {
+    
+    customGroups?: {
+      
+      elementNamePattern?: string[]
+      
+      groupName?: string
+      
+      modifiers?: string[]
+      
+      selector?: string
+    }[]
+    
+    groups?: (string | string[] | {
+      
+      newlinesBetween: boolean
+    })[]
+    
+    ignoreCase?: boolean
+    
+    internalPattern?: string[]
+    
+    newlinesBetween?: boolean
+    
+    order?: ("asc" | "desc")
+    
+    partitionByComment?: boolean
+    
+    partitionByNewline?: boolean
+    
+    sortSideEffects?: boolean
+  }
+  
+  sortPackageJson?: (boolean | {
+    
+    sortScripts?: boolean
+  })
+  
+  sortTailwindcss?: {
+    
+    attributes?: string[]
+    
+    config?: string
+    
+    functions?: string[]
+    
+    preserveDuplicates?: boolean
+    
+    preserveWhitespace?: boolean
+    
+    stylesheet?: string
+  }
   
   tabWidth?: number
   
@@ -122,52 +129,6 @@ export type OxfmtOxfmt = []|[{
       
       endOfLine?: ("lf" | "crlf" | "cr")
       
-      experimentalSortImports?: {
-        
-        customGroups?: {
-          
-          elementNamePattern?: string[]
-          
-          groupName?: string
-        }[]
-        
-        groups?: (string | string[])[]
-        
-        ignoreCase?: boolean
-        
-        internalPattern?: string[]
-        
-        newlinesBetween?: boolean
-        
-        order?: ("asc" | "desc")
-        
-        partitionByComment?: boolean
-        
-        partitionByNewline?: boolean
-        
-        sortSideEffects?: boolean
-      }
-      
-      experimentalSortPackageJson?: (boolean | {
-        
-        sortScripts?: boolean
-      })
-      
-      experimentalTailwindcss?: {
-        
-        attributes?: string[]
-        
-        config?: string
-        
-        functions?: string[]
-        
-        preserveDuplicates?: boolean
-        
-        preserveWhitespace?: boolean
-        
-        stylesheet?: string
-      }
-      
       htmlWhitespaceSensitivity?: ("css" | "ignore" | "strict")
       
       ignorePatterns?: string[]
@@ -189,6 +150,59 @@ export type OxfmtOxfmt = []|[{
       singleAttributePerLine?: boolean
       
       singleQuote?: boolean
+      
+      sortImports?: {
+        
+        customGroups?: {
+          
+          elementNamePattern?: string[]
+          
+          groupName?: string
+          
+          modifiers?: string[]
+          
+          selector?: string
+        }[]
+        
+        groups?: (string | string[] | {
+          
+          newlinesBetween: boolean
+        })[]
+        
+        ignoreCase?: boolean
+        
+        internalPattern?: string[]
+        
+        newlinesBetween?: boolean
+        
+        order?: ("asc" | "desc")
+        
+        partitionByComment?: boolean
+        
+        partitionByNewline?: boolean
+        
+        sortSideEffects?: boolean
+      }
+      
+      sortPackageJson?: (boolean | {
+        
+        sortScripts?: boolean
+      })
+      
+      sortTailwindcss?: {
+        
+        attributes?: string[]
+        
+        config?: string
+        
+        functions?: string[]
+        
+        preserveDuplicates?: boolean
+        
+        preserveWhitespace?: boolean
+        
+        stylesheet?: string
+      }
       
       tabWidth?: number
       

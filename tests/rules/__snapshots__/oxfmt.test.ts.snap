@@ -333,7 +333,7 @@ exports[`oxfmt > invalid > Invalid #13: Should put each JSX attribute on a separ
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #14: Should sort Tailwind CSS classes when experimentalTailwindcss is enabled 1`] = `
+exports[`oxfmt > invalid > Invalid #14: Should sort Tailwind CSS classes when sortTailwindcss is enabled 1`] = `
 [
   {
     "column": 33,
@@ -448,7 +448,7 @@ exports[`oxfmt > invalid > Invalid #18: Should format while respecting whitespac
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically when experimentalSortImports is enabled 1`] = `
+exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically when sortImports is enabled 1`] = `
 [
   {
     "column": 8,
@@ -489,7 +489,7 @@ exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically wh
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #20: Should sort package.json scripts when experimentalSortPackageJson is enabled 1`] = `
+exports[`oxfmt > invalid > Invalid #20: Should sort package.json scripts when sortPackageJson is enabled 1`] = `
 [
   {
     "column": 6,

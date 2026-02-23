@@ -108,12 +108,12 @@ export default [
           vueIndentScriptAndStyle: false,
 
           // Experiments
-          experimentalSortImports: {
+          sortImports: {
             order: 'asc',
             newlinesBetween: true,
           },
-          experimentalSortPackageJson: { sortScripts: true },
-          experimentalTailwindcss: {
+          sortPackageJson: { sortScripts: true },
+          sortTailwindcss: {
             attributes: ['class', 'className', ':class'],
             functions: ['clsx', 'cn'],
             preserveDuplicates: false,
@@ -201,18 +201,18 @@ All options are optional and default to sensible values.
 
 ### Advanced Options
 
-| Option                        | Type                | Default  | Description                                                                  |
-| ----------------------------- | ------------------- | -------- | ---------------------------------------------------------------------------- |
-| `experimentalSortImports`     | `object`            | disabled | Experimental import sorting configuration                                    |
-| `experimentalSortPackageJson` | `boolean \| object` | `true`   | Experimental package.json sorting (object form: `{ sortScripts?: boolean }`) |
-| `experimentalTailwindcss`     | `object`            | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
+| Option            | Type                | Default  | Description                                                                  |
+| ----------------- | ------------------- | -------- | ---------------------------------------------------------------------------- |
+| `sortImports`     | `object`            | disabled | Experimental import sorting configuration                                    |
+| `sortPackageJson` | `boolean \| object` | `true`   | Experimental package.json sorting (object form: `{ sortScripts?: boolean }`) |
+| `sortTailwindcss` | `object`            | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
 
-#### Import sorting (`experimentalSortImports`)
+#### Import sorting (`sortImports`)
 
 Available keys:
 
-- `customGroups`: Ordered custom group definitions `{ elementNamePattern?: string[]; groupName?: string }[]`
-- `groups`: Ordered group list; supports nested arrays to merge groups (see perfectionist docs)
+- `customGroups`: Ordered custom group definitions `{ elementNamePattern?: string[]; groupName?: string; modifiers?: string[]; selector?: string }[]`
+- `groups`: Ordered group list; supports nested arrays and boundary markers like `{ newlinesBetween: boolean }`
 - `ignoreCase`: Ignore case when sorting (default `true`)
 - `internalPattern`: Glob patterns for internal imports
 - `newlinesBetween`: Insert blank lines between groups (default `true`)
@@ -221,7 +221,7 @@ Available keys:
 - `partitionByNewline`: Split groups by blank lines (default `false`)
 - `sortSideEffects`: Sort side-effect imports (default `false`)
 
-#### package.json sorting (`experimentalSortPackageJson`)
+#### package.json sorting (`sortPackageJson`)
 
 - Boolean to toggle (default `true`).
 - Object form: `{ sortScripts?: boolean }` (default `false`).
@@ -242,7 +242,7 @@ export default [
       'oxfmt/oxfmt': [
         'error',
         {
-          experimentalTailwindcss: {},
+          sortTailwindcss: {},
         },
       ],
     },
@@ -254,7 +254,7 @@ You can pass the Tailwind plugin options to control which attributes/functions a
 
 ```json
 {
-  "experimentalTailwindcss": {
+  "sortTailwindcss": {
     "attributes": ["class", "className", ":class"],
     "config": "./tailwind.config.js",
     "functions": ["clsx", "cn"],
@@ -294,7 +294,7 @@ export default [
               files: ['packages/**/src/**/*.{ts,tsx}'],
               options: {
                 printWidth: 90,
-                experimentalSortImports: {
+                sortImports: {
                   newlinesBetween: true,
                 },
               },
@@ -337,7 +337,7 @@ Add this to your `.vscode/settings.json`:
 }
 ```
 
-## Suppported languages
+## Supported languages
 
 - Check [Oxfmt - Supported languages](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
 

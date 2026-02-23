@@ -357,7 +357,7 @@ run({
       },
     },
     {
-      description: `Should sort Tailwind CSS classes when experimentalTailwindcss is enabled`,
+      description: `Should sort Tailwind CSS classes when sortTailwindcss is enabled`,
       filename: 'test.jsx',
       name: 'Tailwind class sorting',
       code: $`
@@ -365,8 +365,8 @@ run({
       `,
       options: [
         {
-          experimentalTailwindcss: {},
           insertFinalNewline: false,
+          sortTailwindcss: {},
           useConfig: false,
         },
       ],
@@ -390,7 +390,7 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalTailwindcss: {
+          sortTailwindcss: {
             attributes: ['tw'],
           },
         },
@@ -416,7 +416,7 @@ run({
           insertFinalNewline: false,
           semi: false,
           useConfig: false,
-          experimentalTailwindcss: {
+          sortTailwindcss: {
             functions: ['cn'],
           },
         },
@@ -441,7 +441,7 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalTailwindcss: {
+          sortTailwindcss: {
             preserveDuplicates: true,
           },
         },
@@ -466,7 +466,7 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalTailwindcss: {
+          sortTailwindcss: {
             preserveWhitespace: true,
           },
         },
@@ -481,7 +481,7 @@ run({
       },
     },
     {
-      description: `Should reorder imports alphabetically when experimentalSortImports is enabled`,
+      description: `Should reorder imports alphabetically when sortImports is enabled`,
       filename: 'imports.js',
       name: 'sort imports when enabled',
       code: $`
@@ -492,7 +492,7 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalSortImports: {
+          sortImports: {
             newlinesBetween: false,
             order: 'asc',
           },
@@ -508,7 +508,7 @@ run({
       },
     },
     {
-      description: `Should sort package.json scripts when experimentalSortPackageJson is enabled`,
+      description: `Should sort package.json scripts when sortPackageJson is enabled`,
       filename: 'package.json',
       name: 'sort package json scripts',
       code: $`
@@ -524,7 +524,7 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalSortPackageJson: {
+          sortPackageJson: {
             sortScripts: true,
           },
         },
@@ -904,7 +904,7 @@ run({
       ],
     },
     {
-      description: `Should remain valid when experimentalTailwindcss uses a custom config path`,
+      description: `Should remain valid when sortTailwindcss uses a custom config path`,
       filename: 'test.jsx',
       name: 'Tailwind config option (valid)',
       code: $`
@@ -914,14 +914,14 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalTailwindcss: {
+          sortTailwindcss: {
             config: './tests/fixtures/tailwind.config.js',
           },
         },
       ],
     },
     {
-      description: `Should remain valid when experimentalTailwindcss uses a custom stylesheet path`,
+      description: `Should remain valid when sortTailwindcss uses a custom stylesheet path`,
       filename: 'test.jsx',
       name: 'Tailwind stylesheet option (valid)',
       code: $`
@@ -931,7 +931,7 @@ run({
         {
           insertFinalNewline: false,
           useConfig: false,
-          experimentalTailwindcss: {
+          sortTailwindcss: {
             stylesheet: './src/app.css',
           },
         },
