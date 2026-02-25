@@ -19,7 +19,7 @@ let formatViaOxfmt: (
 export const oxfmt: Rule.RuleModule = {
   meta: {
     defaultOptions: [],
-    fixable: 'code',
+    fixable: 'whitespace',
     messages,
     schema: [oxfmtRuleSchema],
     type: 'layout',
@@ -37,7 +37,7 @@ export const oxfmt: Rule.RuleModule = {
     const sourceText = context.sourceCode.text
 
     return {
-      Program() {
+      [context.sourceCode.ast.type || 'Program']() {
         try {
           const formatResult = formatViaOxfmt(context.filename, sourceText, {
             ...context.options?.[0],
@@ -52,11 +52,11 @@ export const oxfmt: Rule.RuleModule = {
                 const end = context.sourceCode.getLocFromIndex(label.end)
                 context.report({
                   loc: { end, start },
-                  message: error.message,
+                  message: `Failed to format code: ${error.message}`,
                 })
               } else {
                 context.report({
-                  message: error.message,
+                  message: `Failed to format code: ${error.message}`,
                   loc: {
                     end: { column: 0, line: 1 },
                     start: { column: 0, line: 1 },
@@ -69,7 +69,7 @@ export const oxfmt: Rule.RuleModule = {
           }
         } catch {
           context.report({
-            message: `Failed to format file ${context.filename}`,
+            message: `Failed to format file: ${context.filename}`,
             loc: {
               end: { column: 0, line: 1 },
               start: { column: 0, line: 1 },
