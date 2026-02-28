@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: css > invalid > Invalid #0: .btn{color:red} 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: .btn{color:red} 1`] = `
 [
   {
     "column": 5,
@@ -18,7 +18,7 @@ exports[`file: css > invalid > Invalid #0: .btn{color:red} 1`] = `
     "line": 1,
     "message": "Replace \`{color:red\` with \`·{⏎··color:·red;⏎\`",
     "messageId": "replace",
-    "ruleId": "file: css",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

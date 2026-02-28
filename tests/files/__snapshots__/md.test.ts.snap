@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: md > invalid > Invalid #0: # title
+exports[`oxfmt/oxfmt > invalid > Invalid #0: # title
 
 -   item
 - item2 1`] = `
@@ -19,7 +19,7 @@ exports[`file: md > invalid > Invalid #0: # title
     "line": 3,
     "message": "Delete \`··\`",
     "messageId": "delete",
-    "ruleId": "file: md",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

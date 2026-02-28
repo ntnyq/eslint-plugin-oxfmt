@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: ts > invalid > Invalid #0: const numbers: number[] = [1,2,3] 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: const numbers: number[] = [1,2,3] 1`] = `
 [
   {
     "column": 30,
@@ -16,7 +16,7 @@ exports[`file: ts > invalid > Invalid #0: const numbers: number[] = [1,2,3] 1`] 
     "line": 1,
     "message": "Replace \`2,\` with \`·2,·\`",
     "messageId": "replace",
-    "ruleId": "file: ts",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

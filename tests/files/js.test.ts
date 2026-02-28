@@ -3,7 +3,6 @@ import { oxfmt as rule } from '../../src/rules/oxfmt'
 import { run } from '../internal'
 
 run({
-  name: 'file: js',
   rule,
   invalid: [
     {

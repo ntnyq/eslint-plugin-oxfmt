@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: tsx > invalid > Invalid #0: const el: JSX.Element = <button type="button" aria-label="submit">Send</button> 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: const el: JSX.Element = <button type="button" aria-label="submit">Send</button> 1`] = `
 [
   {
     "column": 24,
@@ -24,7 +24,7 @@ exports[`file: tsx > invalid > Invalid #0: const el: JSX.Element = <button type=
     "line": 1,
     "message": "Replace \`·<button·type="button"·aria-label="submit">Send</button>\` with \`⏎··(⏎····<button⏎······type="button"⏎······aria-label="submit"⏎····>⏎······Send⏎····</button>⏎··);\`",
     "messageId": "replace",
-    "ruleId": "file: tsx",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

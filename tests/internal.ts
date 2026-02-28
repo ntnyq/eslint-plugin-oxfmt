@@ -10,6 +10,7 @@ export function run(
   options: RuleTesterInitOptions & TestCasesOptions<RuleOxfmtOptions>,
 ) {
   return _run({
+    name: 'oxfmt/oxfmt',
     languageOptions: {
       parser: parserPlain,
     },

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: scss > invalid > Invalid #0: .parent{.child{color:red}} 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: .parent{.child{color:red}} 1`] = `
 [
   {
     "column": 8,
@@ -20,7 +20,7 @@ exports[`file: scss > invalid > Invalid #0: .parent{.child{color:red}} 1`] = `
     "line": 1,
     "message": "Replace \`{.child{color:red}\` with \`·{⏎··.child·{⏎····color:·red;⏎··}⏎\`",
     "messageId": "replace",
-    "ruleId": "file: scss",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

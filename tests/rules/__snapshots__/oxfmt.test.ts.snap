@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`oxfmt > invalid > Invalid #0: Should add semicolon at the end of statements when semi is true (default behavior) 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: Should add semicolon at the end of statements when semi is true (default behavior) 1`] = `
 [
   {
     "column": 27,
@@ -16,13 +16,13 @@ exports[`oxfmt > invalid > Invalid #0: Should add semicolon at the end of statem
     "line": 1,
     "message": "Insert \`;\`",
     "messageId": "insert",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #1: Should remove semicolon at the end of statements when semi is false 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #1: Should remove semicolon at the end of statements when semi is false 1`] = `
 [
   {
     "column": 22,
@@ -38,13 +38,13 @@ exports[`oxfmt > invalid > Invalid #1: Should remove semicolon at the end of sta
     "line": 1,
     "message": "Delete \`;\`",
     "messageId": "delete",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #2: Should convert double quotes to single quotes when singleQuote is true 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #2: Should convert double quotes to single quotes when singleQuote is true 1`] = `
 [
   {
     "column": 13,
@@ -60,13 +60,13 @@ exports[`oxfmt > invalid > Invalid #2: Should convert double quotes to single qu
     "line": 1,
     "message": "Replace \`"hello·world"\` with \`'hello·world'\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #3: Should wrap long lines based on printWidth setting (40 characters) 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #3: Should wrap long lines based on printWidth setting (40 characters) 1`] = `
 [
   {
     "column": 5,
@@ -85,13 +85,13 @@ exports[`oxfmt > invalid > Invalid #3: Should wrap long lines based on printWidt
     "line": 1,
     "message": "Replace \`reallyLongArg(),·omgSoManyParameters()\` with \`⏎··reallyLongArg(),⏎··omgSoManyParameters(),⏎\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #4: Should remove parentheses around single arrow function parameter when arrowParens is avoid 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #4: Should remove parentheses around single arrow function parameter when arrowParens is avoid 1`] = `
 [
   {
     "column": 15,
@@ -107,13 +107,13 @@ exports[`oxfmt > invalid > Invalid #4: Should remove parentheses around single a
     "line": 1,
     "message": "Replace \`(n)\` with \`n\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #5: Should remove trailing commas from object literals when trailingComma is none 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #5: Should remove trailing commas from object literals when trailingComma is none 1`] = `
 [
   {
     "column": 11,
@@ -129,13 +129,13 @@ exports[`oxfmt > invalid > Invalid #5: Should remove trailing commas from object
     "line": 3,
     "message": "Delete \`,\`",
     "messageId": "delete",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #6: Should remove unnecessary quotes from object property names when quoteProps is as-needed 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #6: Should remove unnecessary quotes from object property names when quoteProps is as-needed 1`] = `
 [
   {
     "column": 3,
@@ -151,13 +151,13 @@ exports[`oxfmt > invalid > Invalid #6: Should remove unnecessary quotes from obj
     "line": 2,
     "message": "Replace \`"name":·"foobar"\` with \`name:·"foobar",\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #7: Should adjust indentation to 4 spaces per level when tabWidth is 4 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #7: Should adjust indentation to 4 spaces per level when tabWidth is 4 1`] = `
 [
   {
     "column": 3,
@@ -173,13 +173,13 @@ exports[`oxfmt > invalid > Invalid #7: Should adjust indentation to 4 spaces per
     "line": 2,
     "message": "Insert \`··\`",
     "messageId": "insert",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #8: Should use tab characters for indentation instead of spaces when useTabs is true 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #8: Should use tab characters for indentation instead of spaces when useTabs is true 1`] = `
 [
   {
     "column": 1,
@@ -195,13 +195,13 @@ exports[`oxfmt > invalid > Invalid #8: Should use tab characters for indentation
     "line": 2,
     "message": "Replace \`··\` with \`↹\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #9: Should remove spaces inside object literal braces when bracketSpacing is false 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #9: Should remove spaces inside object literal braces when bracketSpacing is false 1`] = `
 [
   {
     "column": 14,
@@ -217,13 +217,13 @@ exports[`oxfmt > invalid > Invalid #9: Should remove spaces inside object litera
     "line": 1,
     "message": "Replace \`·name:·"foobar"·\` with \`name:·"foobar"\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #10: Should use CRLF (\\r\\n) line endings instead of LF when endOfLine is crlf 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #10: Should use CRLF (\\r\\n) line endings instead of LF when endOfLine is crlf 1`] = `
 [
   {
     "column": 13,
@@ -240,13 +240,13 @@ exports[`oxfmt > invalid > Invalid #10: Should use CRLF (\\r\\n) line endings in
     "line": 1,
     "message": "Insert \`␍\`",
     "messageId": "insert",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #11: Should use single quotes in JSX attributes when jsxSingleQuote is true 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #11: Should use single quotes in JSX attributes when jsxSingleQuote is true 1`] = `
 [
   {
     "column": 32,
@@ -262,13 +262,13 @@ exports[`oxfmt > invalid > Invalid #11: Should use single quotes in JSX attribut
     "line": 1,
     "message": "Replace \`"container"\` with \`'container'\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #12: Should format JSX tags compactly on one line when possible with bracketSameLine enabled 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #12: Should format JSX tags compactly on one line when possible with bracketSameLine enabled 1`] = `
 [
   {
     "column": 21,
@@ -284,13 +284,13 @@ exports[`oxfmt > invalid > Invalid #12: Should format JSX tags compactly on one 
     "line": 1,
     "message": "Replace \`⏎··className="container"⏎>⏎··Hello⏎\` with \`·className="container">Hello\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #13: Should put each JSX attribute on a separate line when singleAttributePerLine is true 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #13: Should put each JSX attribute on a separate line when singleAttributePerLine is true 1`] = `
 [
   {
     "column": 17,
@@ -313,13 +313,13 @@ exports[`oxfmt > invalid > Invalid #13: Should put each JSX attribute on a separ
     "line": 1,
     "message": "Replace \`<div·className="container"·id="main">Hello</div>\` with \`(⏎··<div⏎····className="container"⏎····id="main"⏎··>⏎····Hello⏎··</div>⏎)\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #14: Should sort Tailwind CSS classes when sortTailwindcss is enabled 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #14: Should sort Tailwind CSS classes when sortTailwindcss is enabled 1`] = `
 [
   {
     "column": 33,
@@ -335,13 +335,13 @@ exports[`oxfmt > invalid > Invalid #14: Should sort Tailwind CSS classes when so
     "line": 1,
     "message": "Replace \`text-lg·bg-red-500·flex·px-2\` with \`flex·bg-red-500·px-2·text-lg\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #15: Should sort Tailwind classes for custom attributes when attributes option is provided 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #15: Should sort Tailwind classes for custom attributes when attributes option is provided 1`] = `
 [
   {
     "column": 26,
@@ -357,13 +357,13 @@ exports[`oxfmt > invalid > Invalid #15: Should sort Tailwind classes for custom 
     "line": 1,
     "message": "Replace \`text-lg·bg-red-500·flex·px-2\` with \`flex·bg-red-500·px-2·text-lg\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #16: Should sort Tailwind classes inside custom functions when functions option is provided 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #16: Should sort Tailwind classes inside custom functions when functions option is provided 1`] = `
 [
   {
     "column": 17,
@@ -379,13 +379,13 @@ exports[`oxfmt > invalid > Invalid #16: Should sort Tailwind classes inside cust
     "line": 1,
     "message": "Replace \`text-lg·bg-red-500·flex·px-2\` with \`flex·bg-red-500·px-2·text-lg\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #17: Should retain duplicate classes when preserveDuplicates is true 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #17: Should retain duplicate classes when preserveDuplicates is true 1`] = `
 [
   {
     "column": 33,
@@ -401,13 +401,13 @@ exports[`oxfmt > invalid > Invalid #17: Should retain duplicate classes when pre
     "line": 1,
     "message": "Replace \`text-lg·px-2·px-2·bg-red-500·flex\` with \`flex·bg-red-500·px-2·px-2·text-lg\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #18: Should format while respecting whitespace when preserveWhitespace is true 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #18: Should format while respecting whitespace when preserveWhitespace is true 1`] = `
 [
   {
     "column": 33,
@@ -423,13 +423,13 @@ exports[`oxfmt > invalid > Invalid #18: Should format while respecting whitespac
     "line": 1,
     "message": "Replace \`text-lg···bg-red-500··flex·px-2\` with \`flex···bg-red-500··px-2·text-lg\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically when sortImports is enabled 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #19: Should reorder imports alphabetically when sortImports is enabled 1`] = `
 [
   {
     "column": 8,
@@ -445,7 +445,7 @@ exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically wh
     "line": 1,
     "message": "Replace \`z·from·"z\` with \`a·from·"a\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
   {
@@ -462,13 +462,13 @@ exports[`oxfmt > invalid > Invalid #19: Should reorder imports alphabetically wh
     "line": 2,
     "message": "Replace \`a·from·"a\` with \`z·from·"z\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #20: Should sort package.json scripts when sortPackageJson is enabled 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #20: Should sort package.json scripts when sortPackageJson is enabled 1`] = `
 [
   {
     "column": 6,
@@ -484,7 +484,7 @@ exports[`oxfmt > invalid > Invalid #20: Should sort package.json scripts when so
     "line": 4,
     "message": "Replace \`lint":·"echo·lint\` with \`dev":·"echo·dev\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
   {
@@ -501,13 +501,13 @@ exports[`oxfmt > invalid > Invalid #20: Should sort package.json scripts when so
     "line": 5,
     "message": "Replace \`dev":·"echo·dev\` with \`lint":·"echo·lint\`",
     "messageId": "replace",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
 `;
 
-exports[`oxfmt > invalid > Invalid #21: Should remove trailing comma when override for **/*.test.js sets trailingComma to none 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #21: Should remove trailing comma when override for **/*.test.js sets trailingComma to none 1`] = `
 [
   {
     "column": 9,
@@ -523,7 +523,7 @@ exports[`oxfmt > invalid > Invalid #21: Should remove trailing comma when overri
     "line": 3,
     "message": "Delete \`,\`",
     "messageId": "delete",
-    "ruleId": "oxfmt",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

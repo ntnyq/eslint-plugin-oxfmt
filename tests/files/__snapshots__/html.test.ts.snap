@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: html > invalid > Invalid #0: <div>
+exports[`oxfmt/oxfmt > invalid > Invalid #0: <div>
 <p>Hi</p>
 </div> 1`] = `
 [
@@ -18,7 +18,7 @@ exports[`file: html > invalid > Invalid #0: <div>
     "line": 2,
     "message": "Insert \`··\`",
     "messageId": "insert",
-    "ruleId": "file: html",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: json > invalid > Invalid #0: {"name":"foo","list":[1,2,3]} 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: {"name":"foo","list":[1,2,3]} 1`] = `
 [
   {
     "column": 2,
@@ -16,7 +16,7 @@ exports[`file: json > invalid > Invalid #0: {"name":"foo","list":[1,2,3]} 1`] = 
     "line": 1,
     "message": "Replace \`"name":"foo","list":[1,2,3]\` with \`·"name":·"foo",·"list":·[1,·2,·3]·\`",
     "messageId": "replace",
-    "ruleId": "file: json",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

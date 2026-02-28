@@ -3,11 +3,7 @@ import { oxfmt as rule } from '../../src/rules/oxfmt'
 import { $, run } from '../internal'
 
 run({
-  name: 'oxfmt',
   rule,
-  /**
-   * @pg invalid cases
-   */
   invalid: [
     {
       description: `Should add semicolon at the end of statements when semi is true (default behavior)`,
@@ -576,9 +572,6 @@ run({
       },
     },
   ],
-  /**
-   * @pg valid cases
-   */
   valid: [
     {
       description: `Code with semicolons should be accepted when semi is true (default)`,

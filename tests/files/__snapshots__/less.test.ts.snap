@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: less > invalid > Invalid #0: @primary:#fff;.btn{color:@primary} 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: @primary:#fff;.btn{color:@primary} 1`] = `
 [
   {
     "column": 10,
@@ -19,7 +19,7 @@ exports[`file: less > invalid > Invalid #0: @primary:#fff;.btn{color:@primary} 1
     "line": 1,
     "message": "Replace \`#fff;.btn{color:@primary\` with \`·#fff;⏎.btn·{⏎··color:·@primary;⏎\`",
     "messageId": "replace",
-    "ruleId": "file: less",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

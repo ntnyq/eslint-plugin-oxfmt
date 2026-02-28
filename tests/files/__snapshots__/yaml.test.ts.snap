@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: yaml > invalid > Invalid #0: name:   foo 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: name:   foo 1`] = `
 [
   {
     "column": 7,
@@ -16,7 +16,7 @@ exports[`file: yaml > invalid > Invalid #0: name:   foo 1`] = `
     "line": 1,
     "message": "Delete \`··\`",
     "messageId": "delete",
-    "ruleId": "file: yaml",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]

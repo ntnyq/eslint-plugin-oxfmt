@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`file: js > invalid > Invalid #0: const name = "foo"; 1`] = `
+exports[`oxfmt/oxfmt > invalid > Invalid #0: const name = "foo"; 1`] = `
 [
   {
     "column": 14,
@@ -16,7 +16,7 @@ exports[`file: js > invalid > Invalid #0: const name = "foo"; 1`] = `
     "line": 1,
     "message": "Replace \`"foo";\` with \`'foo'\`",
     "messageId": "replace",
-    "ruleId": "file: js",
+    "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
 ]
