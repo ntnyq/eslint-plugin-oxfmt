@@ -69,6 +69,32 @@ function applyOverrides(
   return hasOverrides ? mergedOptions : baseOptions
 }
 
+/**
+ * Check if a file should be ignored based on ignorePatterns
+ * @param filename - The file path
+ * @param cwd - Current working directory
+ * @param [ignorePatterns] - Ignore patterns
+ * @returns - Whether the file should be ignored
+ */
+function shouldIgnoreFile(
+  /** @type {string} */
+  filename,
+  /** @type {string} */
+  cwd,
+  /** @type {string[] | undefined} */
+  ignorePatterns,
+) {
+  if (!ignorePatterns || ignorePatterns.length === 0) {
+    return false
+  }
+
+  // Get relative path from cwd and normalize to forward slashes for cross-platform compatibility
+  const relativePath = relative(cwd, filename).replace(/\\/g, '/')
+
+  // Check if file matches any ignore pattern
+  return picomatch.isMatch(relativePath, ignorePatterns)
+}
+
 runAsWorker(
   async (
     /**
@@ -87,6 +113,7 @@ runAsWorker(
     const {
       configPath,
       cwd,
+      ignorePatterns,
       overrides,
       useConfig = true,
       ...formatOptions
@@ -101,6 +128,16 @@ runAsWorker(
           })
         : {}),
       ...formatOptions,
+    }
+
+    if (
+      shouldIgnoreFile(
+        filename,
+        cwd,
+        ignorePatterns || baseOptions.ignorePatterns,
+      )
+    ) {
+      return { code: sourceText }
     }
 
     // Apply overrides based on filename

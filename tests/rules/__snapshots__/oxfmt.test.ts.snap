@@ -528,3 +528,25 @@ exports[`oxfmt/oxfmt > invalid > Invalid #21: Should remove trailing comma when 
   },
 ]
 `;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #22: Should still format when file does not match ignorePatterns 1`] = `
+[
+  {
+    "column": 20,
+    "endColumn": 20,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        19,
+        19,
+      ],
+      "text": ";",
+    },
+    "line": 1,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;

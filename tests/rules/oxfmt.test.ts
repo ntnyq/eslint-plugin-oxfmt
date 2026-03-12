@@ -571,6 +571,27 @@ run({
         `)
       },
     },
+    {
+      description: `Should still format when file does not match ignorePatterns`,
+      filename: 'src/not-ignored.js',
+      name: 'ignorePatterns non-matching file',
+      code: $`
+        const value = "foo"
+      `,
+      options: [
+        {
+          ignorePatterns: ['**/ignored/**'],
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`"const value = \"foo\";"`)
+      },
+    },
   ],
   valid: [
     {
@@ -1006,6 +1027,36 @@ run({
       options: [
         {
           ignorePatterns: ['**/ignored/**'],
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+    },
+    {
+      description: `Should skip formatting when file matches ignorePatterns and code is not formatted`,
+      filename: 'ignored/unformatted.js',
+      name: 'ignored file keeps original text',
+      code: $`
+        const value = "foo"
+      `,
+      options: [
+        {
+          ignorePatterns: ['**/ignored/**'],
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+    },
+    {
+      description: `Should skip formatting when any ignorePatterns entry matches`,
+      filename: 'fixtures/vendor/a.js',
+      name: 'ignored by one of multiple patterns',
+      code: $`
+        const value = "foo"
+      `,
+      options: [
+        {
+          ignorePatterns: ['**/generated/**', '**/vendor/**'],
           insertFinalNewline: false,
           useConfig: false,
         },

@@ -9,11 +9,11 @@
   "htmlWhitespaceSensitivity": "css",
   "ignorePatterns": [
     "**/node_modules/**",
-    "**/dist/**",
     "pnpm-lock.yaml",
     "**/*.min.*",
-    "**/tests/fixtures/**",
-    "dts/rule-options.d.ts"
+    "**/dist/**",
+    "**/fixtures/**",
+    "dts/rule-options.d.ts",
   ],
   "insertFinalNewline": true,
   "jsxSingleQuote": true,
@@ -22,15 +22,15 @@
     {
       "files": ["**/*.{css,scss}"],
       "options": {
-        "singleQuote": false
-      }
+        "singleQuote": false,
+      },
     },
     {
       "files": ["**/*.html"],
       "options": {
-        "singleAttributePerLine": false
-      }
-    }
+        "singleAttributePerLine": false,
+      },
+    },
   ],
   "printWidth": 80,
   "proseWrap": "preserve",
@@ -41,5 +41,5 @@
   "tabWidth": 2,
   "trailingComma": "all",
   "useTabs": false,
-  "vueIndentScriptAndStyle": false
+  "vueIndentScriptAndStyle": false,
 }
