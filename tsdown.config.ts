@@ -6,6 +6,6 @@ export default defineConfig({
   entry: ['src/index.ts'],
   platform: 'node',
   deps: {
-    onlyAllowBundle: ['eslint-parser-plain', 'show-invisibles'],
+    onlyBundle: ['eslint-parser-plain', 'show-invisibles'],
   },
 })

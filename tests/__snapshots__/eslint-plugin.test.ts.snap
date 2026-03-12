@@ -111,3 +111,51 @@ exports[`should lint work > ts.ts 1`] = `
   },
 ]
 `;
+
+exports[`should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns > ignored/unformatted.js 1`] = `
+[
+  {
+    "column": 22,
+    "endColumn": 22,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        21,
+        21,
+      ],
+      "text": ";",
+    },
+    "line": 1,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns > src/unformatted.js 1`] = `[]`;
+
+exports[`should respect ignorePatterns from .oxfmtrc when useConfig is true > ignored/unformatted.js 1`] = `[]`;
+
+exports[`should respect ignorePatterns from .oxfmtrc when useConfig is true > src/unformatted.js 1`] = `
+[
+  {
+    "column": 27,
+    "endColumn": 27,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        26,
+        26,
+      ],
+      "text": ";",
+    },
+    "line": 1,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
