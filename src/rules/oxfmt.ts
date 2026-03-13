@@ -30,6 +30,18 @@ export const oxfmt: Rule.RuleModule = {
     },
   },
   create(context) {
+    // Skip processor-extracted virtual files.
+    // When ESLint processors (e.g. angular-eslint's processInlineTemplates)
+    // extract parts of a file, context.filename is a virtual path while
+    // context.physicalFilename is the real on-disk path.
+    // Since oxfmt already formats inline templates as part of the parent
+    // file, formatting the extracted fragment separately would produce
+    // conflicting results (ping-pong).
+    const physicalFilename = context.physicalFilename ?? context.filename
+    if (context.filename !== physicalFilename) {
+      return {}
+    }
+
     if (!formatViaOxfmt) {
       formatViaOxfmt = createSyncFn(join(dirWorkers, 'oxfmt.mjs'))
     }
