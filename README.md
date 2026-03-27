@@ -13,7 +13,9 @@
 - 🔧 **Auto-fix** - Automatically format code on save or via ESLint's fix command
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
-- 🎨 **Highly Configurable** - Support for all oxfmt formatting options
+- 🧩 **Config File Discovery** - Supports `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.ts`
+- 📝 **EditorConfig Support** - Supports `.editorconfig` (root + section overrides) via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
+- 🎨 **Highly Configurable** - Supports all oxfmt formatting options
 - 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
 
 ## Requirements
@@ -139,12 +141,28 @@ All options are optional and default to sensible values.
 
 ### Plugin Options
 
-| Option       | Type      | Default | Description                                                                                            |
-| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------------------ |
-| `useConfig`  | `boolean` | `true`  | Load `.oxfmtrc` / config files via `load-oxfmt-config`. Set to `false` to rely only on inline options. |
-| `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                              |
+| Option       | Type      | Default | Description                                                                                                                                                               |
+| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useConfig`  | `boolean` | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.ts` via `load-oxfmt-config` (with `.editorconfig` merge support). Set to `false` to rely only on inline options. |
+| `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                                                                                                 |
 
 > Note: `cwd` is taken from ESLint automatically; you usually do not need to set it manually.
+
+> `.editorconfig` merge behavior follows oxfmt's documented strategy: https://oxc.rs/docs/guide/usage/formatter/config#editorconfig
+
+### Config Discovery & Precedence
+
+When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
+
+- Config discovery order (from `cwd`, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts`
+- `.editorconfig` support: nearest `.editorconfig` (including section overrides) is merged into the final options
+- `configPath` overrides discovery and directly targets the specified config file
+- ESLint rule options still take highest priority because inline rule options are merged after loaded config
+
+For detailed behavior, see:
+
+- [Oxfmt configuration](https://oxc.rs/docs/guide/usage/formatter/config)
+- [Oxfmt `.editorconfig` strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
 
 ### Basic Options
 
