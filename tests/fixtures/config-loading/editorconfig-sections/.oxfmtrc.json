@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "options": {
+        "printWidth": 40,
+        "tabWidth": 2,
+        "useTabs": false
+      }
+    }
+  ]
+}

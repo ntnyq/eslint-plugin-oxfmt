@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "load-oxfmt-config": "^0.2.0",
+    "load-oxfmt-config": "^0.3.0",
     "picomatch": "^4.0.4",
     "synckit": "^0.11.12"
   },
@@ -72,7 +72,7 @@
     "@ntnyq/eslint-config": "^6.0.0-beta.14",
     "@types/json-schema": "^7.0.15",
     "@types/node": "^25.5.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260325.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260326.1",
     "bumpp": "^11.0.1",
     "eslint": "^10.1.0",
     "eslint-parser-plain": "^0.1.1",
@@ -85,10 +85,10 @@
     "oxfmt": "^0.42.0",
     "show-invisibles": "^0.0.2",
     "tinyglobby": "^0.2.15",
-    "tsdown": "^0.21.4",
+    "tsdown": "^0.21.5",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.2"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

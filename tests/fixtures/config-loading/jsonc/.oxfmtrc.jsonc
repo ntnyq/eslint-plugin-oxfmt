@@ -1,0 +1,8 @@
+{
+  // JSONC support should be discovered and parsed.
+  "insertFinalNewline": false,
+  "printWidth": 24,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+}

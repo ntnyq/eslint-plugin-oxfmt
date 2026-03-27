@@ -1,5 +1,220 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`should apply .editorconfig sections and keep oxfmt overrides higher priority 1`] = `
+{
+  "fixture": "editorconfig-sections",
+  "summary": [
+    {
+      "file": "scripts/sectioned.ts",
+      "messages": [
+        {
+          "column": 27,
+          "endColumn": 39,
+          "endLine": 1,
+          "fix": {
+            "range": [
+              26,
+              38,
+            ],
+            "text": "
+	name: string,
+",
+          },
+          "line": 1,
+          "message": "Replace \`name:·string\` with \`⏎↹name:·string,⏎\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 62,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              42,
+              103,
+            ],
+            "text": "	return createUserProfile(
+		name,
+		'a very long display name',
+	",
+          },
+          "line": 2,
+          "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`↹return·createUserProfile(⏎↹↹name,⏎↹↹'a·very·long·display·name',⏎↹\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 2,
+          "endColumn": 1,
+          "endLine": 4,
+          "fix": {
+            "range": [
+              107,
+              108,
+            ],
+            "text": "",
+          },
+          "line": 3,
+          "message": "Delete \`⏎\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function buildUser(
+	name: string,
+) {
+	return createUserProfile(
+		name,
+		'a very long display name',
+	);
+}",
+    },
+    {
+      "file": "src/override.ts",
+      "messages": [
+        {
+          "column": 27,
+          "endColumn": 39,
+          "endLine": 1,
+          "fix": {
+            "range": [
+              26,
+              38,
+            ],
+            "text": "
+  name: string,
+",
+          },
+          "line": 1,
+          "message": "Replace \`name:·string\` with \`⏎··name:·string,⏎\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 62,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              42,
+              103,
+            ],
+            "text": "  return createUserProfile(
+    name,
+    'a very long display name',
+  ",
+          },
+          "line": 2,
+          "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`··return·createUserProfile(⏎····name,⏎····'a·very·long·display·name',⏎··\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 2,
+          "endColumn": 1,
+          "endLine": 4,
+          "fix": {
+            "range": [
+              107,
+              108,
+            ],
+            "text": "",
+          },
+          "line": 3,
+          "message": "Delete \`⏎\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function buildUser(
+  name: string,
+) {
+  return createUserProfile(
+    name,
+    'a very long display name',
+  );
+}",
+    },
+    {
+      "file": "src/sectioned.js",
+      "messages": [
+        {
+          "column": 27,
+          "endColumn": 31,
+          "endLine": 1,
+          "fix": {
+            "range": [
+              26,
+              30,
+            ],
+            "text": "
+     name,
+",
+          },
+          "line": 1,
+          "message": "Replace \`name\` with \`⏎·····name,⏎\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 62,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              34,
+              95,
+            ],
+            "text": "     return createUserProfile(
+          name,
+          'a very long display name',
+     ",
+          },
+          "line": 2,
+          "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`·····return·createUserProfile(⏎··········name,⏎··········'a·very·long·display·name',⏎·····\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 2,
+          "endColumn": 1,
+          "endLine": 4,
+          "fix": {
+            "range": [
+              99,
+              100,
+            ],
+            "text": "",
+          },
+          "line": 3,
+          "message": "Delete \`⏎\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function buildUser(
+     name,
+) {
+     return createUserProfile(
+          name,
+          'a very long display name',
+     );
+}",
+    },
+  ],
+}
+`;
+
 exports[`should lint work > ts.ts 1`] = `
 [
   {
@@ -110,6 +325,449 @@ exports[`should lint work > ts.ts 1`] = `
     "severity": 2,
   },
 ]
+`;
+
+exports[`should load .oxfmtrc.json 1`] = `
+{
+  "fixture": "json",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log(
+    'hello world',
+  )",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log(⏎····'hello·world',⏎··)\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 8,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "range": [
+              68,
+              103,
+            ],
+            "text": "
+  reallyLongArg(),
+  anotherLongArg(),",
+          },
+          "line": 5,
+          "message": "Replace \`reallyLongArg(),·anotherLongArg());\` with \`⏎··reallyLongArg(),⏎··anotherLongArg(),\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 1,
+          "endLine": 6,
+          "fix": {
+            "range": [
+              104,
+              104,
+            ],
+            "text": ")",
+          },
+          "line": 6,
+          "message": "Insert \`)\`",
+          "messageId": "insert",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log(
+    'hello world',
+  )
+}
+
+format(
+  reallyLongArg(),
+  anotherLongArg(),
+)",
+    },
+  ],
+}
+`;
+
+exports[`should load .oxfmtrc.jsonc 1`] = `
+{
+  "fixture": "jsonc",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log(
+    'hello world',
+  )",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log(⏎····'hello·world',⏎··)\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 8,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "range": [
+              68,
+              103,
+            ],
+            "text": "
+  reallyLongArg(),
+  anotherLongArg(),",
+          },
+          "line": 5,
+          "message": "Replace \`reallyLongArg(),·anotherLongArg());\` with \`⏎··reallyLongArg(),⏎··anotherLongArg(),\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 1,
+          "endLine": 6,
+          "fix": {
+            "range": [
+              104,
+              104,
+            ],
+            "text": ")",
+          },
+          "line": 6,
+          "message": "Insert \`)\`",
+          "messageId": "insert",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log(
+    'hello world',
+  )
+}
+
+format(
+  reallyLongArg(),
+  anotherLongArg(),
+)",
+    },
+  ],
+}
+`;
+
+exports[`should load oxfmt.config.ts 1`] = `
+{
+  "fixture": "ts-config",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log(
+    'hello world',
+  )",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log(⏎····'hello·world',⏎··)\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 8,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "range": [
+              68,
+              103,
+            ],
+            "text": "
+  reallyLongArg(),
+  anotherLongArg(),",
+          },
+          "line": 5,
+          "message": "Replace \`reallyLongArg(),·anotherLongArg());\` with \`⏎··reallyLongArg(),⏎··anotherLongArg(),\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 1,
+          "endLine": 6,
+          "fix": {
+            "range": [
+              104,
+              104,
+            ],
+            "text": ")",
+          },
+          "line": 6,
+          "message": "Insert \`)\`",
+          "messageId": "insert",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log(
+    'hello world',
+  )
+}
+
+format(
+  reallyLongArg(),
+  anotherLongArg(),
+)",
+    },
+  ],
+}
+`;
+
+exports[`should merge .editorconfig with .oxfmtrc.json 1`] = `
+{
+  "fixture": "json-with-editorconfig",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log('hello world')",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log('hello·world')\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 42,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "range": [
+              102,
+              103,
+            ],
+            "text": "",
+          },
+          "line": 5,
+          "message": "Delete \`;\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log('hello world')
+}
+
+format(reallyLongArg(), anotherLongArg())
+",
+    },
+  ],
+}
+`;
+
+exports[`should merge .editorconfig with .oxfmtrc.jsonc 1`] = `
+{
+  "fixture": "jsonc-with-editorconfig",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log('hello world')",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log('hello·world')\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 42,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "range": [
+              102,
+              103,
+            ],
+            "text": "",
+          },
+          "line": 5,
+          "message": "Delete \`;\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log('hello world')
+}
+
+format(reallyLongArg(), anotherLongArg())
+",
+    },
+  ],
+}
+`;
+
+exports[`should merge .editorconfig with oxfmt.config.ts 1`] = `
+{
+  "fixture": "ts-with-editorconfig",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log('hello world')",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log('hello·world')\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 42,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "range": [
+              102,
+              103,
+            ],
+            "text": "",
+          },
+          "line": 5,
+          "message": "Delete \`;\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log('hello world')
+}
+
+format(reallyLongArg(), anotherLongArg())
+",
+    },
+  ],
+}
+`;
+
+exports[`should prefer .oxfmtrc.json over .oxfmtrc.jsonc and oxfmt.config.ts 1`] = `
+{
+  "fixture": "config-priority",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "range": [
+              28,
+              57,
+            ],
+            "text": "console.log('hello world')",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log('hello·world')\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 2,
+          "endColumn": 1,
+          "endLine": 4,
+          "fix": {
+            "range": [
+              59,
+              60,
+            ],
+            "text": "",
+          },
+          "line": 3,
+          "message": "Delete \`⏎\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log('hello world')
+}",
+    },
+  ],
+}
 `;
 
 exports[`should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns > ignored/unformatted.js 1`] = `

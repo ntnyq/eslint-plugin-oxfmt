@@ -1,0 +1,7 @@
+{
+  // Root values here should override the .editorconfig fallback values.
+  "printWidth": 80,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+}
