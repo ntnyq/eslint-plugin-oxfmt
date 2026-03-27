@@ -592,6 +592,379 @@ run({
         expect(output).toMatchInlineSnapshot(`"const value = \"foo\";"`)
       },
     },
+    {
+      description: `Should normalize and compact short JSDoc comments when jsdoc is enabled`,
+      filename: 'test.js',
+      name: 'jsdoc default option',
+      code: $`
+        /**
+         * foo
+         */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          jsdoc: {},
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`"/** Foo */\nconst a = 1;"`)
+      },
+    },
+    {
+      description: `Should keep JSDoc in multiline form when commentLineStrategy is multiline`,
+      filename: 'test.js',
+      name: 'jsdoc multiline comment line strategy',
+      code: $`
+        /** foo */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            commentLineStrategy: 'multiline',
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * Foo
+           */
+          const a = 1;"
+        `)
+      },
+    },
+    {
+      description: `Should apply JSDoc spacing and blank-line options for tag blocks`,
+      filename: 'test.js',
+      name: 'jsdoc spacing and returns separation',
+      code: $`
+        /**
+         * test
+         * @param {number} a aa
+         * @returns {number} bb
+         */
+        function f(a){return a}
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            bracketSpacing: true,
+            separateReturnsFromParam: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * Test
+           *
+           * @param { number } a Aa
+           *
+           * @returns { number } Bb
+           */
+          function f(a) {
+            return a;
+          }"
+        `)
+      },
+    },
+    {
+      description: `Should not append default value text when addDefaultToDescription is false`,
+      filename: 'test.js',
+      name: 'jsdoc addDefaultToDescription false',
+      code: $`
+        /**
+         * test
+         * @param {number} [a=1] desc
+         */
+        function f(a){return a}
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            addDefaultToDescription: false,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * Test
+           *
+           * @param {number} [a=1] Desc
+           */
+          function f(a) {
+            return a;
+          }"
+        `)
+      },
+    },
+    {
+      description: `Should keep lowercase descriptions when capitalizeDescriptions is false`,
+      filename: 'test.js',
+      name: 'jsdoc capitalizeDescriptions false',
+      code: $`
+        /**
+         * test
+         * @param {number} a desc
+         */
+        function f(a){return a}
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            capitalizeDescriptions: false,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * test
+           *
+           * @param {number} a desc
+           */
+          function f(a) {
+            return a;
+          }"
+        `)
+      },
+    },
+    {
+      description: `Should emit @description tag when descriptionTag is true`,
+      filename: 'test.js',
+      name: 'jsdoc descriptionTag true',
+      code: $`
+        /**
+         * test
+         */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            descriptionTag: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"/** @description Test */\nconst a = 1;"`,
+        )
+      },
+    },
+    {
+      description: `Should append trailing dots when descriptionWithDot is true`,
+      filename: 'test.js',
+      name: 'jsdoc descriptionWithDot true',
+      code: $`
+        /**
+         * test
+         * @param {number} a desc
+         */
+        function f(a){return a}
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            descriptionWithDot: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * Test.
+           *
+           * @param {number} a Desc.
+           */
+          function f(a) {
+            return a;
+          }"
+        `)
+      },
+    },
+    {
+      description: `Should preserve line breaks when lineWrappingStyle is balance`,
+      filename: 'test.js',
+      name: 'jsdoc lineWrappingStyle balance',
+      code: $`
+        /**
+         * This is a long description that should wrap differently when formatting is applied.
+         */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          printWidth: 30,
+          useConfig: false,
+          jsdoc: {
+            lineWrappingStyle: 'balance',
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * This is a long description
+           * that should wrap
+           * differently when formatting
+           * is applied.
+           */
+          const a = 1;"
+        `)
+      },
+    },
+    {
+      description: `Should use fenced blocks in comments when preferCodeFences is true`,
+      filename: 'test.js',
+      name: 'jsdoc preferCodeFences true',
+      code: $`
+        /**
+         * Example:
+         *
+         *     const x = 1
+         */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            preferCodeFences: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * Example:
+           *
+           * \`\`\`
+           * const x = 1;
+           * \`\`\`
+           */
+          const a = 1;"
+        `)
+      },
+    },
+    {
+      description: `Should split different tags into separate groups when separateTagGroups is true`,
+      filename: 'test.js',
+      name: 'jsdoc separateTagGroups true',
+      code: $`
+        /**
+         * test
+         * @param {number} a desc
+         * @returns {number} desc
+         */
+        function f(a){return a}
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            separateTagGroups: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * Test
+           *
+           * @param {number} a Desc
+           *
+           * @returns {number} Desc
+           */
+          function f(a) {
+            return a;
+          }"
+        `)
+      },
+    },
+    {
+      description: `Should keep example indentation setting accepted for unparsable examples`,
+      filename: 'test.js',
+      name: 'jsdoc keepUnparsableExampleIndent true',
+      code: $`
+        /**
+         * @example
+         *     <T>broken
+         */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          jsdoc: {
+            keepUnparsableExampleIndent: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "/**
+           * @example
+           *   <T>broken
+           */
+          const a = 1;"
+        `)
+      },
+    },
   ],
   valid: [
     {

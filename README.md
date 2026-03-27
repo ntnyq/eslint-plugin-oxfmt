@@ -104,10 +104,17 @@ export default [
           htmlWhitespaceSensitivity: 'css',
           proseWrap: 'preserve',
 
+          // JSDoc
+          jsdoc: {
+            commentLineStrategy: 'singleLine',
+            lineWrappingStyle: 'greedy',
+            separateTagGroups: false,
+          },
+
           // Vue
           vueIndentScriptAndStyle: false,
 
-          // Experiments
+          // Advanced
           sortImports: {
             order: 'asc',
             newlinesBetween: true,
@@ -198,6 +205,24 @@ All options are optional and default to sensible values.
 | `embeddedLanguageFormatting` | `'auto' \| 'off'`                   | `'auto'`     | Format embedded code blocks (e.g., JS-in-Vue, CSS-in-JS) |
 | `htmlWhitespaceSensitivity`  | `'css' \| 'ignore' \| 'strict'`     | `'css'`      | Global whitespace sensitivity for HTML-like languages    |
 | `proseWrap`                  | `'always' \| 'never' \| 'preserve'` | `'preserve'` | Control prose wrapping in Markdown/MDX                   |
+
+### JSDoc Options
+
+Use `jsdoc` to enable and configure JSDoc comment formatting. Pass an object to enable it (for example `jsdoc: {}`).
+
+| Option                              | Type                                    | Default        | Description                                            |
+| ----------------------------------- | --------------------------------------- | -------------- | ------------------------------------------------------ |
+| `jsdoc.commentLineStrategy`         | `'singleLine' \| 'multiline' \| 'keep'` | `'singleLine'` | Comment block style policy                             |
+| `jsdoc.lineWrappingStyle`           | `'greedy' \| 'balance'`                 | `'greedy'`     | Wrapping strategy for long descriptions                |
+| `jsdoc.addDefaultToDescription`     | `boolean`                               | `true`         | Append default values to `@param` descriptions         |
+| `jsdoc.bracketSpacing`              | `boolean`                               | `false`        | Add spaces inside JSDoc type braces                    |
+| `jsdoc.capitalizeDescriptions`      | `boolean`                               | `true`         | Capitalize the first letter of tag descriptions        |
+| `jsdoc.descriptionTag`              | `boolean`                               | `false`        | Emit `@description` tag instead of inline description  |
+| `jsdoc.descriptionWithDot`          | `boolean`                               | `false`        | Add a trailing dot to the end of descriptions          |
+| `jsdoc.keepUnparsableExampleIndent` | `boolean`                               | `false`        | Preserve indentation in unparsable `@example` code     |
+| `jsdoc.preferCodeFences`            | `boolean`                               | `false`        | Prefer fenced code blocks over 4-space indentation     |
+| `jsdoc.separateReturnsFromParam`    | `boolean`                               | `false`        | Add a blank line between final `@param` and `@returns` |
+| `jsdoc.separateTagGroups`           | `boolean`                               | `false`        | Add blank lines between different tag groups           |
 
 ### Advanced Options
 

@@ -30,6 +30,31 @@ export type OxfmtOxfmt = []|[{
   
   insertFinalNewline?: boolean
   
+  jsdoc?: {
+    
+    addDefaultToDescription?: boolean
+    
+    bracketSpacing?: boolean
+    
+    capitalizeDescriptions?: boolean
+    
+    commentLineStrategy?: ("singleLine" | "multiline" | "keep")
+    
+    descriptionTag?: boolean
+    
+    descriptionWithDot?: boolean
+    
+    keepUnparsableExampleIndent?: boolean
+    
+    lineWrappingStyle?: ("greedy" | "balance")
+    
+    preferCodeFences?: boolean
+    
+    separateReturnsFromParam?: boolean
+    
+    separateTagGroups?: boolean
+  }
+  
   jsxSingleQuote?: boolean
   
   objectWrap?: ("preserve" | "collapse" | "always")
@@ -134,6 +159,31 @@ export type OxfmtOxfmt = []|[{
       ignorePatterns?: string[]
       
       insertFinalNewline?: boolean
+      
+      jsdoc?: {
+        
+        addDefaultToDescription?: boolean
+        
+        bracketSpacing?: boolean
+        
+        capitalizeDescriptions?: boolean
+        
+        commentLineStrategy?: ("singleLine" | "multiline" | "keep")
+        
+        descriptionTag?: boolean
+        
+        descriptionWithDot?: boolean
+        
+        keepUnparsableExampleIndent?: boolean
+        
+        lineWrappingStyle?: ("greedy" | "balance")
+        
+        preferCodeFences?: boolean
+        
+        separateReturnsFromParam?: boolean
+        
+        separateTagGroups?: boolean
+      }
       
       jsxSingleQuote?: boolean
       

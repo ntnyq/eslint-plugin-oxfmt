@@ -32,7 +32,7 @@ function applyOverrides(
   filename,
   /** @type {string} */
   cwd,
-  /** @type {import('oxfmt').FormatOptions} */
+  /** @type {import('oxfmt').FormatConfig} */
   baseOptions,
   /** @type {Override[] | undefined} */
   overrides,
