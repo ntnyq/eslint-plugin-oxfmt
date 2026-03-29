@@ -662,6 +662,111 @@ exports[`should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns > ig
 
 exports[`should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns > src/unformatted.js 1`] = `[]`;
 
+exports[`should resolve nearest .editorconfig per file path 1`] = `
+{
+  "fixture": "nearest-editorconfig",
+  "summary": [
+    {
+      "file": "src/nested/child.js",
+      "messages": [
+        {
+          "column": 33,
+          "endColumn": 37,
+          "endLine": 1,
+          "fix": {
+            "text": "
+      name,
+",
+          },
+          "line": 1,
+          "message": "Replace \`name\` with \`⏎······name,⏎\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 62,
+          "endLine": 2,
+          "fix": {
+            "text": "      return createUserProfile(
+            name,
+            'a very long display name',
+      ",
+          },
+          "line": 2,
+          "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`······return·createUserProfile(⏎············name,⏎············'a·very·long·display·name',⏎······\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 2,
+          "endColumn": 1,
+          "endLine": 4,
+          "fix": {
+            "text": "",
+          },
+          "line": 3,
+          "message": "Delete \`⏎\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function buildNestedUser(
+      name,
+) {
+      return createUserProfile(
+            name,
+            'a very long display name',
+      );
+}",
+    },
+    {
+      "file": "src/root.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 62,
+          "endLine": 2,
+          "fix": {
+            "text": "return createUserProfile(
+    name,
+    'a very long display name',
+  ",
+          },
+          "line": 2,
+          "message": "Replace \`··return·createUserProfile(name,·"a·very·long·display·name"\` with \`return·createUserProfile(⏎····name,⏎····'a·very·long·display·name',⏎··\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 2,
+          "endColumn": 1,
+          "endLine": 4,
+          "fix": {
+            "text": "",
+          },
+          "line": 3,
+          "message": "Delete \`⏎\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function buildRootUser(name) {
+  return createUserProfile(
+    name,
+    'a very long display name',
+  );
+}",
+    },
+  ],
+}
+`;
+
 exports[`should respect ignorePatterns from .oxfmtrc when useConfig is true > ignored/unformatted.js 1`] = `[]`;
 
 exports[`should respect ignorePatterns from .oxfmtrc when useConfig is true > src/unformatted.js 1`] = `

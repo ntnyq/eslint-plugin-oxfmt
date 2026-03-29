@@ -263,6 +263,10 @@ const configLoadingFixtures = [
       'should apply .editorconfig sections and keep oxfmt overrides higher priority',
   },
   {
+    cwd: resolve('tests/fixtures/config-loading/nearest-editorconfig'),
+    title: 'should resolve nearest .editorconfig per file path',
+  },
+  {
     cwd: resolve('tests/fixtures/config-loading/config-priority'),
     title:
       'should prefer .oxfmtrc.json over .oxfmtrc.jsonc and oxfmt.config.ts',
