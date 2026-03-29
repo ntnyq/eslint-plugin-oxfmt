@@ -51,17 +51,27 @@ async function runFixture(cwd: string, ruleOptions?: RuleOxfmtOptions) {
     createEslint(cwd, ruleOptions, true).lintFiles(files),
   ])
 
-  return files.map((file, index) => {
-    const fixedResult = fixedResults[index]
+  const lintResultsByPath = new Map(
+    lintResults.map(result => [result.filePath, result] as const),
+  )
+  const fixedResultsByPath = new Map(
+    fixedResults.map(result => [result.filePath, result] as const),
+  )
+
+  return files.map(file => {
+    const filePath = resolve(cwd, file)
+    const lintResult = lintResultsByPath.get(filePath)
+    const fixedResult = fixedResultsByPath.get(filePath)
+
+    if (!lintResult || !fixedResult) {
+      throw new Error(`Missing lint result for fixture file: ${file}`)
+    }
 
     return {
       file,
-      messages: lintResults[index].messages,
+      messages: lintResult.messages,
       output:
-        fixedResult.output ??
-        fixedResult.source ??
-        lintResults[index].source ??
-        null,
+        fixedResult.output ?? fixedResult.source ?? lintResult.source ?? null,
     }
   })
 }
