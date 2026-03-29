@@ -2,7 +2,7 @@
   "name": "eslint-plugin-oxfmt",
   "type": "module",
   "version": "0.1.2",
-  "packageManager": "pnpm@10.32.1",
+  "packageManager": "pnpm@10.33.0",
   "description": "An ESLint plugin for formatting code with oxfmt.",
   "keywords": [
     "eslint",
@@ -60,21 +60,21 @@
   },
   "peerDependencies": {
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.35.0"
+    "oxfmt": ">=0.42.0"
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
     "load-oxfmt-config": "^0.2.0",
-    "picomatch": "^4.0.3",
+    "picomatch": "^4.0.4",
     "synckit": "^0.11.12"
   },
   "devDependencies": {
-    "@ntnyq/eslint-config": "^6.0.0-beta.13",
+    "@ntnyq/eslint-config": "^6.0.0-beta.14",
     "@types/json-schema": "^7.0.15",
-    "@types/node": "^25.4.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260312.1",
-    "bumpp": "^10.4.1",
-    "eslint": "^10.0.3",
+    "@types/node": "^25.5.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260325.1",
+    "bumpp": "^11.0.1",
+    "eslint": "^10.1.0",
     "eslint-parser-plain": "^0.1.1",
     "eslint-plugin-oxfmt": "workspace:*",
     "eslint-typegen": "^2.3.1",
@@ -82,13 +82,13 @@
     "husky": "^9.1.7",
     "nano-staged": "^0.9.0",
     "npm-run-all2": "^8.0.4",
-    "oxfmt": "^0.39.0",
+    "oxfmt": "^0.42.0",
     "show-invisibles": "^0.0.2",
     "tinyglobby": "^0.2.15",
-    "tsdown": "^0.21.2",
+    "tsdown": "^0.21.4",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.1"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

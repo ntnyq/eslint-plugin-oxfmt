@@ -43,6 +43,59 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       description: `Whether to insert a final newline at the end of the file. (Default: true)`,
       type: 'boolean',
     },
+    jsdoc: {
+      additionalProperties: false,
+      description: `Enable JSDoc comment formatting.\n\nWhen enabled, JSDoc comments are normalized and reformatted:\ntag aliases are canonicalized, descriptions are capitalized,\nlong lines are wrapped, and short comments are collapsed to single-line.\n\nPass an object (\`jsdoc: {}\`) to enable with defaults, or omit to disable.\n\n- (Default: Disabled)`,
+      type: 'object',
+      properties: {
+        addDefaultToDescription: {
+          description: `Append default values to \`@param\` descriptions (e.g. "Default is \`value\`").\n\n- (Default: true)`,
+          type: 'boolean',
+        },
+        bracketSpacing: {
+          description: `Add spaces inside JSDoc type braces: \`{string}\` → \`{ string }\`.\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+        capitalizeDescriptions: {
+          description: `Capitalize the first letter of tag descriptions.\n\n- (Default: true)`,
+          type: 'boolean',
+        },
+        commentLineStrategy: {
+          description: `How to format comment blocks.\n\n- \`"singleLine"\` — Convert to single-line \`/** content */\` when possible.\n- \`"multiline"\` — Always use multi-line format.\n- \`"keep"\` — Preserve original formatting.\n\n- (Default: "singleLine")`,
+          enum: ['singleLine', 'multiline', 'keep'],
+          type: 'string',
+        },
+        descriptionTag: {
+          description: `Emit \`@description\` tag instead of inline description.\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+        descriptionWithDot: {
+          description: `Add a trailing dot to the end of descriptions.\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+        keepUnparsableExampleIndent: {
+          description: `Preserve indentation in unparsable \`@example\` code.\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+        lineWrappingStyle: {
+          description: `Strategy for wrapping description lines at print width.\n\n- \`"greedy"\` — Always re-wrap text to fit within print width.\n- \`"balance"\` — Preserve original line breaks if all lines fit within print width.\n\n- (Default: "greedy")`,
+          enum: ['greedy', 'balance'],
+          type: 'string',
+        },
+        preferCodeFences: {
+          description: `Use fenced code blocks (\`\`\`) instead of 4-space indentation for code without a language tag.\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+        separateReturnsFromParam: {
+          description: `Add a blank line between the last \`@param\` and \`@returns\`.\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+        separateTagGroups: {
+          description: `Add blank lines between different tag groups (e.g. between \`@param\` and \`@returns\`).\n\n- (Default: false)`,
+          type: 'boolean',
+        },
+      },
+    },
     jsxSingleQuote: {
       description: `Use single quotes instead of double quotes in JSX. (Default: false)`,
       type: 'boolean',
