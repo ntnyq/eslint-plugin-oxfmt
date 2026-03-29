@@ -1,0 +1,20 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+insert_final_newline = false
+
+[scripts/*.ts]
+indent_style = tab
+tab_width = 3
+max_line_length = 18
+
+[src/*.ts]
+indent_style = tab
+tab_width = 3
+max_line_length = 18
+
+[src/*.js]
+indent_size = 5
+max_line_length = 20

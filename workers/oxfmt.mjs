@@ -13,7 +13,7 @@ import { runAsWorker } from 'synckit'
  * @property {string} [configPath] - Custom path to oxfmt configuration file
  */
 /**
- * @typedef {import('load-oxfmt-config').FormatOptionOverride} Override
+ * @typedef {import('load-oxfmt-config').OxfmtConfigOverride} Override
  */
 /**
  * @typedef {import('load-oxfmt-config').OxfmtOptions & PluginOptions} Options
