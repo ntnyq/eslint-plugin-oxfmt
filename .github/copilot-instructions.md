@@ -74,7 +74,7 @@ The rule accepts `FormatConfig` (from oxfmt) merged with config-loading options 
 - Worker is separate process—must serialize options properly
 - [workers/oxfmt.mjs](../workers/oxfmt.mjs) is **plain JS with JSDoc types** (no TypeScript)—add `@param`/`@returns` type annotations to all functions
 - Worker receives: `(filename, sourceText, options?) → FormatResult`
-- Module-level caches (`resolvedBaseOptionsCache`, `mergedOptionsCache`, `picomatchCache`) use LRU eviction (`MAX_CACHE_SIZE`). Cache keys are serialized with `stableReplacer` for property-order-independent hashing
+- Module-level caches (`resolvedBaseOptionsCache`, `mergedOptionsCache`, `picomatchCache`) use FIFO/oldest-entry eviction (`MAX_CACHE_SIZE`). Cache keys are serialized with `stableReplacer` for property-order-independent hashing
 - Config-level and rule-level `overrides` are merged (config first, rule-level appended). `ignorePatterns` uses `??` (nullish coalescing) so an explicit empty array from the rule takes precedence over config
 
 ### Parser Configuration
