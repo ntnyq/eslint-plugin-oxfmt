@@ -5,10 +5,10 @@ import { messages, reportDifferences } from '../reporter'
 import { oxfmtRuleSchema } from '../schema'
 import type { Rule } from 'eslint'
 import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
-import type { format, FormatOptions } from 'oxfmt'
+import type { format, FormatConfig } from 'oxfmt'
 
 type FormatResult = Awaited<ReturnType<typeof format>>
-type Options = FormatOptions & LoadOxfmtConfigOptions
+type Options = FormatConfig & LoadOxfmtConfigOptions
 
 let formatViaOxfmt: (
   filename: string,
