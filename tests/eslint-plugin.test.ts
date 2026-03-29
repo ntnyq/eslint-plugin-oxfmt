@@ -1,13 +1,13 @@
-import { platform } from 'node:os'
+import { readFile } from 'node:fs/promises'
 import { relative } from 'node:path'
 import { ESLint } from 'eslint'
 import { glob } from 'tinyglobby'
 import { expect, it } from 'vitest'
 import { resolve } from '../scripts/utils'
 import pluginOxfmt from '../src'
+import type { Linter } from 'eslint'
 import type { OxfmtOxfmt as RuleOxfmtOptions } from '../dts/rule-options'
 
-const IS_SUPPORTED_PLATFORM = platform() === 'darwin' || platform() === 'linux'
 const FIXTURE_BASE_CWD = resolve('tests/fixtures/base')
 const FIXTURE_USE_CONFIG_CWD = resolve('tests/fixtures/use-config')
 const FIXTURE_CONFIG_LOADING_CWD = resolve('tests/fixtures/config-loading')
@@ -38,6 +38,51 @@ function createEslint(
   })
 }
 
+async function lintFixtureFiles(eslint: ESLint, cwd: string, files: string[]) {
+  const results = await Promise.all(
+    files.map(async file => {
+      const filePath = resolve(cwd, file)
+      const sourceText = normalizeLineEndings(await readFile(filePath, 'utf8'))
+      const [result] = await eslint.lintText(sourceText, { filePath })
+      return result
+    }),
+  )
+
+  return results
+}
+
+function mapResultsByFilePath(results: ESLint.LintResult[]) {
+  return new Map(results.map(result => [result.filePath, result] as const))
+}
+
+function normalizeLineEndings(text: string) {
+  return text.replaceAll('\r\n', '\n')
+}
+
+function normalizeLintMessagesForSnapshot(messages: Linter.LintMessage[]) {
+  return messages.map(message => {
+    const { fix, suggestions, ...rest } = message
+
+    return {
+      ...rest,
+      ...(fix ? { fix: { text: normalizeLineEndings(fix.text) } } : {}),
+      ...(suggestions
+        ? {
+            suggestions: suggestions.map(suggestion => {
+              const { fix: suggestionFix, ...suggestionRest } = suggestion
+              return {
+                ...suggestionRest,
+                ...(suggestionFix
+                  ? { fix: { text: normalizeLineEndings(suggestionFix.text) } }
+                  : {}),
+              }
+            }),
+          }
+        : {}),
+    }
+  })
+}
+
 async function runFixture(cwd: string, ruleOptions?: RuleOxfmtOptions) {
   const files = (
     await glob(['src/**/*.{js,ts}', 'scripts/**/*.{js,ts}'], {
@@ -46,17 +91,16 @@ async function runFixture(cwd: string, ruleOptions?: RuleOxfmtOptions) {
     })
   ).sort()
 
+  const lintEslint = createEslint(cwd, ruleOptions)
+  const fixedEslint = createEslint(cwd, ruleOptions, true)
+
   const [lintResults, fixedResults] = await Promise.all([
-    createEslint(cwd, ruleOptions).lintFiles(files),
-    createEslint(cwd, ruleOptions, true).lintFiles(files),
+    lintFixtureFiles(lintEslint, cwd, files),
+    lintFixtureFiles(fixedEslint, cwd, files),
   ])
 
-  const lintResultsByPath = new Map(
-    lintResults.map(result => [result.filePath, result] as const),
-  )
-  const fixedResultsByPath = new Map(
-    fixedResults.map(result => [result.filePath, result] as const),
-  )
+  const lintResultsByPath = mapResultsByFilePath(lintResults)
+  const fixedResultsByPath = mapResultsByFilePath(fixedResults)
 
   return files.map(file => {
     const filePath = resolve(cwd, file)
@@ -69,14 +113,16 @@ async function runFixture(cwd: string, ruleOptions?: RuleOxfmtOptions) {
 
     return {
       file,
-      messages: lintResult.messages,
+      messages: normalizeLintMessagesForSnapshot(lintResult.messages),
       output:
-        fixedResult.output ?? fixedResult.source ?? lintResult.source ?? null,
+        normalizeLineEndings(
+          fixedResult.output ?? fixedResult.source ?? lintResult.source ?? '',
+        ) || null,
     }
   })
 }
 
-it.runIf(IS_SUPPORTED_PLATFORM)('should lint work', async () => {
+it('should lint work', async () => {
   const files = await glob('**/*.{js,ts}', {
     cwd: FIXTURE_BASE_CWD,
     onlyFiles: true,
@@ -94,75 +140,97 @@ it.runIf(IS_SUPPORTED_PLATFORM)('should lint work', async () => {
     ],
   })
 
-  const results = await eslint.lintFiles(files)
+  const results = await lintFixtureFiles(eslint, FIXTURE_BASE_CWD, files)
+  const resultsByPath = mapResultsByFilePath(results)
 
   expect(results.length).toBe(files.length)
-  results.forEach((result, idx) => {
-    expect(result.messages).toMatchSnapshot(files[idx])
+  files.forEach(file => {
+    const result = resultsByPath.get(resolve(FIXTURE_BASE_CWD, file))
+    if (!result) {
+      throw new Error(`Missing lint result for fixture file: ${file}`)
+    }
+
+    expect(normalizeLintMessagesForSnapshot(result.messages)).toMatchSnapshot(
+      file,
+    )
   })
 })
 
-it.runIf(IS_SUPPORTED_PLATFORM)(
-  'should respect ignorePatterns from .oxfmtrc when useConfig is true',
-  async () => {
-    const files = await glob('**/*.js', {
+it('should respect ignorePatterns from .oxfmtrc when useConfig is true', async () => {
+  const files = (
+    await glob('**/*.js', {
       cwd: FIXTURE_USE_CONFIG_CWD,
       onlyFiles: true,
     })
-    const eslint = new ESLint({
-      cwd: FIXTURE_USE_CONFIG_CWD,
-      ignore: false,
-      overrideConfigFile: true,
-      overrideConfig: [
-        {
-          ...pluginOxfmt.configs.recommended,
-          files: ['**/*.js'],
-        },
-      ],
-    })
+  ).sort()
+  const eslint = new ESLint({
+    cwd: FIXTURE_USE_CONFIG_CWD,
+    ignore: false,
+    overrideConfigFile: true,
+    overrideConfig: [
+      {
+        ...pluginOxfmt.configs.recommended,
+        files: ['**/*.js'],
+      },
+    ],
+  })
 
-    const results = await eslint.lintFiles(files)
+  const results = await lintFixtureFiles(eslint, FIXTURE_USE_CONFIG_CWD, files)
+  const resultsByPath = mapResultsByFilePath(results)
 
-    results.forEach((result, idx) => {
-      expect(result.messages).toMatchSnapshot(files[idx])
-    })
-  },
-)
+  files.forEach(file => {
+    const result = resultsByPath.get(resolve(FIXTURE_USE_CONFIG_CWD, file))
+    if (!result) {
+      throw new Error(`Missing lint result for fixture file: ${file}`)
+    }
 
-it.runIf(IS_SUPPORTED_PLATFORM)(
-  'should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns',
-  async () => {
-    const files = await glob('**/*.js', {
+    expect(normalizeLintMessagesForSnapshot(result.messages)).toMatchSnapshot(
+      file,
+    )
+  })
+})
+
+it('should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns', async () => {
+  const files = (
+    await glob('**/*.js', {
       cwd: FIXTURE_USE_CONFIG_CWD,
       onlyFiles: true,
     })
-    const eslint = new ESLint({
-      cwd: FIXTURE_USE_CONFIG_CWD,
-      ignore: false,
-      overrideConfigFile: true,
-      overrideConfig: [
-        {
-          ...pluginOxfmt.configs.recommended,
-          files: ['**/*.js'],
-          rules: {
-            'oxfmt/oxfmt': [
-              'error',
-              {
-                ignorePatterns: ['**/src/**'],
-              },
-            ],
-          },
+  ).sort()
+  const eslint = new ESLint({
+    cwd: FIXTURE_USE_CONFIG_CWD,
+    ignore: false,
+    overrideConfigFile: true,
+    overrideConfig: [
+      {
+        ...pluginOxfmt.configs.recommended,
+        files: ['**/*.js'],
+        rules: {
+          'oxfmt/oxfmt': [
+            'error',
+            {
+              ignorePatterns: ['**/src/**'],
+            },
+          ],
         },
-      ],
-    })
+      },
+    ],
+  })
 
-    const results = await eslint.lintFiles(files)
+  const results = await lintFixtureFiles(eslint, FIXTURE_USE_CONFIG_CWD, files)
+  const resultsByPath = mapResultsByFilePath(results)
 
-    results.forEach((result, idx) => {
-      expect(result.messages).toMatchSnapshot(files[idx])
-    })
-  },
-)
+  files.forEach(file => {
+    const result = resultsByPath.get(resolve(FIXTURE_USE_CONFIG_CWD, file))
+    if (!result) {
+      throw new Error(`Missing lint result for fixture file: ${file}`)
+    }
+
+    expect(normalizeLintMessagesForSnapshot(result.messages)).toMatchSnapshot(
+      file,
+    )
+  })
+})
 
 const configLoadingFixtures = [
   {
@@ -203,7 +271,7 @@ const configLoadingFixtures = [
 
 configLoadingFixtures.forEach(
   ({ cwd, title }: { cwd: string; title: string }) => {
-    it.runIf(IS_SUPPORTED_PLATFORM)(`${title}`, async () => {
+    it(`${title}`, async () => {
       const summary = await runFixture(cwd)
 
       expect({

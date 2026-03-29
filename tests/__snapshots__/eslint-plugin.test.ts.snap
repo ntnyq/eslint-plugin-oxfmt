@@ -12,10 +12,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 39,
           "endLine": 1,
           "fix": {
-            "range": [
-              26,
-              38,
-            ],
             "text": "
 	name: string,
 ",
@@ -31,10 +27,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 62,
           "endLine": 2,
           "fix": {
-            "range": [
-              42,
-              103,
-            ],
             "text": "	return createUserProfile(
 		name,
 		'a very long display name',
@@ -51,10 +43,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 1,
           "endLine": 4,
           "fix": {
-            "range": [
-              107,
-              108,
-            ],
             "text": "",
           },
           "line": 3,
@@ -81,10 +69,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 39,
           "endLine": 1,
           "fix": {
-            "range": [
-              26,
-              38,
-            ],
             "text": "
   name: string,
 ",
@@ -100,10 +84,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 62,
           "endLine": 2,
           "fix": {
-            "range": [
-              42,
-              103,
-            ],
             "text": "  return createUserProfile(
     name,
     'a very long display name',
@@ -120,10 +100,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 1,
           "endLine": 4,
           "fix": {
-            "range": [
-              107,
-              108,
-            ],
             "text": "",
           },
           "line": 3,
@@ -150,10 +126,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 31,
           "endLine": 1,
           "fix": {
-            "range": [
-              26,
-              30,
-            ],
             "text": "
      name,
 ",
@@ -169,10 +141,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 62,
           "endLine": 2,
           "fix": {
-            "range": [
-              34,
-              95,
-            ],
             "text": "     return createUserProfile(
           name,
           'a very long display name',
@@ -189,10 +157,6 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 1,
           "endLine": 4,
           "fix": {
-            "range": [
-              99,
-              100,
-            ],
             "text": "",
           },
           "line": 3,
@@ -222,10 +186,6 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 28,
     "endLine": 4,
     "fix": {
-      "range": [
-        49,
-        64,
-      ],
       "text": "'hello world')",
     },
     "line": 4,
@@ -239,10 +199,6 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 5,
     "endLine": 7,
     "fix": {
-      "range": [
-        81,
-        85,
-      ],
       "text": "",
     },
     "line": 7,
@@ -256,10 +212,6 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 23,
     "endLine": 10,
     "fix": {
-      "range": [
-        149,
-        150,
-      ],
       "text": "",
     },
     "line": 10,
@@ -273,10 +225,6 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 95,
     "endLine": 13,
     "fix": {
-      "range": [
-        174,
-        264,
-      ],
       "text": "
   reallyLongArg(),
   omgSoManyParameters(),
@@ -295,10 +243,6 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 18,
     "endLine": 16,
     "fix": {
-      "range": [
-        304,
-        307,
-      ],
       "text": "n",
     },
     "line": 16,
@@ -312,10 +256,6 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 19,
     "endLine": 26,
     "fix": {
-      "range": [
-        442,
-        458,
-      ],
       "text": "name: 'foobar',",
     },
     "line": 26,
@@ -339,10 +279,6 @@ exports[`should load .oxfmtrc.json 1`] = `
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log(
     'hello world',
   )",
@@ -358,10 +294,6 @@ exports[`should load .oxfmtrc.json 1`] = `
           "endColumn": 43,
           "endLine": 5,
           "fix": {
-            "range": [
-              68,
-              103,
-            ],
             "text": "
   reallyLongArg(),
   anotherLongArg(),",
@@ -377,10 +309,6 @@ exports[`should load .oxfmtrc.json 1`] = `
           "endColumn": 1,
           "endLine": 6,
           "fix": {
-            "range": [
-              104,
-              104,
-            ],
             "text": ")",
           },
           "line": 6,
@@ -417,10 +345,6 @@ exports[`should load .oxfmtrc.jsonc 1`] = `
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log(
     'hello world',
   )",
@@ -436,10 +360,6 @@ exports[`should load .oxfmtrc.jsonc 1`] = `
           "endColumn": 43,
           "endLine": 5,
           "fix": {
-            "range": [
-              68,
-              103,
-            ],
             "text": "
   reallyLongArg(),
   anotherLongArg(),",
@@ -455,10 +375,6 @@ exports[`should load .oxfmtrc.jsonc 1`] = `
           "endColumn": 1,
           "endLine": 6,
           "fix": {
-            "range": [
-              104,
-              104,
-            ],
             "text": ")",
           },
           "line": 6,
@@ -495,10 +411,6 @@ exports[`should load oxfmt.config.ts 1`] = `
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log(
     'hello world',
   )",
@@ -514,10 +426,6 @@ exports[`should load oxfmt.config.ts 1`] = `
           "endColumn": 43,
           "endLine": 5,
           "fix": {
-            "range": [
-              68,
-              103,
-            ],
             "text": "
   reallyLongArg(),
   anotherLongArg(),",
@@ -533,10 +441,6 @@ exports[`should load oxfmt.config.ts 1`] = `
           "endColumn": 1,
           "endLine": 6,
           "fix": {
-            "range": [
-              104,
-              104,
-            ],
             "text": ")",
           },
           "line": 6,
@@ -573,10 +477,6 @@ exports[`should merge .editorconfig with .oxfmtrc.json 1`] = `
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log('hello world')",
           },
           "line": 2,
@@ -590,10 +490,6 @@ exports[`should merge .editorconfig with .oxfmtrc.json 1`] = `
           "endColumn": 43,
           "endLine": 5,
           "fix": {
-            "range": [
-              102,
-              103,
-            ],
             "text": "",
           },
           "line": 5,
@@ -626,10 +522,6 @@ exports[`should merge .editorconfig with .oxfmtrc.jsonc 1`] = `
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log('hello world')",
           },
           "line": 2,
@@ -643,10 +535,6 @@ exports[`should merge .editorconfig with .oxfmtrc.jsonc 1`] = `
           "endColumn": 43,
           "endLine": 5,
           "fix": {
-            "range": [
-              102,
-              103,
-            ],
             "text": "",
           },
           "line": 5,
@@ -679,10 +567,6 @@ exports[`should merge .editorconfig with oxfmt.config.ts 1`] = `
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log('hello world')",
           },
           "line": 2,
@@ -696,10 +580,6 @@ exports[`should merge .editorconfig with oxfmt.config.ts 1`] = `
           "endColumn": 43,
           "endLine": 5,
           "fix": {
-            "range": [
-              102,
-              103,
-            ],
             "text": "",
           },
           "line": 5,
@@ -732,10 +612,6 @@ exports[`should prefer .oxfmtrc.json over .oxfmtrc.jsonc and oxfmt.config.ts 1`]
           "endColumn": 32,
           "endLine": 2,
           "fix": {
-            "range": [
-              28,
-              57,
-            ],
             "text": "console.log('hello world')",
           },
           "line": 2,
@@ -749,10 +625,6 @@ exports[`should prefer .oxfmtrc.json over .oxfmtrc.jsonc and oxfmt.config.ts 1`]
           "endColumn": 1,
           "endLine": 4,
           "fix": {
-            "range": [
-              59,
-              60,
-            ],
             "text": "",
           },
           "line": 3,
@@ -777,10 +649,6 @@ exports[`should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns > ig
     "endColumn": 22,
     "endLine": 1,
     "fix": {
-      "range": [
-        21,
-        21,
-      ],
       "text": ";",
     },
     "line": 1,
@@ -803,10 +671,6 @@ exports[`should respect ignorePatterns from .oxfmtrc when useConfig is true > sr
     "endColumn": 27,
     "endLine": 1,
     "fix": {
-      "range": [
-        26,
-        26,
-      ],
       "text": ";",
     },
     "line": 1,
