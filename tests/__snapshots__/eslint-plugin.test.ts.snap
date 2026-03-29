@@ -182,72 +182,80 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
 exports[`should lint work > ts.ts 1`] = `
 [
   {
-    "column": 13,
-    "endColumn": 28,
-    "endLine": 4,
-    "fix": {
-      "text": "'hello world')",
-    },
-    "line": 4,
-    "message": "Replace \`"hello·world");\` with \`'hello·world')\`",
-    "messageId": "replace",
-    "ruleId": "oxfmt/oxfmt",
-    "severity": 2,
-  },
-  {
     "column": 1,
-    "endColumn": 5,
+    "endColumn": 31,
     "endLine": 7,
     "fix": {
-      "text": "",
+      "text": "console.log("hello world");",
     },
     "line": 7,
-    "message": "Delete \`····\`",
-    "messageId": "delete",
+    "message": "Replace \`····console.log('hello·world')\` with \`console.log("hello·world");\`",
+    "messageId": "replace",
     "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
   {
-    "column": 22,
-    "endColumn": 23,
+    "column": 14,
+    "endColumn": 22,
     "endLine": 10,
     "fix": {
-      "text": "",
+      "text": ""foobar"",
     },
     "line": 10,
-    "message": "Delete \`;\`",
-    "messageId": "delete",
+    "message": "Replace \`'foobar'\` with \`"foobar"\`",
+    "messageId": "replace",
     "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
   {
-    "column": 5,
-    "endColumn": 95,
+    "column": 21,
+    "endColumn": 65,
     "endLine": 13,
     "fix": {
-      "text": "
-  reallyLongArg(),
-  omgSoManyParameters(),
-  IShouldRefactorThis(),
-  isThereSeriouslyAnotherOne(),
-)",
+      "text": " omgSoManyParameters(), IShouldRefactorThis(), ",
     },
     "line": 13,
-    "message": "Replace \`reallyLongArg(),omgSoManyParameters(),IShouldRefactorThis(),isThereSeriouslyAnotherOne());\` with \`⏎··reallyLongArg(),⏎··omgSoManyParameters(),⏎··IShouldRefactorThis(),⏎··isThereSeriouslyAnotherOne(),⏎)\`",
+    "message": "Replace \`omgSoManyParameters(),IShouldRefactorThis(),\` with \`·omgSoManyParameters(),·IShouldRefactorThis(),·\`",
     "messageId": "replace",
     "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
   {
-    "column": 15,
-    "endColumn": 18,
+    "column": 33,
+    "endColumn": 33,
     "endLine": 16,
     "fix": {
-      "text": "n",
+      "text": ";",
     },
     "line": 16,
-    "message": "Replace \`(n)\` with \`n\`",
+    "message": "Insert \`;\`",
+    "messageId": "insert",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 9,
+    "endColumn": 17,
+    "endLine": 20,
+    "fix": {
+      "text": ""foobar"",
+    },
+    "line": 20,
+    "message": "Replace \`'foobar'\` with \`"foobar"\`",
     "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 2,
+    "endColumn": 2,
+    "endLine": 22,
+    "fix": {
+      "text": ";",
+    },
+    "line": 22,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
     "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
@@ -256,11 +264,24 @@ exports[`should lint work > ts.ts 1`] = `
     "endColumn": 19,
     "endLine": 26,
     "fix": {
-      "text": "name: 'foobar',",
+      "text": "name: "foobar",",
     },
     "line": 26,
-    "message": "Replace \`'name':·'foobar'\` with \`name:·'foobar',\`",
+    "message": "Replace \`'name':·'foobar'\` with \`name:·"foobar",\`",
     "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 2,
+    "endColumn": 2,
+    "endLine": 27,
+    "fix": {
+      "text": ";",
+    },
+    "line": 27,
+    "message": "Insert \`;\`",
+    "messageId": "insert",
     "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },
@@ -463,6 +484,60 @@ format(
     },
   ],
 }
+`;
+
+exports[`should match config-derived overrides relative to config directory, not ESLint cwd > packages/a/src/example.ts 1`] = `
+[
+  {
+    "column": 27,
+    "endColumn": 39,
+    "endLine": 1,
+    "fix": {
+      "text": "
+  name: string,
+",
+    },
+    "line": 1,
+    "message": "Replace \`name:·string\` with \`⏎··name:·string,⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 1,
+    "endColumn": 62,
+    "endLine": 2,
+    "fix": {
+      "text": "  return createUserProfile(
+    name,
+    'a very long display name',
+  ",
+    },
+    "line": 2,
+    "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`··return·createUserProfile(⏎····name,⏎····'a·very·long·display·name',⏎··\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`should match config-derived overrides relative to config directory, not ESLint cwd > packages/a/src/normal.js 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 30,
+    "endLine": 2,
+    "fix": {
+      "text": "console.log('hello world'",
+    },
+    "line": 2,
+    "message": "Replace \`··console.log("hello·world"\` with \`console.log('hello·world'\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
 `;
 
 exports[`should merge .editorconfig with .oxfmtrc.json 1`] = `

@@ -1,7 +1,7 @@
 // @ts-check
 
 import { dirname, isAbsolute, join, relative } from 'node:path'
-import { loadOxfmtConfig } from 'load-oxfmt-config'
+import { loadOxfmtConfig, resolveOxfmtrcPath } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
 import picomatch from 'picomatch'
 import { runAsWorker } from 'synckit'
@@ -23,6 +23,7 @@ import { runAsWorker } from 'synckit'
 /**
  * @typedef {object} ResolvedBaseOptions
  * @property {import('oxfmt').FormatConfig} baseOptions Resolved base formatter options.
+ * @property {string} configDir Directory of the resolved config file, used as base for config-derived glob patterns.
  */
 
 const MAX_CACHE_SIZE = 1000
@@ -170,11 +171,12 @@ function getConfigPathForFile(
 
 /**
  * Build cache key for merged options per file invocation.
- * The key includes filename, cwd, resolved base options, and rule-level
+ * The key includes filename, cwd, configDir, resolved base options, and rule-level
  * override inputs to avoid stale cache hits.
  *
  * @param filename - Current file path.
- * @param cwd - Base directory used for glob matching.
+ * @param cwd - Base directory used for rule-level glob matching.
+ * @param configDir - Directory of the resolved config file, used for config-derived glob matching.
  * @param baseOptions - Resolved base options used for formatting.
  * @param ignorePatterns - Rule-level ignore patterns.
  * @param overrides - Rule-level override entries.
@@ -186,6 +188,8 @@ function getMergedOptionsCacheKey(
   filename,
   /** @type {string} */
   cwd,
+  /** @type {string} */
+  configDir,
   /** @type {import('oxfmt').FormatConfig} */
   baseOptions,
   /** @type {string[] | undefined} */
@@ -198,6 +202,7 @@ function getMergedOptionsCacheKey(
   return JSON.stringify(
     {
       baseOptions,
+      configDir,
       cwd,
       filename,
       ignorePatterns,
@@ -283,6 +288,7 @@ async function resolveBaseOptions(
 
     if (!useConfig) {
       return {
+        configDir: cwd,
         baseOptions: {
           ...formatOptions,
         },
@@ -290,12 +296,18 @@ async function resolveBaseOptions(
     }
 
     const resolvedConfigPath = getConfigPathForFile(cwd, configPath)
+    const resolvedPath = await resolveOxfmtrcPath(
+      resolveFromDir,
+      resolvedConfigPath,
+    )
+    const configDir = resolvedPath ? dirname(resolvedPath) : cwd
     const configOptions = await loadOxfmtConfig({
       configPath: resolvedConfigPath,
       cwd: resolveFromDir,
     })
 
     return {
+      configDir,
       baseOptions: {
         ...configOptions,
         ...formatOptions,
@@ -364,7 +376,7 @@ runAsWorker(
       ...formatOptions
     } = options
 
-    const { baseOptions } = await resolveBaseOptions(
+    const { baseOptions, configDir } = await resolveBaseOptions(
       filename,
       cwd,
       configPath,
@@ -375,6 +387,7 @@ runAsWorker(
     const mergedOptionsCacheKey = getMergedOptionsCacheKey(
       filename,
       cwd,
+      configDir,
       baseOptions,
       ignorePatterns,
       overrides,
@@ -385,8 +398,9 @@ runAsWorker(
       baseOptions.ignorePatterns
     )
     const effectiveIgnorePatterns = ignorePatterns ?? baseIgnorePatterns
+    const ignoreBase = ignorePatterns == null ? configDir : cwd
 
-    if (shouldIgnoreFile(filename, cwd, effectiveIgnorePatterns)) {
+    if (shouldIgnoreFile(filename, ignoreBase, effectiveIgnorePatterns)) {
       return { code: sourceText }
     }
 
@@ -399,18 +413,21 @@ runAsWorker(
       baseOptions.overrides
     )
 
-    // Merge config-level and rule-level overrides (rule-level takes precedence)
-    const effectiveOverrides = useConfig
-      ? [...(baseOverrides ?? []), ...(overrides ?? [])]
-      : overrides
+    // Apply config-level overrides (relative to config directory)
+    let mergedOptions = baseOptions
+    if (useConfig && baseOverrides && baseOverrides.length > 0) {
+      mergedOptions = applyOverrides(
+        filename,
+        configDir,
+        mergedOptions,
+        baseOverrides,
+      )
+    }
 
-    // Apply overrides based on filename
-    const mergedOptions = applyOverrides(
-      filename,
-      cwd,
-      baseOptions,
-      effectiveOverrides,
-    )
+    // Apply rule-level overrides (relative to ESLint cwd)
+    if (overrides && overrides.length > 0) {
+      mergedOptions = applyOverrides(filename, cwd, mergedOptions, overrides)
+    }
 
     mergedOptionsCache.set(mergedOptionsCacheKey, mergedOptions)
     evictCache(mergedOptionsCache)

@@ -132,10 +132,14 @@ it('should lint work', async () => {
     ignore: false,
     overrideConfigFile: true,
     overrideConfig: [
-      // recommended config
+      // recommended config with useConfig disabled to avoid
+      // inheriting root .oxfmtrc.jsonc ignorePatterns
       {
         ...pluginOxfmt.configs.recommended,
         files: ['**/*.{js,ts}'],
+        rules: {
+          'oxfmt/oxfmt': ['error', { useConfig: false }],
+        },
       },
     ],
   })
@@ -285,3 +289,70 @@ configLoadingFixtures.forEach(
     })
   },
 )
+
+it('should match config-derived overrides relative to config directory, not ESLint cwd', async () => {
+  // ESLint cwd is the parent "nested-config/" directory, but the
+  // .oxfmtrc.json lives in "packages/a/". The config's overrides use
+  // files: ["src/**/*.ts"] which must be resolved relative to the config
+  // directory (packages/a/), not ESLint cwd (nested-config/).
+  const parentCwd = resolve('tests/fixtures/config-loading/nested-config')
+  const files = (
+    await glob('packages/a/src/**/*.{js,ts}', {
+      cwd: parentCwd,
+      onlyFiles: true,
+    })
+  ).sort()
+
+  const eslint = createEslint(parentCwd)
+  const results = await lintFixtureFiles(eslint, parentCwd, files)
+  const resultsByPath = mapResultsByFilePath(results)
+
+  // example.ts should be affected by the override (printWidth: 40)
+  const tsResult = resultsByPath.get(
+    resolve(parentCwd, 'packages/a/src/example.ts'),
+  )
+  expect(tsResult).toBeDefined()
+  expect(normalizeLintMessagesForSnapshot(tsResult!.messages)).toMatchSnapshot(
+    'packages/a/src/example.ts',
+  )
+
+  // normal.js should NOT be affected by the override (*.ts only)
+  const jsResult = resultsByPath.get(
+    resolve(parentCwd, 'packages/a/src/normal.js'),
+  )
+  expect(jsResult).toBeDefined()
+  expect(normalizeLintMessagesForSnapshot(jsResult!.messages)).toMatchSnapshot(
+    'packages/a/src/normal.js',
+  )
+})
+
+it('should match config-derived ignorePatterns relative to config directory, not ESLint cwd', async () => {
+  // Same nested-config fixture: .oxfmtrc.json in packages/a/ has
+  // ignorePatterns: ["**/ignored/**"]. Files under packages/a/ignored/
+  // should be ignored even when ESLint cwd is the parent directory.
+  const parentCwd = resolve('tests/fixtures/config-loading/nested-config')
+  const files = (
+    await glob('packages/a/**/*.{js,ts}', {
+      cwd: parentCwd,
+      onlyFiles: true,
+    })
+  ).sort()
+
+  const eslint = createEslint(parentCwd)
+  const results = await lintFixtureFiles(eslint, parentCwd, files)
+  const resultsByPath = mapResultsByFilePath(results)
+
+  // ignored/skipped.ts should produce no lint messages (ignored by config)
+  const ignoredResult = resultsByPath.get(
+    resolve(parentCwd, 'packages/a/ignored/skipped.ts'),
+  )
+  expect(ignoredResult).toBeDefined()
+  expect(ignoredResult!.messages).toHaveLength(0)
+
+  // src/example.ts should still produce lint messages (not ignored)
+  const srcResult = resultsByPath.get(
+    resolve(parentCwd, 'packages/a/src/example.ts'),
+  )
+  expect(srcResult).toBeDefined()
+  expect(srcResult!.messages.length).toBeGreaterThan(0)
+})

@@ -1,0 +1,12 @@
+{
+  "singleQuote": true,
+  "ignorePatterns": ["**/ignored/**"],
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "options": {
+        "printWidth": 40
+      }
+    }
+  ]
+}
