@@ -38,21 +38,22 @@ pnpm run dev           # Watch mode
 ### Testing
 
 - Run: `pnpm test` (vitest)
-- **Platform-gated tests**: Tests only run on macOS/Linux (see `platform() === 'darwin'` in tests)
 - **Test structure**: [tests/eslint-plugin.test.ts](../tests/eslint-plugin.test.ts) lints fixture files and verifies results
 - **Fixtures**: [tests/fixtures/eslint-plugin/](../tests/fixtures/eslint-plugin/) contains sample code to lint
 
 ### Code Quality
 
 ```bash
+pnpm run format        # Format code via oxfmt
+pnpm run format:check  # Check formatting without writing
 pnpm run lint          # ESLint with recommended config
 pnpm run typecheck     # TypeScript validation (tsgo --noEmit)
-pnpm run release:check # Full QA before release: lint + typecheck + test + build
+pnpm run release:check # Full QA: format:check → lint → typecheck → test → build
 ```
 
 ### Pre-commit & Release
 
-- Husky is configured for `prepare` hook
+- **Husky** + **nano-staged** for pre-commit: runs `eslint --fix` on supported files and `oxfmt` on all files
 - Release uses `bumpp` for version bumping
 - Must pass `release:check` before publishing
 
@@ -66,18 +67,15 @@ pnpm run release:check # Full QA before release: lint + typecheck + test + build
 
 ### Rule Options Format
 
-The rule accepts `FormatOptions` (from oxfmt) + `LoadOxfmtConfigOptions`:
-
-- `semi`, `singleQuote`, `tabWidth`, `useTabs`, `trailingComma`, `printWidth`, `arrowParens` (Prettier-like)
-- `jsxSingleQuote`, `bracketSameLine`, `singleAttributePerLine` (JSX-specific)
-- `bracketSpacing`, `quoteProps`, `endOfLine`, `insertFinalNewline` (object/line-ending)
-- `useConfig`, `cwd`, `configPath` (config loading behavior)
+The rule accepts `FormatConfig` (from oxfmt) merged with config-loading options (`useConfig`, `cwd`, `configPath`, `ignorePatterns`, `overrides`). See [README.md](../README.md#configuration-options) for the full options reference.
 
 ### Worker Thread Boundary
 
 - Worker is separate process—must serialize options properly
-- Import statements in [workers/oxfmt.mjs](../workers/oxfmt.mjs) are **CommonJS-compatible JSDoc-typed** (no TypeScript in worker)
+- [workers/oxfmt.mjs](../workers/oxfmt.mjs) is **plain JS with JSDoc types** (no TypeScript)—add `@param`/`@returns` type annotations to all functions
 - Worker receives: `(filename, sourceText, options?) → FormatResult`
+- Module-level caches (`resolvedBaseOptionsCache`, `mergedOptionsCache`, `picomatchCache`) use FIFO/oldest-entry eviction (`MAX_CACHE_SIZE`). Cache keys are serialized with `stableReplacer` for property-order-independent hashing
+- Config-level and rule-level `overrides` are merged (config first, rule-level appended). `ignorePatterns` uses `??` (nullish coalescing) so an explicit empty array from the rule takes precedence over config
 
 ### Parser Configuration
 
@@ -101,23 +99,23 @@ Uses `eslint-parser-plain` (re-exported in [src/parser.ts](../src/parser.ts)) to
 - **synckit** - Wraps worker calls in sync API for ESLint compatibility
 - **eslint-parser-plain** - Plain-text parser (no AST parsing)
 
-### Peer Dependency
+### Peer Dependencies
 
-- ESLint `^9.5.0` (flat config only—no legacy `eslintrc` support)
+- ESLint `^9.5.0 || ^10.0.0` (flat config only—no legacy `eslintrc` support)
+- oxfmt `>=0.42.0`
 
-### Monorepo Setup
+### Engine Requirements
 
-- Uses pnpm workspaces (see `pnpm-workspace.yaml`)
-- Root packages: Node.js 18+, pnpm 10.26.2+
+- Node.js `^20.19.0 || >=22.12.0`
+- pnpm `>=10.33.0`
 
 ## Debugging Tips
 
 ### Common Issues
 
-1. **Snapshot mismatches in tests** - Likely due to oxfmt version differences or platform variance. Update snapshots with `vitest -u`.
+1. **Snapshot mismatches in tests** - Update snapshots with `vitest -u`.
 2. **Worker thread errors** - Check [workers/oxfmt.mjs](../workers/oxfmt.mjs) JSDoc types match actual options passed from rule
 3. **Config not loading** - Verify `useConfig`, `cwd`, `configPath` options and that `.oxfmtrc` exists at correct path
-4. **Platform-specific test failures** - Tests skip on Windows; check test conditions in [tests/eslint-plugin.test.ts](../tests/eslint-plugin.test.ts)
 
 ### Local Testing
 
