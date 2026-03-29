@@ -14,7 +14,7 @@
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
 - 🧩 **Config File Discovery** - Supports `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.ts`
-- 📝 **EditorConfig Support** - Supports `.editorconfig` (root + section overrides) via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
+- 📝 **EditorConfig Integration** - Respects a subset of `.editorconfig` options via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
 - 🎨 **Highly Configurable** - Supports all oxfmt formatting options
 - 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
 
@@ -147,7 +147,6 @@ All options are optional and default to sensible values.
 | `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                                                                                                 |
 
 > Note: `cwd` is taken from ESLint automatically; you usually do not need to set it manually.
-
 > `.editorconfig` merge behavior follows oxfmt's documented strategy: https://oxc.rs/docs/guide/usage/formatter/config#editorconfig
 
 ### Config Discovery & Precedence
@@ -157,7 +156,7 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - Config discovery order (from `cwd`, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts`
 - `.editorconfig` support: nearest `.editorconfig` (including section overrides) is merged into the final options
 - `configPath` overrides discovery and directly targets the specified config file
-- ESLint rule options still take highest priority because inline rule options are merged after loaded config
+- ESLint rule options generally take highest priority because inline rule options are merged after loaded config. However, when `useConfig` is `true`, `overrides` are taken from the loaded config (not from rule options).
 
 For detailed behavior, see:
 

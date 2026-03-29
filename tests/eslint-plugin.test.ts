@@ -12,7 +12,7 @@ const FIXTURE_BASE_CWD = resolve('tests/fixtures/base')
 const FIXTURE_USE_CONFIG_CWD = resolve('tests/fixtures/use-config')
 const FIXTURE_CONFIG_LOADING_CWD = resolve('tests/fixtures/config-loading')
 
-async function createEslint(
+function createEslint(
   cwd: string,
   ruleOptions?: RuleOxfmtOptions,
   fix = false,
@@ -47,8 +47,8 @@ async function runFixture(cwd: string, ruleOptions?: RuleOxfmtOptions) {
   ).sort()
 
   const [lintResults, fixedResults] = await Promise.all([
-    (await createEslint(cwd, ruleOptions)).lintFiles(files),
-    (await createEslint(cwd, ruleOptions, true)).lintFiles(files),
+    createEslint(cwd, ruleOptions).lintFiles(files),
+    createEslint(cwd, ruleOptions, true).lintFiles(files),
   ])
 
   return files.map((file, index) => {
