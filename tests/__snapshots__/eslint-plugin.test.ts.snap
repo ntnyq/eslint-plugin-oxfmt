@@ -179,6 +179,19 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
 }
 `;
 
+exports[`should apply .editorconfig settings when no oxfmt config exists 1`] = `
+{
+  "fixture": "editorconfig-only",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [],
+      "output": null,
+    },
+  ],
+}
+`;
+
 exports[`should lint work > ts.ts 1`] = `
 [
   {

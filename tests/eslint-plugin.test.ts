@@ -281,6 +281,10 @@ const CONFIG_LOADER_FIXTURES = [
     title:
       'should prefer .oxfmtrc.json over .oxfmtrc.jsonc and oxfmt.config.ts',
   },
+  {
+    cwd: resolve('tests/fixtures/config-loading/editorconfig-only'),
+    title: 'should apply .editorconfig settings when no oxfmt config exists',
+  },
 ] as const
 
 CONFIG_LOADER_FIXTURES.forEach(

@@ -7,13 +7,6 @@ import picomatch from 'picomatch'
 import { runAsWorker } from 'synckit'
 
 /**
- * @typedef {object} PluginOptions
- * @property {boolean} [useConfig] - Whether to use oxfmt configuration file
- * @property {string} cwd - Current working directory for resolving configuration
- * @property {string} [configPath] - Custom path to oxfmt configuration file
- */
-
-/**
  * @typedef {import('load-oxfmt-config').OxfmtConfigOverride} Override
  */
 /**
@@ -21,9 +14,22 @@ import { runAsWorker } from 'synckit'
  */
 
 /**
+ * @typedef {object} PluginOptions
+ * @property {boolean} [useConfig] - Whether to use oxfmt configuration file
+ * @property {string} cwd - Current working directory for resolving configuration
+ * @property {string} [configPath] - Custom path to oxfmt configuration file
+ */
+
+/**
  * @typedef {object} ResolvedBaseOptions
  * @property {import('oxfmt').FormatConfig} baseOptions Resolved base formatter options.
  * @property {string} configDir Directory of the resolved config file, used as base for config-derived glob patterns.
+ */
+
+/**
+ * @typedef {object} ResolvedOxfmtConfig
+ * @property {string} configDir Directory of the resolved config file.
+ * @property {string | undefined} resolvedConfigPath Absolute path to the config file, or undefined.
  */
 
 const MAX_CACHE_SIZE = 1000
@@ -76,6 +82,9 @@ const mergedOptionsCache = new Map()
 
 /** @type {Map<string, ReturnType<typeof picomatch>>} */
 const picomatchCache = new Map()
+
+/** @type {Map<string, Promise<ResolvedOxfmtConfig>>} */
+const oxfmtConfigResolutionCache = new Map()
 
 /**
  * Apply overrides to the base options based on the filename
@@ -251,6 +260,10 @@ function getResolvedBaseOptionsCacheKey(
 /**
  * Resolve base formatter options for a file and cache the async result.
  *
+ * The oxfmt configuration file is resolved once per `cwd + configPath` pair
+ * (via `resolveOxfmtConfigOnce`), while `.editorconfig` is still resolved
+ * per file directory to support nearest-editorconfig scenarios.
+ *
  * @param filename - Current file path.
  * @param cwd - Current working directory from ESLint context.
  * @param configPath - Optional user-provided config path.
@@ -285,8 +298,6 @@ async function resolveBaseOptions(
 
   /** @type {Promise<ResolvedBaseOptions>} */
   const task = (async () => {
-    const resolveFromDir = dirname(filename)
-
     if (!useConfig) {
       return {
         configDir: cwd,
@@ -296,15 +307,21 @@ async function resolveBaseOptions(
       }
     }
 
-    const resolvedConfigPath = getConfigPathForFile(cwd, configPath)
-    const resolvedPath = await resolveOxfmtrcPath(
-      resolveFromDir,
-      resolvedConfigPath,
+    // Resolve oxfmt config path once per file directory + configPath pair.
+    // Walks upward from the file's directory, but caches the result so files
+    // in the same (or child) directories reuse the resolved path.
+    const { configDir, resolvedConfigPath } = await resolveOxfmtConfigOnce(
+      dirname(filename),
+      configPath,
     )
-    const configDir = resolvedPath ? dirname(resolvedPath) : cwd
+
+    // Load config: use pre-resolved config path to skip the redundant oxfmt
+    // config walk inside loadOxfmtConfig, but still resolve .editorconfig
+    // per file directory via editorconfig.cwd
     const configOptions = await loadOxfmtConfig({
       configPath: resolvedConfigPath,
-      cwd: resolveFromDir,
+      cwd,
+      editorconfig: { cwd: dirname(filename) },
     })
 
     return {
@@ -323,6 +340,47 @@ async function resolveBaseOptions(
     return await task
   } catch (err) {
     resolvedBaseOptionsCache.delete(cacheKey)
+    throw err
+  }
+}
+
+/**
+ * Resolve the oxfmt config file path once per `cwd + configPath` pair and cache
+ * the result. When no explicit configPath is given, discovers the config by
+ * walking upward from `cwd`.
+ *
+ * @param cwd - Directory to start searching from.
+ * @param [configPath] - Optional user-provided config path.
+ * @returns Resolved config directory and absolute config path.
+ */
+async function resolveOxfmtConfigOnce(
+  /** @type {string} */
+  cwd,
+  /** @type {string | undefined} */
+  configPath,
+) {
+  const key = `${cwd}::${configPath || ''}`
+  const cached = oxfmtConfigResolutionCache.get(key)
+  if (cached) {
+    return cached
+  }
+
+  const task = (async () => {
+    const resolvedConfigPath = getConfigPathForFile(cwd, configPath)
+    const resolvedPath = await resolveOxfmtrcPath(cwd, resolvedConfigPath)
+    return {
+      configDir: resolvedPath ? dirname(resolvedPath) : cwd,
+      resolvedConfigPath: resolvedPath,
+    }
+  })()
+
+  oxfmtConfigResolutionCache.set(key, task)
+  evictCache(oxfmtConfigResolutionCache)
+
+  try {
+    return await task
+  } catch (err) {
+    oxfmtConfigResolutionCache.delete(key)
     throw err
   }
 }
