@@ -25,11 +25,56 @@ import { runAsWorker } from 'synckit'
  * @property {import('oxfmt').FormatConfig} baseOptions Resolved base formatter options.
  */
 
+const MAX_CACHE_SIZE = 1000
+
+/**
+ * Evict oldest entries when the cache exceeds MAX_CACHE_SIZE.
+ * @param cache - The cache map to evict entries from
+ */
+function evictCache(
+  /** @type {Map<string, unknown>} */
+  cache,
+) {
+  if (cache.size <= MAX_CACHE_SIZE) {
+    return
+  }
+  const keysToDelete = [...cache.keys()].slice(0, cache.size - MAX_CACHE_SIZE)
+  for (const key of keysToDelete) {
+    cache.delete(key)
+  }
+}
+
+/**
+ * JSON.stringify replacer that sorts object keys for stable serialization.
+ * @param key - The key of the property being processed
+ * @param value - The value of the property being processed
+ * @returns - The value to be serialized, with object keys sorted if it's an object
+ */
+function stableReplacer(
+  /** @type {string} */
+  key,
+  /** @type {unknown} */
+  value,
+) {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return Object.keys(value)
+      .sort()
+      .reduce((sorted, k) => {
+        sorted[k] = /** @type {Record<string, unknown>} */ (value)[k]
+        return sorted
+      }, /** @type {Record<string, unknown>} */ ({}))
+  }
+  return value
+}
+
 /** @type {Map<string, Promise<ResolvedBaseOptions>>} */
 const resolvedBaseOptionsCache = new Map()
 
 /** @type {Map<string, import('oxfmt').FormatConfig>} */
 const mergedOptionsCache = new Map()
+
+/** @type {Map<string, ReturnType<typeof picomatch>>} */
+const picomatchCache = new Map()
 
 /**
  * Apply overrides to the base options based on the filename
@@ -64,12 +109,12 @@ function applyOverrides(
     const { excludeFiles, files, options: overrideOptions } = override
 
     // Check if file matches the files patterns
-    const matches = picomatch.isMatch(relativePath, files)
+    const matches = getCachedMatcher(files)(relativePath)
 
     // Check if file is excluded
     const excluded =
       excludeFiles && excludeFiles.length > 0
-        ? picomatch.isMatch(relativePath, excludeFiles)
+        ? getCachedMatcher(excludeFiles)(relativePath)
         : false
 
     if (matches && !excluded && overrideOptions) {
@@ -79,6 +124,26 @@ function applyOverrides(
   }
 
   return hasOverrides ? mergedOptions : baseOptions
+}
+
+/**
+ * Get or create a cached picomatch matcher for the given patterns.
+ * @param patterns - Glob patterns to match against file paths
+ * @returns - Picomatch matcher function
+ */
+function getCachedMatcher(
+  /** @type {string | string[]} */
+  patterns,
+) {
+  const key = Array.isArray(patterns) ? patterns.join('\0') : patterns
+  const cached = picomatchCache.get(key)
+  if (cached) {
+    return cached
+  }
+  const matcher = picomatch(patterns)
+  picomatchCache.set(key, matcher)
+  evictCache(picomatchCache)
+  return matcher
 }
 
 /**
@@ -110,7 +175,7 @@ function getConfigPathForFile(
  *
  * @param filename - Current file path.
  * @param cwd - Base directory used for glob matching.
- * @param formatOptions - Base options used for formatting.
+ * @param baseOptions - Resolved base options used for formatting.
  * @param ignorePatterns - Rule-level ignore patterns.
  * @param overrides - Rule-level override entries.
  * @param useConfig - Whether config file loading is enabled.
@@ -122,7 +187,7 @@ function getMergedOptionsCacheKey(
   /** @type {string} */
   cwd,
   /** @type {import('oxfmt').FormatConfig} */
-  formatOptions,
+  baseOptions,
   /** @type {string[] | undefined} */
   ignorePatterns,
   /** @type {Override[] | undefined} */
@@ -130,14 +195,17 @@ function getMergedOptionsCacheKey(
   /** @type {boolean} */
   useConfig,
 ) {
-  return JSON.stringify({
-    cwd,
-    filename,
-    formatOptions,
-    ignorePatterns,
-    overrides,
-    useConfig,
-  })
+  return JSON.stringify(
+    {
+      baseOptions,
+      cwd,
+      filename,
+      ignorePatterns,
+      overrides,
+      useConfig,
+    },
+    stableReplacer,
+  )
 }
 
 /**
@@ -163,13 +231,16 @@ function getResolvedBaseOptionsCacheKey(
   /** @type {import('oxfmt').FormatConfig} */
   formatOptions,
 ) {
-  return JSON.stringify({
-    configPath: configPath || '',
-    cwd,
-    fileDir: dirname(filename),
-    formatOptions,
-    useConfig,
-  })
+  return JSON.stringify(
+    {
+      configPath: configPath || '',
+      cwd,
+      fileDir: dirname(filename),
+      formatOptions,
+      useConfig,
+    },
+    stableReplacer,
+  )
 }
 
 /**
@@ -233,6 +304,7 @@ async function resolveBaseOptions(
   })()
 
   resolvedBaseOptionsCache.set(cacheKey, task)
+  evictCache(resolvedBaseOptionsCache)
 
   try {
     return await task
@@ -265,7 +337,7 @@ function shouldIgnoreFile(
   const relativePath = relative(cwd, filename).replace(/\\/g, '/')
 
   // Check if file matches any ignore pattern
-  return picomatch.isMatch(relativePath, ignorePatterns)
+  return getCachedMatcher(ignorePatterns)(relativePath)
 }
 
 runAsWorker(
@@ -309,43 +381,40 @@ runAsWorker(
       useConfig,
     )
 
-    const cachedMergedOptions = mergedOptionsCache.get(mergedOptionsCacheKey)
-    if (cachedMergedOptions) {
-      const cachedIgnorePatterns = /** @type {string[] | undefined} */ (
-        cachedMergedOptions.ignorePatterns
-      )
-
-      if (
-        shouldIgnoreFile(filename, cwd, ignorePatterns || cachedIgnorePatterns)
-      ) {
-        return { code: sourceText }
-      }
-
-      return format(filename, sourceText, cachedMergedOptions)
-    }
-
     const baseIgnorePatterns = /** @type {string[] | undefined} */ (
       baseOptions.ignorePatterns
     )
+    const effectiveIgnorePatterns = ignorePatterns ?? baseIgnorePatterns
+
+    if (shouldIgnoreFile(filename, cwd, effectiveIgnorePatterns)) {
+      return { code: sourceText }
+    }
+
+    const cachedMergedOptions = mergedOptionsCache.get(mergedOptionsCacheKey)
+    if (cachedMergedOptions) {
+      return format(filename, sourceText, cachedMergedOptions)
+    }
+
     const baseOverrides = /** @type {Override[] | undefined} */ (
       baseOptions.overrides
     )
 
-    if (shouldIgnoreFile(filename, cwd, ignorePatterns || baseIgnorePatterns)) {
-      return { code: sourceText }
-    }
+    // Merge config-level and rule-level overrides (rule-level takes precedence)
+    const effectiveOverrides = useConfig
+      ? [...(baseOverrides ?? []), ...(overrides ?? [])]
+      : overrides
 
     // Apply overrides based on filename
     const mergedOptions = applyOverrides(
       filename,
       cwd,
       baseOptions,
-      useConfig ? baseOverrides : overrides,
+      effectiveOverrides,
     )
 
     mergedOptionsCache.set(mergedOptionsCacheKey, mergedOptions)
+    evictCache(mergedOptionsCache)
 
-    const formatResult = await format(filename, sourceText, mergedOptions)
-    return formatResult
+    return format(filename, sourceText, mergedOptions)
   },
 )
