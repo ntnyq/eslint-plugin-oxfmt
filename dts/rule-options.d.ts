@@ -30,7 +30,7 @@ export type OxfmtOxfmt = []|[{
   
   insertFinalNewline?: boolean
   
-  jsdoc?: {
+  jsdoc?: (boolean | {
     
     addDefaultToDescription?: boolean
     
@@ -53,7 +53,7 @@ export type OxfmtOxfmt = []|[{
     separateReturnsFromParam?: boolean
     
     separateTagGroups?: boolean
-  }
+  })
   
   jsxSingleQuote?: boolean
   
@@ -71,7 +71,7 @@ export type OxfmtOxfmt = []|[{
   
   singleQuote?: boolean
   
-  sortImports?: {
+  sortImports?: (boolean | {
     
     customGroups?: {
       
@@ -102,14 +102,14 @@ export type OxfmtOxfmt = []|[{
     partitionByNewline?: boolean
     
     sortSideEffects?: boolean
-  }
+  })
   
   sortPackageJson?: (boolean | {
     
     sortScripts?: boolean
   })
   
-  sortTailwindcss?: {
+  sortTailwindcss?: (boolean | {
     
     attributes?: string[]
     
@@ -122,7 +122,7 @@ export type OxfmtOxfmt = []|[{
     preserveWhitespace?: boolean
     
     stylesheet?: string
-  }
+  })
   
   tabWidth?: number
   
@@ -160,7 +160,7 @@ export type OxfmtOxfmt = []|[{
       
       insertFinalNewline?: boolean
       
-      jsdoc?: {
+      jsdoc?: (boolean | {
         
         addDefaultToDescription?: boolean
         
@@ -183,7 +183,7 @@ export type OxfmtOxfmt = []|[{
         separateReturnsFromParam?: boolean
         
         separateTagGroups?: boolean
-      }
+      })
       
       jsxSingleQuote?: boolean
       
@@ -201,7 +201,7 @@ export type OxfmtOxfmt = []|[{
       
       singleQuote?: boolean
       
-      sortImports?: {
+      sortImports?: (boolean | {
         
         customGroups?: {
           
@@ -232,14 +232,14 @@ export type OxfmtOxfmt = []|[{
         partitionByNewline?: boolean
         
         sortSideEffects?: boolean
-      }
+      })
       
       sortPackageJson?: (boolean | {
         
         sortScripts?: boolean
       })
       
-      sortTailwindcss?: {
+      sortTailwindcss?: (boolean | {
         
         attributes?: string[]
         
@@ -252,7 +252,7 @@ export type OxfmtOxfmt = []|[{
         preserveWhitespace?: boolean
         
         stylesheet?: string
-      }
+      })
       
       tabWidth?: number
       

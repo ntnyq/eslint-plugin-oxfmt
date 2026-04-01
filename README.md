@@ -225,7 +225,7 @@ For detailed behavior, see:
 
 ### JSDoc Options
 
-Use `jsdoc` to enable and configure JSDoc comment formatting. Pass an object to enable it (for example `jsdoc: {}`).
+Use `jsdoc` to enable and configure JSDoc comment formatting. Pass `true` to enable defaults, or pass an object for custom behavior (for example `jsdoc: {}`).
 
 | Option                              | Type                                    | Default        | Description                                            |
 | ----------------------------------- | --------------------------------------- | -------------- | ------------------------------------------------------ |
@@ -241,15 +241,19 @@ Use `jsdoc` to enable and configure JSDoc comment formatting. Pass an object to 
 | `jsdoc.separateReturnsFromParam`    | `boolean`                               | `false`        | Add a blank line between final `@param` and `@returns` |
 | `jsdoc.separateTagGroups`           | `boolean`                               | `false`        | Add blank lines between different tag groups           |
 
+Tip: `jsdoc: true` is equivalent to enabling JSDoc with default settings.
+
 ### Advanced Options
 
 | Option            | Type                | Default  | Description                                                                  |
 | ----------------- | ------------------- | -------- | ---------------------------------------------------------------------------- |
-| `sortImports`     | `object`            | disabled | Experimental import sorting configuration                                    |
+| `sortImports`     | `boolean \| object` | disabled | Experimental import sorting configuration                                    |
 | `sortPackageJson` | `boolean \| object` | `true`   | Experimental package.json sorting (object form: `{ sortScripts?: boolean }`) |
-| `sortTailwindcss` | `object`            | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
+| `sortTailwindcss` | `boolean \| object` | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
 
 #### Import sorting (`sortImports`)
+
+Use `sortImports: true` to enable import sorting with defaults, or pass an object to customize behavior.
 
 Available keys:
 
@@ -270,7 +274,7 @@ Available keys:
 
 #### Tailwind CSS class sorting
 
-Enable experimental Tailwind CSS class sorting powered by `prettier-plugin-tailwindcss` (pass an empty object to turn it on):
+Enable experimental Tailwind CSS class sorting powered by `prettier-plugin-tailwindcss` (set `sortTailwindcss: true` for defaults, or pass an object for custom options):
 
 ```js
 // eslint.config.mjs

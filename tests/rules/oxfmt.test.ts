@@ -965,6 +965,77 @@ run({
         `)
       },
     },
+    {
+      description: `Should sort Tailwind CSS classes when sortTailwindcss is true`,
+      filename: 'test.jsx',
+      name: 'Tailwind class sorting boolean true',
+      code: $`
+        const element = <div className="text-lg bg-red-500 flex px-2">Hello</div>;
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          sortTailwindcss: true,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(
+          `"const element = <div className="flex bg-red-500 px-2 text-lg">Hello</div>;"`,
+        )
+      },
+    },
+    {
+      description: `Should reorder imports alphabetically when sortImports is true`,
+      filename: 'imports.js',
+      name: 'sort imports boolean true',
+      code: $`
+        import z from "z";
+        import a from "a";
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          sortImports: true,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "import a from \"a\";\nimport z from \"z\";"
+        `)
+      },
+    },
+    {
+      description: `Should normalize and compact short JSDoc comments when jsdoc is true`,
+      filename: 'test.js',
+      name: 'jsdoc boolean true',
+      code: $`
+        /**
+         * foo
+         */
+        const a=1
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          jsdoc: true,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`"/** Foo */\nconst a = 1;"`)
+      },
+    },
   ],
   valid: [
     {
@@ -1328,9 +1399,10 @@ run({
       description: `Should accept markdown when prose/html formatting controls are provided`,
       filename: 'notes.md',
       name: 'prose and embedded formatting options',
+      // eslint-disable-next-line antfu/indent-unindent
       code: $`
         # Title
-        
+
         Short paragraph that fits.
       `,
       options: [
