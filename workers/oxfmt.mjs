@@ -283,6 +283,7 @@ async function resolveBaseOptions(
     return cachedTask
   }
 
+  /** @type {Promise<ResolvedBaseOptions>} */
   const task = (async () => {
     const resolveFromDir = dirname(filename)
 
