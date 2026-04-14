@@ -51,6 +51,12 @@ async function lintFixtureFiles(eslint: ESLint, cwd: string, files: string[]) {
   return results
 }
 
+function mapFixtureSummaryByFile(
+  summary: Awaited<ReturnType<typeof runFixture>>,
+) {
+  return new Map(summary.map(result => [result.file, result] as const))
+}
+
 function mapResultsByFilePath(results: ESLint.LintResult[]) {
   return new Map(results.map(result => [result.filePath, result] as const))
 }
@@ -236,7 +242,7 @@ it('should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns', async (
   })
 })
 
-const configLoadingFixtures = [
+const CONFIG_LOADER_FIXTURES = [
   {
     cwd: resolve('tests/fixtures/config-loading/json'),
     title: 'should load .oxfmtrc.json',
@@ -277,7 +283,7 @@ const configLoadingFixtures = [
   },
 ] as const
 
-configLoadingFixtures.forEach(
+CONFIG_LOADER_FIXTURES.forEach(
   ({ cwd, title }: { cwd: string; title: string }) => {
     it(`${title}`, async () => {
       const summary = await runFixture(cwd)
@@ -355,4 +361,66 @@ it('should match config-derived ignorePatterns relative to config directory, not
   )
   expect(srcResult).toBeDefined()
   expect(srcResult!.messages.length).toBeGreaterThan(0)
+})
+
+const EDITORCONFIG_QUOTE_TYPE_ROOT_CASES = [
+  {
+    expectedOutput: `export const message = 'hello world';`,
+    cwd: resolve(
+      'tests/fixtures/config-loading/editorconfig-quote-type-root-auto',
+    ),
+    title:
+      'should treat root .editorconfig quote_type=auto as a supported no-op fallback',
+  },
+  {
+    expectedOutput: `export const message = "hello world";`,
+    title: 'should map root .editorconfig quote_type=double to double quotes',
+    cwd: resolve(
+      'tests/fixtures/config-loading/editorconfig-quote-type-root-double',
+    ),
+  },
+  {
+    expectedOutput: `export const message = 'hello world';`,
+    title: 'should map root .editorconfig quote_type=single to single quotes',
+    cwd: resolve(
+      'tests/fixtures/config-loading/editorconfig-quote-type-root-single',
+    ),
+  },
+] as const
+
+EDITORCONFIG_QUOTE_TYPE_ROOT_CASES.forEach(
+  ({
+    cwd,
+    expectedOutput,
+    title,
+  }: (typeof EDITORCONFIG_QUOTE_TYPE_ROOT_CASES)[number]) => {
+    it(`${title}`, async () => {
+      const summary = await runFixture(cwd)
+
+      expect(summary).toHaveLength(1)
+      expect(summary[0]?.messages.length).toBeGreaterThan(0)
+      expect(summary[0]?.output).toBe(expectedOutput)
+    })
+  },
+)
+
+it('should map section .editorconfig quote_type values for single, double, and auto', async () => {
+  const summary = await runFixture(
+    resolve('tests/fixtures/config-loading/editorconfig-quote-type-sections'),
+  )
+  const summaryByFile = mapFixtureSummaryByFile(summary)
+
+  expect(summaryByFile.get('src/single.js')?.output).toBe(
+    `export const message = 'hello world';`,
+  )
+  expect(summaryByFile.get('src/double.js')?.output).toBe(
+    `export const message = "hello world";`,
+  )
+  expect(summaryByFile.get('src/auto.js')?.output).toBe(
+    `export const message = 'hello world';`,
+  )
+
+  expect(summaryByFile.get('src/single.js')?.messages.length).toBeGreaterThan(0)
+  expect(summaryByFile.get('src/double.js')?.messages.length).toBeGreaterThan(0)
+  expect(summaryByFile.get('src/auto.js')?.messages.length).toBeGreaterThan(0)
 })

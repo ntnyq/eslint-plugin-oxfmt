@@ -1,0 +1,13 @@
+root = true
+
+[*]
+insert_final_newline = false
+
+[src/single.js]
+quote_type = single
+
+[src/double.js]
+quote_type = double
+
+[src/auto.js]
+quote_type = auto
