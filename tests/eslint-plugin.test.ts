@@ -6,7 +6,10 @@ import { expect, it } from 'vitest'
 import { resolve } from '../scripts/utils'
 import pluginOxfmt from '../src'
 import type { Linter } from 'eslint'
-import type { OxfmtOxfmt as RuleOxfmtOptions } from '../dts/rule-options'
+import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
+import type { FormatConfig } from 'oxfmt'
+
+type RuleOxfmtOptions = FormatConfig & LoadOxfmtConfigOptions
 
 const FIXTURE_BASE_CWD = resolve('tests/fixtures/base')
 const FIXTURE_USE_CONFIG_CWD = resolve('tests/fixtures/use-config')
@@ -330,6 +333,30 @@ it('should match config-derived overrides relative to config directory, not ESLi
   expect(normalizeLintMessagesForSnapshot(jsResult!.messages)).toMatchSnapshot(
     'packages/a/src/normal.js',
   )
+})
+
+it('should ignore rule-level overrides when useConfig is true', async () => {
+  const cwd = resolve('tests/fixtures/config-loading/rule-overrides-ignored')
+  const ruleOptions: RuleOxfmtOptions = {
+    useConfig: true,
+    overrides: [
+      {
+        files: ['src/**/*.ts'],
+        options: {
+          printWidth: 120,
+        },
+      },
+    ],
+  }
+
+  const [baselineSummary, conflictingSummary] = await Promise.all([
+    runFixture(cwd),
+    runFixture(cwd, ruleOptions),
+  ])
+
+  expect(baselineSummary).toHaveLength(1)
+  expect(baselineSummary[0]?.messages.length).toBeGreaterThan(0)
+  expect(conflictingSummary).toEqual(baselineSummary)
 })
 
 it('should match config-derived ignorePatterns relative to config directory, not ESLint cwd', async () => {

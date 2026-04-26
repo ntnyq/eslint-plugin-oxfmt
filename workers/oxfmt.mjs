@@ -426,7 +426,7 @@ runAsWorker(
     }
 
     // Apply rule-level overrides (relative to ESLint cwd)
-    if (overrides && overrides.length > 0) {
+    if (!useConfig && overrides && overrides.length > 0) {
       mergedOptions = applyOverrides(filename, cwd, mergedOptions, overrides)
     }
 
