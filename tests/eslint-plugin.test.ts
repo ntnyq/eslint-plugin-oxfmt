@@ -424,3 +424,30 @@ it('should map section .editorconfig quote_type values for single, double, and a
   expect(summaryByFile.get('src/double.js')?.messages.length).toBeGreaterThan(0)
   expect(summaryByFile.get('src/auto.js')?.messages.length).toBeGreaterThan(0)
 })
+
+it('should treat .editorconfig [**] sections as overrides instead of root fallback options', async () => {
+  const summary = await runFixture(
+    resolve('tests/fixtures/config-loading/editorconfig-double-star'),
+  )
+
+  expect(summary).toHaveLength(1)
+  expect(summary[0]?.messages.length).toBeGreaterThan(0)
+  expect(summary[0]?.output).toBe(`export const message = "hello world";`)
+})
+
+it('should align section indent_size fallback with oxfmt and keep inherited root indentation', async () => {
+  const summary = await runFixture(
+    resolve('tests/fixtures/config-loading/editorconfig-sections'),
+  )
+  const summaryByFile = mapFixtureSummaryByFile(summary)
+
+  expect(summaryByFile.get('src/sectioned.js')?.output)
+    .toBe(`export function buildUser(
+  name,
+) {
+  return createUserProfile(
+    name,
+    'a very long display name',
+  );
+}`)
+})

@@ -127,11 +127,11 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endLine": 1,
           "fix": {
             "text": "
-     name,
+  name,
 ",
           },
           "line": 1,
-          "message": "Replace \`name\` with \`⏎·····name,⏎\`",
+          "message": "Replace \`name\` with \`⏎··name,⏎\`",
           "messageId": "replace",
           "ruleId": "oxfmt/oxfmt",
           "severity": 2,
@@ -141,13 +141,13 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
           "endColumn": 62,
           "endLine": 2,
           "fix": {
-            "text": "     return createUserProfile(
-          name,
-          'a very long display name',
-     ",
+            "text": "  return createUserProfile(
+    name,
+    'a very long display name',
+  ",
           },
           "line": 2,
-          "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`·····return·createUserProfile(⏎··········name,⏎··········'a·very·long·display·name',⏎·····\`",
+          "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`··return·createUserProfile(⏎····name,⏎····'a·very·long·display·name',⏎··\`",
           "messageId": "replace",
           "ruleId": "oxfmt/oxfmt",
           "severity": 2,
@@ -167,12 +167,12 @@ exports[`should apply .editorconfig sections and keep oxfmt overrides higher pri
         },
       ],
       "output": "export function buildUser(
-     name,
+  name,
 ) {
-     return createUserProfile(
-          name,
-          'a very long display name',
-     );
+  return createUserProfile(
+    name,
+    'a very long display name',
+  );
 }",
     },
   ],
