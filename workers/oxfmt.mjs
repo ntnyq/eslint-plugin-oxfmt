@@ -21,8 +21,20 @@ import { runAsWorker } from 'synckit'
  */
 
 /**
+ * @typedef {object} WorkerOptions
+ * @property {string} cwd Current working directory for resolving rule-relative inputs.
+ * @property {string | undefined} configPath Custom path to an oxfmt configuration file.
+ * @property {string[] | undefined} ignorePatterns Rule-level ignore patterns.
+ * @property {Override[] | undefined} overrides Rule-level override entries.
+ * @property {boolean} useConfig Whether config loading is enabled.
+ * @property {import('oxfmt').FormatConfig} formatOptions Pure formatter options passed to oxfmt.
+ */
+
+/**
  * @typedef {object} ResolvedBaseOptions
- * @property {import('oxfmt').FormatConfig} baseOptions Resolved base formatter options.
+ * @property {import('oxfmt').FormatConfig} formatOptions Resolved base formatter options.
+ * @property {string[] | undefined} ignorePatterns Resolved ignore patterns from config loading.
+ * @property {Override[] | undefined} overrides Resolved overrides from config loading.
  * @property {string} configDir Directory of the resolved config file, used as base for config-derived glob patterns.
  */
 
@@ -79,17 +91,14 @@ const picomatchCache = new Map()
 
 /**
  * Apply overrides to the base options based on the filename
- * @param filename - The file path
- * @param cwd - Base directory for glob matching
+ * @param relativePath - The file path relative to the glob base directory
  * @param baseOptions - Base format options
  * @param [overrides] - Override configurations
  * @returns - Merged options
  */
 function applyOverrides(
   /** @type {string} */
-  filename,
-  /** @type {string} */
-  cwd,
+  relativePath,
   /** @type {import('oxfmt').FormatConfig} */
   baseOptions,
   /** @type {Override[] | undefined} */
@@ -98,9 +107,6 @@ function applyOverrides(
   if (!overrides || overrides.length === 0) {
     return baseOptions
   }
-
-  // Get relative path from cwd and normalize to forward slashes for cross-platform compatibility
-  const relativePath = relative(cwd, filename).replace(/\\/g, '/')
 
   let mergedOptions = baseOptions
   let hasOverrides = false
@@ -171,46 +177,46 @@ function getConfigPathForFile(
 
 /**
  * Build cache key for merged options per file invocation.
- * The key includes filename, cwd, configDir, resolved base options, and rule-level
- * override inputs to avoid stale cache hits.
+ * The key only includes data that can affect the final formatter options.
  *
- * @param filename - Current file path.
- * @param cwd - Base directory used for rule-level glob matching.
- * @param configDir - Directory of the resolved config file, used for config-derived glob matching.
  * @param baseOptions - Resolved base options used for formatting.
- * @param ignorePatterns - Rule-level ignore patterns.
+ * @param relativePath - File path relative to the override base directory.
  * @param overrides - Rule-level override entries.
- * @param useConfig - Whether config file loading is enabled.
  * @returns Serialized cache key.
  */
 function getMergedOptionsCacheKey(
-  /** @type {string} */
-  filename,
-  /** @type {string} */
-  cwd,
-  /** @type {string} */
-  configDir,
   /** @type {import('oxfmt').FormatConfig} */
   baseOptions,
-  /** @type {string[] | undefined} */
-  ignorePatterns,
+  /** @type {string | undefined} */
+  relativePath,
   /** @type {Override[] | undefined} */
   overrides,
-  /** @type {boolean} */
-  useConfig,
 ) {
+  const hasOverrides = !!(overrides && overrides.length > 0)
+
   return JSON.stringify(
     {
       baseOptions,
-      configDir,
-      cwd,
-      filename,
-      ignorePatterns,
-      overrides,
-      useConfig,
+      overrides: hasOverrides ? overrides : undefined,
+      relativePath: hasOverrides ? relativePath : undefined,
     },
     stableReplacer,
   )
+}
+
+/**
+ * Normalize a file path relative to the provided base directory.
+ * @param baseDir - Base directory used for glob evaluation
+ * @param filename - Absolute file path
+ * @returns - Normalized relative path using forward slashes
+ */
+function getRelativePath(
+  /** @type {string} */
+  baseDir,
+  /** @type {string} */
+  filename,
+) {
+  return relative(baseDir, filename).replace(/\\/g, '/')
 }
 
 /**
@@ -246,6 +252,74 @@ function getResolvedBaseOptionsCacheKey(
     },
     stableReplacer,
   )
+}
+
+/**
+ * Validate and normalize worker invocation options.
+ * @param options - Raw worker options
+ * @returns - Validated worker options
+ */
+function getWorkerOptions(
+  /** @type {Options | undefined} */
+  options,
+) {
+  if (!options || typeof options !== 'object') {
+    throw new TypeError('oxfmt worker expected an options object.')
+  }
+
+  const {
+    configPath,
+    cwd,
+    ignorePatterns,
+    overrides,
+    useConfig = true,
+    ...formatOptions
+  } = options
+
+  if (typeof cwd !== 'string' || cwd.length === 0) {
+    throw new TypeError('oxfmt worker requires a non-empty "cwd" option.')
+  }
+  if (configPath != null && typeof configPath !== 'string') {
+    throw new TypeError(
+      'oxfmt worker requires "configPath" to be a string when provided.',
+    )
+  }
+  if (ignorePatterns != null && !isStringArray(ignorePatterns)) {
+    throw new TypeError(
+      'oxfmt worker requires "ignorePatterns" to be an array of strings when provided.',
+    )
+  }
+  if (overrides != null && !Array.isArray(overrides)) {
+    throw new TypeError(
+      'oxfmt worker requires "overrides" to be an array when provided.',
+    )
+  }
+  if (typeof useConfig !== 'boolean') {
+    throw new TypeError(
+      'oxfmt worker requires "useConfig" to be a boolean when provided.',
+    )
+  }
+
+  return {
+    configPath,
+    cwd,
+    formatOptions,
+    ignorePatterns,
+    overrides,
+    useConfig,
+  }
+}
+
+/**
+ * Check whether a value is an array of strings.
+ * @param value - Value to validate
+ * @returns - Whether the value is a string array
+ */
+function isStringArray(
+  /** @type {unknown} */
+  value,
+) {
+  return Array.isArray(value) && value.every(item => typeof item === 'string')
 }
 
 /**
@@ -290,7 +364,9 @@ async function resolveBaseOptions(
     if (!useConfig) {
       return {
         configDir: cwd,
-        baseOptions: {
+        ignorePatterns: undefined,
+        overrides: undefined,
+        formatOptions: {
           ...formatOptions,
         },
       }
@@ -306,11 +382,15 @@ async function resolveBaseOptions(
       configPath: resolvedConfigPath,
       cwd: resolveFromDir,
     })
+    const { ignorePatterns, overrides, ...loadedFormatOptions } =
+      configOptions ?? {}
 
     return {
       configDir,
-      baseOptions: {
-        ...configOptions,
+      ignorePatterns,
+      overrides,
+      formatOptions: {
+        ...loadedFormatOptions,
         ...formatOptions,
       },
     }
@@ -329,25 +409,18 @@ async function resolveBaseOptions(
 
 /**
  * Check if a file should be ignored based on ignorePatterns
- * @param filename - The file path
- * @param cwd - Base directory for glob matching
+ * @param relativePath - The file path relative to the glob base directory
  * @param [ignorePatterns] - Ignore patterns
  * @returns - Whether the file should be ignored
  */
 function shouldIgnoreFile(
   /** @type {string} */
-  filename,
-  /** @type {string} */
-  cwd,
-  /** @type {string[] | undefined} */
-  ignorePatterns,
+  relativePath,
+  /** @type {string[] | undefined} */ ignorePatterns,
 ) {
   if (!ignorePatterns || ignorePatterns.length === 0) {
     return false
   }
-
-  // Get relative path from cwd and normalize to forward slashes for cross-platform compatibility
-  const relativePath = relative(cwd, filename).replace(/\\/g, '/')
 
   // Check if file matches any ignore pattern
   return getCachedMatcher(ignorePatterns)(relativePath)
@@ -371,63 +444,60 @@ runAsWorker(
     const {
       configPath,
       cwd,
+      formatOptions,
       ignorePatterns,
       overrides,
-      useConfig = true,
-      ...formatOptions
-    } = options
+      useConfig,
+    } = getWorkerOptions(options)
 
-    const { baseOptions, configDir } = await resolveBaseOptions(
+    const {
+      configDir,
+      formatOptions: baseFormatOptions,
+      ignorePatterns: baseIgnorePatterns,
+      overrides: baseOverrides,
+    } = await resolveBaseOptions(
       filename,
       cwd,
       configPath,
       useConfig,
       formatOptions,
     )
-
-    const mergedOptionsCacheKey = getMergedOptionsCacheKey(
-      filename,
-      cwd,
-      configDir,
-      baseOptions,
-      ignorePatterns,
-      overrides,
-      useConfig,
-    )
-
-    const baseIgnorePatterns = /** @type {string[] | undefined} */ (
-      baseOptions.ignorePatterns
-    )
     const effectiveIgnorePatterns = ignorePatterns ?? baseIgnorePatterns
     const ignoreBase = ignorePatterns == null ? configDir : cwd
+    const ignoreRelativePath = effectiveIgnorePatterns?.length
+      ? getRelativePath(ignoreBase, filename)
+      : undefined
 
-    if (shouldIgnoreFile(filename, ignoreBase, effectiveIgnorePatterns)) {
+    if (
+      ignoreRelativePath &&
+      shouldIgnoreFile(ignoreRelativePath, effectiveIgnorePatterns)
+    ) {
       return { code: sourceText }
     }
+
+    const effectiveOverrides = useConfig ? baseOverrides : overrides
+    const overrideBase = useConfig ? configDir : cwd
+    const overrideRelativePath = effectiveOverrides?.length
+      ? getRelativePath(overrideBase, filename)
+      : undefined
+    const mergedOptionsCacheKey = getMergedOptionsCacheKey(
+      baseFormatOptions,
+      overrideRelativePath,
+      effectiveOverrides,
+    )
 
     const cachedMergedOptions = mergedOptionsCache.get(mergedOptionsCacheKey)
     if (cachedMergedOptions) {
       return format(filename, sourceText, cachedMergedOptions)
     }
 
-    const baseOverrides = /** @type {Override[] | undefined} */ (
-      baseOptions.overrides
-    )
-
-    // Apply config-level overrides (relative to config directory)
-    let mergedOptions = baseOptions
-    if (useConfig && baseOverrides && baseOverrides.length > 0) {
+    let mergedOptions = baseFormatOptions
+    if (overrideRelativePath && effectiveOverrides?.length) {
       mergedOptions = applyOverrides(
-        filename,
-        configDir,
+        overrideRelativePath,
         mergedOptions,
-        baseOverrides,
+        effectiveOverrides,
       )
-    }
-
-    // Apply rule-level overrides (relative to ESLint cwd)
-    if (!useConfig && overrides && overrides.length > 0) {
-      mergedOptions = applyOverrides(filename, cwd, mergedOptions, overrides)
     }
 
     mergedOptionsCache.set(mergedOptionsCacheKey, mergedOptions)

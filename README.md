@@ -156,7 +156,9 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - Config discovery order (from `cwd`, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts`
 - `.editorconfig` support: nearest `.editorconfig` (including section overrides) is merged into the final options
 - `configPath` overrides discovery and directly targets the specified config file
-- ESLint rule options generally take highest priority because inline rule options are merged after loaded config. However, when `useConfig` is `true`, `overrides` are taken from the loaded config (not from rule options).
+- ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
+- When `useConfig` is `true`, rule-level `overrides` are ignored. Only `overrides` loaded from the resolved oxfmt config file are applied.
+- Rule-level `ignorePatterns` still override config-derived `ignorePatterns` when provided.
 
 For detailed behavior, see:
 
