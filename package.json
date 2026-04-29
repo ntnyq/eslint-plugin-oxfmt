@@ -45,6 +45,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "pnpm run update:rule-options && tsdown",
+    "check:schema": "tsx scripts/checkSchemaParity.ts",
     "dev": "tsdown --watch",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
@@ -52,7 +53,7 @@
     "prepare": "husky",
     "prepublishOnly": "pnpm run build",
     "release": "run-s release:check release:version",
-    "release:check": "run-s format:check lint typecheck test build",
+    "release:check": "run-s check:schema format:check lint typecheck test build",
     "release:version": "bumpp",
     "test": "vitest",
     "typecheck": "tsgo --noEmit",
