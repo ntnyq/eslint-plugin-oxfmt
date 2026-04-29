@@ -3,6 +3,7 @@ import type { Linter, Rule } from 'eslint'
 export interface PluginOxfmt {
   configs: {
     recommended: Linter.Config<Linter.RulesRecord>
+    recommendedWithoutParser: Linter.Config<Linter.RulesRecord>
   }
   meta: {
     name: string

@@ -55,6 +55,22 @@ export default [
 ]
 ```
 
+`recommended` includes `eslint-parser-plain` as `languageOptions.parser` for convenience.
+
+If you need parser-agnostic composition (for example to keep `jsonc-eslint-parser` from another config), use the dedicated preset:
+
+```js
+// eslint.config.mjs
+import pluginOxfmt from 'eslint-plugin-oxfmt'
+
+export default [
+  {
+    ...pluginOxfmt.configs.recommendedWithoutParser,
+    files: ['**/*.{js,ts,mjs,cjs,jsx,tsx,json,jsonc}'],
+  },
+]
+```
+
 ### Custom Configuration
 
 You can customize the formatting options by configuring the rule:
@@ -366,6 +382,13 @@ This plugin provides a single rule that formats your code using oxfmt.
 - Type: Layout
 
 ## Integration
+
+### Parser Compatibility
+
+- `recommended`: forces `eslint-parser-plain` for matched files
+- `recommendedWithoutParser`: parser-agnostic (safe to compose with language-specific parsers)
+
+When composing shareable configs, prefer `recommendedWithoutParser` if parser ownership belongs to another preset.
 
 ### Format on Save in VS Code
 
