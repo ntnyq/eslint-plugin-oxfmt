@@ -183,14 +183,14 @@ For detailed behavior, see:
 
 ### Basic Options
 
-| Option           | Type       | Default | Description                                        |
-| ---------------- | ---------- | ------- | -------------------------------------------------- |
-| `semi`           | `boolean`  | `true`  | Add semicolons at the end of statements            |
-| `singleQuote`    | `boolean`  | `false` | Use single quotes instead of double quotes         |
-| `tabWidth`       | `number`   | `2`     | Number of spaces per indentation level             |
-| `useTabs`        | `boolean`  | `false` | Use tabs for indentation                           |
-| `printWidth`     | `number`   | `100`   | Maximum line length for wrapping                   |
-| `ignorePatterns` | `string[]` | `[]`    | Glob patterns (relative to cwd) to skip formatting |
+| Option           | Type       | Default | Description                                                                                                                                            |
+| ---------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `semi`           | `boolean`  | `true`  | Add semicolons at the end of statements                                                                                                                |
+| `singleQuote`    | `boolean`  | `false` | Use single quotes instead of double quotes                                                                                                             |
+| `tabWidth`       | `number`   | `2`     | Number of spaces per indentation level                                                                                                                 |
+| `useTabs`        | `boolean`  | `false` | Use tabs for indentation                                                                                                                               |
+| `printWidth`     | `number`   | `100`   | Maximum line length for wrapping                                                                                                                       |
+| `ignorePatterns` | `string[]` | `[]`    | Glob patterns to skip formatting. Rule option patterns are resolved from ESLint cwd; config file patterns are resolved from the config file directory. |
 
 ### Trailing Commas
 
@@ -224,7 +224,7 @@ For detailed behavior, see:
 | ---------------- | ------------------------------------------- | ------------- | ------------------------------------------------ |
 | `bracketSpacing` | `boolean`                                   | `true`        | Print spaces between brackets in object literals |
 | `quoteProps`     | `'as-needed' \| 'consistent' \| 'preserve'` | `'as-needed'` | When to quote object property names              |
-| `objectWrap`     | `'preserve' \| 'collapse' \| 'always'`      | `'preserve'`  | How to wrap object literals                      |
+| `objectWrap`     | `'preserve' \| 'collapse'`                  | `'preserve'`  | How to wrap object literals                      |
 
 ### Line Endings
 

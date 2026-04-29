@@ -108,8 +108,8 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       type: 'boolean',
     },
     objectWrap: {
-      description: `How to wrap object literals when they could fit on one line or span multiple lines. (Default: "preserve")\nNOTE: In addition to Prettier's "preserve" and "collapse", we also support "always".`,
-      enum: ['preserve', 'collapse', 'always'],
+      description: `How to wrap object literals when they could fit on one line or span multiple lines. (Default: "preserve")`,
+      enum: ['preserve', 'collapse'],
       type: 'string',
     },
     printWidth: {

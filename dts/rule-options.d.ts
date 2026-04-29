@@ -57,7 +57,7 @@ export type OxfmtOxfmt = []|[{
   
   jsxSingleQuote?: boolean
   
-  objectWrap?: ("preserve" | "collapse" | "always")
+  objectWrap?: ("preserve" | "collapse")
   
   printWidth?: number
   
@@ -187,7 +187,7 @@ export type OxfmtOxfmt = []|[{
       
       jsxSingleQuote?: boolean
       
-      objectWrap?: ("preserve" | "collapse" | "always")
+      objectWrap?: ("preserve" | "collapse")
       
       printWidth?: number
       
