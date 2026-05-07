@@ -1,7 +1,6 @@
 // @ts-check
 
-import { readFile } from 'node:fs/promises'
-import { dirname, isAbsolute, relative, resolve } from 'node:path'
+import { dirname, relative } from 'node:path'
 import { isOxfmtIgnored, loadOxfmtConfigResult } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
 import picomatch from 'picomatch'
@@ -39,9 +38,6 @@ const PLUGIN_ONLY_OPTIONS = new Set([
   'useConfig',
   'withNodeModules',
 ])
-
-/** @type {Map<string, Promise<string[]>>} */
-const ignorePathPatternsCache = new Map()
 /** @type {Map<string, import('picomatch').Matcher>} */
 const matcherCache = new Map()
 
@@ -96,28 +92,6 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
 
   const cwd = pluginOptions.cwd
   const useConfig = pluginOptions.useConfig !== false
-  const normalizedIgnorePath = normalizeIgnorePath(
-    pluginOptions.ignorePath,
-    cwd,
-  )
-
-  if (normalizedIgnorePath && cwd) {
-    const ignorePathPatterns = await loadIgnorePathPatterns(
-      normalizedIgnorePath,
-      pluginOptions.useCache,
-    )
-    if (ignorePathPatterns.length > 0) {
-      const relativePathFromCwd = getRelativePath(cwd, filename)
-      const ignorePathMatcher = getCachedMatcher(ignorePathPatterns)
-      if (ignorePathMatcher && ignorePathMatcher(relativePathFromCwd)) {
-        return {
-          code: sourceText,
-          ignored: true,
-          reason: 'ignore-path',
-        }
-      }
-    }
-  }
 
   const ruleIgnorePatterns = isStringArray(inlineFormatOptions.ignorePatterns)
     ? inlineFormatOptions.ignorePatterns
@@ -133,16 +107,17 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
     }
   }
 
-  if (pluginOptions.respectOxfmtDefaultIgnores !== false && useConfig) {
-    /** @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions & {useConfig?: boolean}} */
+  if (pluginOptions.respectOxfmtDefaultIgnores !== false && cwd) {
+    /** @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions & {includeConfigIgnorePatterns?: boolean, loadConfigForIgnorePatterns?: boolean}} */
     const ignoredOptions = {
       configPath: pluginOptions.configPath,
       cwd,
       disableNestedConfig: pluginOptions.disableNestedConfig,
       filepath: filename,
-      ignorePath: normalizedIgnorePath,
+      ignorePath: pluginOptions.ignorePath,
+      includeConfigIgnorePatterns: useConfig,
+      loadConfigForIgnorePatterns: useConfig,
       useCache: pluginOptions.useCache,
-      useConfig,
       withNodeModules: pluginOptions.withNodeModules,
     }
     const ignored = await isOxfmtIgnored(ignoredOptions)
@@ -245,77 +220,6 @@ function getRelativePath(baseDir, filename) {
  */
 function isStringArray(value) {
   return Array.isArray(value) && value.every(item => typeof item === 'string')
-}
-
-/**
- * Load glob patterns from ignore files.
- * @param {string | string[]} ignorePath - Ignore file path(s).
- * @param {boolean | undefined} useCache - Whether to use worker cache.
- * @returns {Promise<string[]>} Loaded glob patterns.
- */
-async function loadIgnorePathPatterns(ignorePath, useCache) {
-  const paths = Array.isArray(ignorePath) ? ignorePath : [ignorePath]
-
-  if (useCache === false) {
-    const chunks = await Promise.all(
-      paths.map(async filePath => {
-        const content = await readFile(filePath, 'utf8')
-        return content
-          .split(/\r?\n/u)
-          .map(line => line.trim())
-          .filter(line => line.length > 0 && !line.startsWith('#'))
-      }),
-    )
-    return chunks.flat()
-  }
-
-  const cacheKey = paths.join('\0')
-  const cached = ignorePathPatternsCache.get(cacheKey)
-  if (cached) {
-    return cached
-  }
-
-  const task = (async () => {
-    const chunks = await Promise.all(
-      paths.map(async filePath => {
-        const content = await readFile(filePath, 'utf8')
-        return content
-          .split(/\r?\n/u)
-          .map(line => line.trim())
-          .filter(line => line.length > 0 && !line.startsWith('#'))
-      }),
-    )
-
-    return chunks.flat()
-  })()
-
-  setCacheEntry(ignorePathPatternsCache, cacheKey, task)
-  try {
-    return await task
-  } catch (err) {
-    ignorePathPatternsCache.delete(cacheKey)
-    throw err
-  }
-}
-
-/**
- * Normalize ignorePath(s) to absolute paths when cwd is available.
- * @param {string | string[] | undefined} ignorePath - Ignore path input.
- * @param {string | undefined} cwd - Current working directory.
- * @returns {string | string[] | undefined} Normalized ignore path input.
- */
-function normalizeIgnorePath(ignorePath, cwd) {
-  if (!ignorePath || !cwd) {
-    return ignorePath
-  }
-
-  if (Array.isArray(ignorePath)) {
-    return ignorePath.map(path =>
-      isAbsolute(path) ? path : resolve(cwd, path),
-    )
-  }
-
-  return isAbsolute(ignorePath) ? ignorePath : resolve(cwd, ignorePath)
 }
 
 /**

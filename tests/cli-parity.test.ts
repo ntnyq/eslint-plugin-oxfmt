@@ -113,7 +113,7 @@ it('should ignore files matched by .gitignore', async () => {
 
 it('should honor ignorePath when provided', async () => {
   const result = await lintFile(FIXTURE_CWD, 'src/ignored-by-custom.js', {
-    ignorePath: 'ignores/custom.ignore',
+    ignorePath: 'custom.ignore',
   })
   expect(result.messages).toHaveLength(0)
 })
@@ -167,4 +167,24 @@ it('should skip oxfmt config loading when useConfig is false', async () => {
   )
 
   expect(result.output).toBe(`export const root = "hello";\n`)
+})
+
+it('should not apply config ignorePatterns when useConfig is false', async () => {
+  const result = await lintFile(
+    FIXTURE_CWD,
+    'configs/project/ignored-config/example.ts',
+    {
+      useConfig: false,
+    },
+  )
+
+  expect(result.messages.length).toBeGreaterThan(0)
+})
+
+it('should still respect .gitignore when useConfig is false', async () => {
+  const result = await lintFile(FIXTURE_CWD, 'src/gitignored.js', {
+    useConfig: false,
+  })
+
+  expect(result.messages).toHaveLength(0)
 })
