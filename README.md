@@ -71,6 +71,20 @@ export default [
 ]
 ```
 
+For CLI-like ignore/config behavior, use `cliParity`:
+
+```js
+// eslint.config.mjs
+import pluginOxfmt from 'eslint-plugin-oxfmt'
+
+export default [
+  {
+    ...pluginOxfmt.configs.cliParity,
+    files: ['**/*.{js,ts,mjs,cjs,jsx,tsx,json,jsonc,yaml,yml}'],
+  },
+]
+```
+
 ### Custom Configuration
 
 You can customize the formatting options by configuring the rule:
@@ -157,10 +171,14 @@ All options are optional and default to sensible values.
 
 ### Plugin Options
 
-| Option       | Type      | Default | Description                                                                                                                                                               |
-| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `useConfig`  | `boolean` | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.ts` via `load-oxfmt-config` (with `.editorconfig` merge support). Set to `false` to rely only on inline options. |
-| `configPath` | `string`  | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                                                                                                 |
+| Option                       | Type                 | Default | Description                                                                                                                         |
+| ---------------------------- | -------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `useConfig`                  | `boolean`            | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.*` via `load-oxfmt-config`. Set to `false` to rely only on inline options. |
+| `configPath`                 | `string`             | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                                                           |
+| `ignorePath`                 | `string \| string[]` | —       | Ignore file path(s) for CLI-style ignore resolution (same role as CLI `--ignore-path`).                                             |
+| `withNodeModules`            | `boolean`            | `false` | Include files under `node_modules` during ignore checks.                                                                            |
+| `disableNestedConfig`        | `boolean`            | `false` | Disable nested config discovery and resolve config from `cwd` / `configPath` only.                                                  |
+| `respectOxfmtDefaultIgnores` | `boolean`            | `true`  | Respect oxfmt default ignores (`.gitignore`, `.prettierignore`, default ignored directories, default ignored lockfiles).            |
 
 > Note: `cwd` is taken from ESLint automatically; you usually do not need to set it manually.
 > `.editorconfig` merge behavior follows oxfmt's documented strategy: https://oxc.rs/docs/guide/usage/formatter/config#editorconfig
@@ -173,8 +191,9 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - `.editorconfig` support: nearest `.editorconfig` (including section overrides) is merged into the final options
 - `configPath` overrides discovery and directly targets the specified config file
 - ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
-- When `useConfig` is `true`, rule-level `overrides` are ignored. Only `overrides` loaded from the resolved oxfmt config file are applied.
-- Rule-level `ignorePatterns` still override config-derived `ignorePatterns` when provided.
+- Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory.
+- When `useConfig` is `true`, config `overrides` are applied first and rule-level `overrides` are appended after them (later entries win on conflicts).
+- When `useConfig` is `false`, config discovery and config `ignorePatterns` are skipped, while global ignores still apply when `respectOxfmtDefaultIgnores` is enabled.
 
 For detailed behavior, see:
 
@@ -381,12 +400,31 @@ This plugin provides a single rule that formats your code using oxfmt.
 - Fixable: Yes (automatically applies formatting)
 - Type: Layout
 
+## CLI parity mode
+
+`oxfmt/cli-parity` tries to match `oxfmt` CLI behavior for files processed by ESLint.
+
+It respects:
+
+- `.oxfmtrc.json`
+- `.oxfmtrc.jsonc`
+- `oxfmt.config.*`
+- `.editorconfig`
+- `ignorePatterns`
+- `.gitignore`
+- `.prettierignore`
+- default ignored directories
+- default ignored lockfiles
+
+Note: ESLint still controls file discovery. Files excluded by ESLint will never reach this rule.
+
 ## Integration
 
 ### Parser Compatibility
 
 - `recommended`: forces `eslint-parser-plain` for matched files
 - `recommendedWithoutParser`: parser-agnostic (safe to compose with language-specific parsers)
+- `cliParity`: parser-agnostic preset tuned for CLI-like config/ignore behavior
 
 When composing shareable configs, prefer `recommendedWithoutParser` if parser ownership belongs to another preset.
 

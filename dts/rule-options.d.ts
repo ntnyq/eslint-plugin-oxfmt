@@ -134,7 +134,15 @@ export type OxfmtOxfmt = []|[{
   
   configPath?: string
   
+  disableNestedConfig?: boolean
+  
+  ignorePath?: (string | string[])
+  
+  respectOxfmtDefaultIgnores?: boolean
+  
   useConfig?: boolean
+  
+  withNodeModules?: boolean
   
   overrides?: {
     

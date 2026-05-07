@@ -12,3 +12,5 @@ lib-cov
 *.tsbuildinfo
 
 **/.vitepress/cache
+
+!tests/fixtures/**/node_modules/

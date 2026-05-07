@@ -14,3 +14,17 @@ it('should expose a parser-agnostic preset', () => {
     configs.recommendedWithoutParser.languageOptions?.parser,
   ).toBeUndefined()
 })
+
+it('should expose a cli parity preset', () => {
+  expect(configs.cliParity.name).toBe('oxfmt/cli-parity')
+  expect(configs.cliParity.languageOptions?.parser).toBeUndefined()
+  expect(configs.cliParity.rules?.['oxfmt/oxfmt']).toEqual([
+    'error',
+    {
+      disableNestedConfig: false,
+      respectOxfmtDefaultIgnores: true,
+      useConfig: true,
+      withNodeModules: false,
+    },
+  ])
+})

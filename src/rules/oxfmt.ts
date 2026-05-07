@@ -4,17 +4,13 @@ import { dirWorkers } from '../dir'
 import { messages, reportDifferences } from '../reporter'
 import { oxfmtRuleSchema } from '../schema'
 import type { Rule } from 'eslint'
-import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
-import type { format, FormatConfig } from 'oxfmt'
-
-type FormatResult = Awaited<ReturnType<typeof format>>
-type Options = FormatConfig & LoadOxfmtConfigOptions
+import type { RuleOxfmtOptions, WorkerFormatResult } from '../types'
 
 let formatViaOxfmt: (
   filename: string,
   sourceText: string,
-  options?: Options,
-) => FormatResult
+  options?: RuleOxfmtOptions,
+) => WorkerFormatResult
 
 export const oxfmt: Rule.RuleModule = {
   meta: {
@@ -55,6 +51,10 @@ export const oxfmt: Rule.RuleModule = {
             ...context.options?.[0],
             cwd: context.cwd,
           })
+
+          if (formatResult.ignored) {
+            return
+          }
 
           if (formatResult.errors?.length) {
             for (const error of formatResult.errors) {
