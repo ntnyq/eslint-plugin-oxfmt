@@ -192,6 +192,7 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - `configPath` overrides discovery and directly targets the specified config file
 - ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
 - Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory.
+- When `useConfig` is `true`, config `overrides` are applied first and rule-level `overrides` are appended after them (later entries win on conflicts).
 
 For detailed behavior, see:
 

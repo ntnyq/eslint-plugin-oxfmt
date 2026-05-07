@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import process from 'node:process'
 import { createSyncFn } from 'synckit'
 import { expect, it } from 'vitest'
+import { resolve } from '../scripts/utils'
 import { dirWorkers } from '../src/dir'
 import type { format } from 'oxfmt'
 import type { RuleOxfmtOptions } from '../src/types'
@@ -15,9 +16,8 @@ const runWorker = createSyncFn(join(dirWorkers, 'oxfmt.mjs')) as unknown as (
 ) => FormatResult
 
 it('should allow invoking the worker without an options object', () => {
-  const result = runWorker('test.js', 'const value = 1;', {
-    useConfig: false,
-  })
+  const filename = resolve('tests/fixtures/config-loading/json/src/example.js')
+  const result = runWorker(filename, `export const value = "hello"\n`)
   expect(result).toBeTypeOf('object')
 })
 
