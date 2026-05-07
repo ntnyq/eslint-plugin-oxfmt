@@ -7,7 +7,16 @@ import picomatch from 'picomatch'
 import { runAsWorker } from 'synckit'
 
 /**
- * @typedef {{cwd?: string, configPath?: string, ignorePath?: string | string[], withNodeModules?: boolean, disableNestedConfig?: boolean, useCache?: boolean, useConfig?: boolean, respectOxfmtDefaultIgnores?: boolean, editorconfig?: import('load-oxfmt-config').Options['editorconfig']}} PluginOnlyOptions
+ * @typedef {object} PluginOnlyOptions
+ * @property {string} [cwd] - Base working directory used for path resolution.
+ * @property {string} [configPath] - Explicit path to oxfmt config file.
+ * @property {string | string[]} [ignorePath] - One or more ignore file paths.
+ * @property {boolean} [withNodeModules] - Whether node_modules should be included in ignore checks.
+ * @property {boolean} [disableNestedConfig] - Disable per-file nested config lookup.
+ * @property {boolean} [useCache] - Reuse caches for config/ignore resolution.
+ * @property {boolean} [useConfig] - Whether config discovery/loading is enabled.
+ * @property {boolean} [respectOxfmtDefaultIgnores] - Whether CLI-like default ignores should apply.
+ * @property {import('load-oxfmt-config').Options['editorconfig']} [editorconfig] - EditorConfig loading strategy.
  */
 
 /**
@@ -15,11 +24,28 @@ import { runAsWorker } from 'synckit'
  */
 
 /**
- * @typedef {{ignored: true, reason?: import('load-oxfmt-config').IsOxfmtIgnoredResult['reason'], code: string, errors?: never} | {ignored?: false, code: string, errors?: unknown[]}} WorkerFormatResult
+ * @typedef {object} WorkerIgnoredResult
+ * @property {true} ignored - Indicates formatting was skipped due to ignore rules.
+ * @property {import('load-oxfmt-config').IsOxfmtIgnoredResult['reason']} [reason] - Ignore reason from resolution step.
+ * @property {string} code - Unchanged source code.
+ * @property {never} [errors] - Not present for ignored results.
  */
 
 /**
- * @typedef {{pluginOptions: PluginOnlyOptions, formatOptions: import('oxfmt').FormatConfig}} SplitOptionsResult
+ * @typedef {object} WorkerFormattedResult
+ * @property {false} [ignored] - False or undefined when formatting was attempted.
+ * @property {string} code - Formatted source code.
+ * @property {unknown[]} [errors] - Optional formatter errors.
+ */
+
+/**
+ * @typedef {WorkerIgnoredResult | WorkerFormattedResult} WorkerFormatResult
+ */
+
+/**
+ * @typedef {object} SplitOptionsResult
+ * @property {PluginOnlyOptions} pluginOptions - Plugin orchestration options.
+ * @property {import('oxfmt').FormatConfig} formatOptions - Pure oxfmt options.
  */
 
 /**
@@ -108,7 +134,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
   }
 
   if (pluginOptions.respectOxfmtDefaultIgnores !== false && cwd) {
-    /** @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions & {includeConfigIgnorePatterns?: boolean, loadConfigForIgnorePatterns?: boolean}} */
+    /** @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions} */
     const ignoredOptions = {
       configPath: pluginOptions.configPath,
       cwd,
@@ -284,19 +310,35 @@ function splitOptions(options = {}) {
  * @param {PluginOnlyOptions} pluginOptions - Plugin-only options.
  */
 function validatePluginOptions(pluginOptions) {
-  if (pluginOptions.cwd != null && typeof pluginOptions.cwd !== 'string') {
-    throw new TypeError(
-      'oxfmt worker requires "cwd" to be a string when provided.',
-    )
+  /** @type {('cwd' | 'configPath')[]} */
+  const stringKeys = ['configPath', 'cwd']
+  /** @type {('disableNestedConfig' | 'respectOxfmtDefaultIgnores' | 'useConfig' | 'useCache' | 'withNodeModules')[]} */
+  const booleanKeys = [
+    'disableNestedConfig',
+    'respectOxfmtDefaultIgnores',
+    'useCache',
+    'useConfig',
+    'withNodeModules',
+  ]
+
+  for (const key of stringKeys) {
+    const value = pluginOptions[key]
+    if (value != null && typeof value !== 'string') {
+      throw new TypeError(
+        `oxfmt worker requires "${key}" to be a string when provided.`,
+      )
+    }
   }
-  if (
-    pluginOptions.configPath != null &&
-    typeof pluginOptions.configPath !== 'string'
-  ) {
-    throw new TypeError(
-      'oxfmt worker requires "configPath" to be a string when provided.',
-    )
+
+  for (const key of booleanKeys) {
+    const value = pluginOptions[key]
+    if (value != null && typeof value !== 'boolean') {
+      throw new TypeError(
+        `oxfmt worker requires "${key}" to be a boolean when provided.`,
+      )
+    }
   }
+
   if (
     pluginOptions.ignorePath != null &&
     typeof pluginOptions.ignorePath !== 'string' &&
@@ -304,38 +346,6 @@ function validatePluginOptions(pluginOptions) {
   ) {
     throw new TypeError(
       'oxfmt worker requires "ignorePath" to be a string or string array when provided.',
-    )
-  }
-  if (
-    pluginOptions.useConfig != null &&
-    typeof pluginOptions.useConfig !== 'boolean'
-  ) {
-    throw new TypeError(
-      'oxfmt worker requires "useConfig" to be a boolean when provided.',
-    )
-  }
-  if (
-    pluginOptions.withNodeModules != null &&
-    typeof pluginOptions.withNodeModules !== 'boolean'
-  ) {
-    throw new TypeError(
-      'oxfmt worker requires "withNodeModules" to be a boolean when provided.',
-    )
-  }
-  if (
-    pluginOptions.disableNestedConfig != null &&
-    typeof pluginOptions.disableNestedConfig !== 'boolean'
-  ) {
-    throw new TypeError(
-      'oxfmt worker requires "disableNestedConfig" to be a boolean when provided.',
-    )
-  }
-  if (
-    pluginOptions.respectOxfmtDefaultIgnores != null &&
-    typeof pluginOptions.respectOxfmtDefaultIgnores !== 'boolean'
-  ) {
-    throw new TypeError(
-      'oxfmt worker requires "respectOxfmtDefaultIgnores" to be a boolean when provided.',
     )
   }
 }
