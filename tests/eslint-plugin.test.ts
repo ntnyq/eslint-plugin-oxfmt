@@ -7,10 +7,7 @@ import { expect, it } from 'vitest'
 import { resolve } from '../scripts/utils'
 import pluginOxfmt from '../src'
 import type { Linter } from 'eslint'
-import type { Options as LoadOxfmtConfigOptions } from 'load-oxfmt-config'
-import type { FormatConfig } from 'oxfmt'
-
-type RuleOxfmtOptions = FormatConfig & LoadOxfmtConfigOptions
+import type { RuleOxfmtOptions } from '../src/types'
 
 const FIXTURE_BASE_CWD = resolve('tests/fixtures/base')
 const FIXTURE_USE_CONFIG_CWD = resolve('tests/fixtures/use-config')

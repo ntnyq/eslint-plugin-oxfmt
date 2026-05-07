@@ -6,7 +6,14 @@ import type { JSONSchema4, JSONSchema4Type } from 'json-schema'
 
 const UPSTREAM_SCHEMA_PATH = 'node_modules/oxfmt/configuration_schema.json'
 
-const PLUGIN_ONLY_TOP_LEVEL_OPTIONS = new Set(['configPath', 'useConfig'])
+const PLUGIN_ONLY_TOP_LEVEL_OPTIONS = new Set([
+  'configPath',
+  'disableNestedConfig',
+  'ignorePath',
+  'respectOxfmtDefaultIgnores',
+  'useConfig',
+  'withNodeModules',
+])
 const LOG_PREFIX = styleText('gray', '[check:schema]')
 
 function formatList(values: JSONSchema4Type[]) {

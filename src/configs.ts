@@ -25,7 +25,24 @@ export const recommended: Linter.Config<Linter.RulesRecord> = {
   },
 }
 
+export const cliParity: Linter.Config<Linter.RulesRecord> = {
+  ...recommendedWithoutParser,
+  name: 'oxfmt/cli-parity',
+  rules: {
+    'oxfmt/oxfmt': [
+      'error',
+      {
+        disableNestedConfig: false,
+        respectOxfmtDefaultIgnores: true,
+        useConfig: true,
+        withNodeModules: false,
+      },
+    ],
+  },
+}
+
 export const configs: PluginOxfmt['configs'] = {
+  cliParity,
   recommended,
   recommendedWithoutParser,
 }

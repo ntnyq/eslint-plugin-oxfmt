@@ -33,7 +33,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       type: 'string',
     },
     ignorePatterns: {
-      description: `Ignore files matching these glob patterns. Current working directory is used as the root.`,
+      description: `Ignore files matching these glob patterns. Rule-level ignorePatterns are resolved relative to ESLint cwd. Config ignorePatterns are resolved relative to the config file directory.`,
       type: 'array',
       items: {
         type: 'string',
@@ -334,8 +334,38 @@ export const oxfmtConfigSchema: JSONSchema4 = {
       description: `Path to Oxfmt configuration file.\nIf you provide an absolute path, Oxfmt will use it directly.\n If not provided, Oxfmt will search for configuration files starting from the current working directory upwards.\n\n- (Default: undefined)`,
       type: 'string',
     },
+    disableNestedConfig: {
+      default: false,
+      description: `Disable nested config lookup and resolve from cwd/configPath only. (Default: false)`,
+      type: 'boolean',
+    },
+    ignorePath: {
+      description: `Path(s) to ignore files used for CLI-style ignore resolution. Accepts a single path or multiple paths. (Default: undefined)`,
+      oneOf: [
+        {
+          type: 'string',
+        },
+        {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+        },
+      ],
+    },
+    respectOxfmtDefaultIgnores: {
+      default: true,
+      description: `Whether to respect oxfmt default ignores (.gitignore, .prettierignore, lockfiles, default directories). (Default: true)`,
+      type: 'boolean',
+    },
     useConfig: {
-      description: `Whether to load Oxfmt configuration file.\n\n- (Default: true)`,
+      default: true,
+      description: `Whether to load Oxfmt configuration file. (Default: true)`,
+      type: 'boolean',
+    },
+    withNodeModules: {
+      default: false,
+      description: `Whether to include files inside node_modules during ignore resolution. (Default: false)`,
       type: 'boolean',
     },
   },
