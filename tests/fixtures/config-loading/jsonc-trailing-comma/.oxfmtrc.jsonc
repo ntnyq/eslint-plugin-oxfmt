@@ -1,0 +1,8 @@
+{
+  // regression: load-oxfmt-config should accept trailing commas in JSONC.
+  "insertFinalNewline": false,
+  "printWidth": 24,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+}

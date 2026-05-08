@@ -323,6 +323,14 @@ const CONFIG_LOADER_FIXTURES = [
     title: 'should load .oxfmtrc.jsonc',
   },
   {
+    cwd: resolve('tests/fixtures/config-loading/jsonc-trailing-comma'),
+    title: 'should load .oxfmtrc.jsonc with trailing comma',
+  },
+  {
+    cwd: resolve('tests/fixtures/config-loading/jsonc-empty'),
+    title: 'should load empty .oxfmtrc.jsonc',
+  },
+  {
     cwd: resolve('tests/fixtures/config-loading/ts-config'),
     title: 'should load oxfmt.config.ts',
   },

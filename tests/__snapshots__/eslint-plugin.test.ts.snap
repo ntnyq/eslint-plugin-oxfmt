@@ -420,6 +420,104 @@ format(
 }
 `;
 
+exports[`should load .oxfmtrc.jsonc with trailing comma 1`] = `
+{
+  "fixture": "jsonc-trailing-comma",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 32,
+          "endLine": 2,
+          "fix": {
+            "text": "console.log(
+    'hello world',
+  )",
+          },
+          "line": 2,
+          "message": "Replace \`··console.log("hello·world");\` with \`console.log(⏎····'hello·world',⏎··)\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 8,
+          "endColumn": 43,
+          "endLine": 5,
+          "fix": {
+            "text": "
+  reallyLongArg(),
+  anotherLongArg(),",
+          },
+          "line": 5,
+          "message": "Replace \`reallyLongArg(),·anotherLongArg());\` with \`⏎··reallyLongArg(),⏎··anotherLongArg(),\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 1,
+          "endColumn": 1,
+          "endLine": 6,
+          "fix": {
+            "text": ")",
+          },
+          "line": 6,
+          "message": "Insert \`)\`",
+          "messageId": "insert",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log(
+    'hello world',
+  )
+}
+
+format(
+  reallyLongArg(),
+  anotherLongArg(),
+)",
+    },
+  ],
+}
+`;
+
+exports[`should load empty .oxfmtrc.jsonc 1`] = `
+{
+  "fixture": "jsonc-empty",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 3,
+          "endColumn": 5,
+          "endLine": 2,
+          "fix": {
+            "text": "",
+          },
+          "line": 2,
+          "message": "Delete \`··\`",
+          "messageId": "delete",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log("hello world");
+}
+
+format(reallyLongArg(), anotherLongArg());
+",
+    },
+  ],
+}
+`;
+
 exports[`should load oxfmt.config.ts 1`] = `
 {
   "fixture": "ts-config",
