@@ -367,6 +367,39 @@ CONFIG_LOADER_FIXTURES.forEach(
   },
 )
 
+const CONFIG_PATH_FORMAT_CASES = [
+  'configs/custom.json',
+  'configs/custom.jsonc',
+  'configs/custom.ts',
+  'configs/custom.mts',
+  'configs/custom.js',
+  'configs/custom.mjs',
+  'configs/custom.cjs',
+] as const
+
+const CONFIG_PATH_EXPECTED_OUTPUT = `export function greet() {
+  console.log(
+    'hello world',
+  )
+}
+
+format(
+  reallyLongArg(),
+  anotherLongArg(),
+)`
+
+CONFIG_PATH_FORMAT_CASES.forEach(configPath => {
+  it(`should load explicit configPath for ${configPath}`, async () => {
+    const cwd = resolve('tests/fixtures/config-loading/config-path-explicit')
+    const summary = await runFixture(cwd, { configPath })
+
+    expect(summary).toHaveLength(1)
+    expect(summary[0]?.file).toBe('src/example.js')
+    expect(summary[0]?.messages.length).toBeGreaterThan(0)
+    expect(summary[0]?.output).toBe(CONFIG_PATH_EXPECTED_OUTPUT)
+  })
+})
+
 it('should match config-derived overrides relative to config directory, not ESLint cwd', async () => {
   // ESLint cwd is the parent "nested-config/" directory, but the
   // .oxfmtrc.json lives in "packages/a/". The config's overrides use

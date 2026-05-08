@@ -13,7 +13,7 @@
 - 🔧 **Auto-fix** - Automatically format code on save or via ESLint's fix command
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
-- 🧩 **Config File Discovery** - Supports `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.ts`
+- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.ts`
 - 📝 **EditorConfig Integration** - Respects a subset of `.editorconfig` options via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
 - 🎨 **Highly Configurable** - Supports all oxfmt formatting options
 - 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
@@ -171,15 +171,15 @@ All options are optional and default to sensible values.
 
 ### Plugin Options
 
-| Option                       | Type                                             | Default | Description                                                                                                                         |
-| ---------------------------- | ------------------------------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `useConfig`                  | `boolean`                                        | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.*` via `load-oxfmt-config`. Set to `false` to rely only on inline options. |
-| `configPath`                 | `string`                                         | —       | Custom path to an oxfmt config file. Resolved from ESLint `cwd` when set.                                                           |
-| `editorconfig`               | `boolean \| { onlyCwd?: boolean; cwd?: string }` | `true`  | Control `.editorconfig` loading. Use `false` to disable, or object form for advanced resolution strategy.                           |
-| `ignorePath`                 | `string \| string[]`                             | —       | Ignore file path(s) for CLI-style ignore resolution (same role as CLI `--ignore-path`).                                             |
-| `withNodeModules`            | `boolean`                                        | `false` | Include files under `node_modules` during ignore checks.                                                                            |
-| `disableNestedConfig`        | `boolean`                                        | `false` | Disable nested config discovery and resolve config from `cwd` / `configPath` only.                                                  |
-| `respectOxfmtDefaultIgnores` | `boolean`                                        | `true`  | Respect oxfmt default ignores (`.gitignore`, `.prettierignore`, default ignored directories, default ignored lockfiles).            |
+| Option                       | Type                                             | Default | Description                                                                                                                                                                                                  |
+| ---------------------------- | ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `useConfig`                  | `boolean`                                        | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.*` via `load-oxfmt-config`. Set to `false` to rely only on inline options.                                                                          |
+| `configPath`                 | `string`                                         | —       | Custom path to an oxfmt config file. Relative paths resolve from ESLint `cwd`; absolute paths are used as-is. Explicit `configPath` accepts `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`. |
+| `editorconfig`               | `boolean \| { onlyCwd?: boolean; cwd?: string }` | `true`  | Control `.editorconfig` loading. Use `false` to disable, or object form for advanced resolution strategy.                                                                                                    |
+| `ignorePath`                 | `string \| string[]`                             | —       | Ignore file path(s) for CLI-style ignore resolution (same role as CLI `--ignore-path`).                                                                                                                      |
+| `withNodeModules`            | `boolean`                                        | `false` | Include files under `node_modules` during ignore checks.                                                                                                                                                     |
+| `disableNestedConfig`        | `boolean`                                        | `false` | Disable nested config discovery and resolve config from `cwd` / `configPath` only.                                                                                                                           |
+| `respectOxfmtDefaultIgnores` | `boolean`                                        | `true`  | Respect oxfmt default ignores (`.gitignore`, `.prettierignore`, default ignored directories, default ignored lockfiles).                                                                                     |
 
 > Note: `cwd` is taken from ESLint automatically; you usually do not need to set it manually.
 > `.editorconfig` merge behavior follows oxfmt's documented strategy: https://oxc.rs/docs/guide/usage/formatter/config#editorconfig
@@ -194,6 +194,7 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - Set `editorconfig: { onlyCwd: true }` to read only the current `cwd`'s `.editorconfig` (no upward traversal)
 - Set `editorconfig: { cwd: '/path/to/base' }` to customize editorconfig resolution base directory
 - `configPath` overrides discovery and directly targets the specified config file
+- `configPath` supports explicit file paths with extensions: `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`
 - ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
 - Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory.
 - When `useConfig` is `true`, config `overrides` are applied first and rule-level `overrides` are appended after them (later entries win on conflicts).
