@@ -136,6 +136,13 @@ export type OxfmtOxfmt = []|[{
   
   disableNestedConfig?: boolean
   
+  editorconfig?: (boolean | {
+    
+    cwd?: string
+    
+    onlyCwd?: boolean
+  })
+  
   ignorePath?: (string | string[])
   
   respectOxfmtDefaultIgnores?: boolean

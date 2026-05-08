@@ -339,6 +339,28 @@ export const oxfmtConfigSchema: JSONSchema4 = {
       description: `Disable nested config lookup and resolve from cwd/configPath only. (Default: false)`,
       type: 'boolean',
     },
+    editorconfig: {
+      description: `Control .editorconfig reading.\n- true: enable with default behavior.\n- false: disable .editorconfig reading.\n- object: enable with advanced options (onlyCwd/cwd).\n\n- (Default: true)`,
+      oneOf: [
+        {
+          type: 'boolean',
+        },
+        {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            cwd: {
+              description: `Override directory used as the start point for .editorconfig resolution.`,
+              type: 'string',
+            },
+            onlyCwd: {
+              description: `When true, only read .editorconfig from cwd (no upward traversal).`,
+              type: 'boolean',
+            },
+          },
+        },
+      ],
+    },
     ignorePath: {
       description: `Path(s) to ignore files used for CLI-style ignore resolution. Accepts a single path or multiple paths. (Default: undefined)`,
       oneOf: [
