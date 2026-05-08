@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       load-oxfmt-config:
-        specifier: ^0.7.0
-        version: 0.7.0(oxfmt@0.48.0)
+        specifier: ^0.7.1
+        version: 0.7.1(oxfmt@0.48.0)
       picomatch:
         specifier: ^4.0.4
         version: 4.0.4
@@ -1988,8 +1988,8 @@ packages:
     peerDependencies:
       oxfmt: '>=0.41.0'
 
-  load-oxfmt-config@0.7.0:
-    resolution: {integrity: sha512-x1MmHrYbj7eZGEkfwCqVNqV6Js/JDKJxoyG3EWtYaPeFf1aeEQ+FfGBwxgmkn90gbPzoW6KMy65e55PFopPqMQ==}
+  load-oxfmt-config@0.7.1:
+    resolution: {integrity: sha512-d3WpSG2ygCdzBaNOO2vCT2PtysPphNgjpkZLa0Pz/O3trd8Orj6j32GkXhIGBFfLZLtUQSDS3MsPqnzUev+g3g==}
     peerDependencies:
       oxfmt: '>=0.41.0'
 
@@ -4396,7 +4396,7 @@ snapshots:
       jsonc-parser: 3.3.1
       oxfmt: 0.48.0
 
-  load-oxfmt-config@0.7.0(oxfmt@0.48.0):
+  load-oxfmt-config@0.7.1(oxfmt@0.48.0):
     dependencies:
       '@ntnyq/utils': 0.13.2
       editorconfig: 3.0.2

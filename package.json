@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "load-oxfmt-config": "^0.7.0",
+    "load-oxfmt-config": "^0.7.1",
     "picomatch": "^4.0.4",
     "synckit": "^0.11.12"
   },

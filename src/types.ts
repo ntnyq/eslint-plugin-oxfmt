@@ -1,7 +1,7 @@
 import type { Linter, Rule } from 'eslint'
 import type {
   IsOxfmtIgnoredResult,
-  Options as LoadOxfmtConfigOptions,
+  LoadOxfmtConfigOptions,
 } from 'load-oxfmt-config'
 import type { format, FormatConfig } from 'oxfmt'
 

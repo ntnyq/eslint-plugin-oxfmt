@@ -9,6 +9,7 @@ const UPSTREAM_SCHEMA_PATH = 'node_modules/oxfmt/configuration_schema.json'
 const PLUGIN_ONLY_TOP_LEVEL_OPTIONS = new Set([
   'configPath',
   'disableNestedConfig',
+  'editorconfig',
   'ignorePath',
   'respectOxfmtDefaultIgnores',
   'useConfig',

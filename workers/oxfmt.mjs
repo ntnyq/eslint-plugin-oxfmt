@@ -16,11 +16,11 @@ import { runAsWorker } from 'synckit'
  * @property {boolean} [useCache] - Reuse caches for config/ignore resolution.
  * @property {boolean} [useConfig] - Whether config discovery/loading is enabled.
  * @property {boolean} [respectOxfmtDefaultIgnores] - Whether CLI-like default ignores should apply.
- * @property {import('load-oxfmt-config').Options['editorconfig']} [editorconfig] - EditorConfig loading strategy.
+ * @property {import('load-oxfmt-config').LoadOxfmtConfigOptions['editorconfig']} [editorconfig] - EditorConfig loading strategy.
  */
 
 /**
- * @typedef {PluginOnlyOptions & import('load-oxfmt-config').Options & import('oxfmt').FormatConfig} PluginOptions
+ * @typedef {PluginOnlyOptions & import('load-oxfmt-config').LoadOxfmtConfigOptions & import('oxfmt').FormatConfig} PluginOptions
  */
 
 /**
