@@ -13,7 +13,7 @@
 - 🔧 **Auto-fix** - Automatically format code on save or via ESLint's fix command
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
-- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.*`
+- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.{ts,mts,cts,js,mjs,cjs}`
 - 📝 **EditorConfig Integration** - Respects a subset of `.editorconfig` options via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
 - 🎨 **Highly Configurable** - Supports all oxfmt formatting options
 - 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
@@ -84,6 +84,8 @@ export default [
   },
 ]
 ```
+
+`cliParity` is parser-agnostic. For non-JS extensions (for example `svelte`, `json`, `yaml`), also configure a suitable `languageOptions.parser` (such as `eslint-parser-plain`) in that config block.
 
 ### Custom Configuration
 
@@ -173,7 +175,7 @@ All options are optional and default to sensible values.
 
 | Option                       | Type                                             | Default | Description                                                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `useConfig`                  | `boolean`                                        | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.*` via `load-oxfmt-config`. Set to `false` to rely only on inline options.                                                                          |
+| `useConfig`                  | `boolean`                                        | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.{ts,mts,cts,js,mjs,cjs}` via `load-oxfmt-config`. Set to `false` to rely only on inline options.                                                                          |
 | `configPath`                 | `string`                                         | —       | Custom path to an oxfmt config file. Relative paths resolve from ESLint `cwd`; absolute paths are used as-is. Explicit `configPath` accepts `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`. |
 | `editorconfig`               | `boolean \| { onlyCwd?: boolean; cwd?: string }` | `true`  | Control `.editorconfig` loading. Use `false` to disable, or object form for advanced resolution strategy.                                                                                                    |
 | `ignorePath`                 | `string \| string[]`                             | —       | Ignore file path(s) for CLI-style ignore resolution (same role as CLI `--ignore-path`).                                                                                                                      |
@@ -414,7 +416,7 @@ It respects:
 
 - `.oxfmtrc.json`
 - `.oxfmtrc.jsonc`
-- `oxfmt.config.*`
+- `oxfmt.config.{ts,mts,cts,js,mjs,cjs}`
 - `.editorconfig`
 - `ignorePatterns`
 - `.gitignore`

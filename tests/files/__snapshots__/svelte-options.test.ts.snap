@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`oxfmt/oxfmt > invalid > Invalid #0: <script>let foo = 1</script>
-<Component foo={foo} /> 1`] = `
+<Component {foo} /> 1`] = `
 [
   {
     "column": 9,
@@ -20,6 +20,23 @@ exports[`oxfmt/oxfmt > invalid > Invalid #0: <script>let foo = 1</script>
     "line": 1,
     "message": "Replace \`let·foo·=·1</script>\` with \`⏎··let·foo·=·1⏎</script>⏎\`",
     "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 12,
+    "endColumn": 12,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        40,
+        40,
+      ],
+      "text": "foo=",
+    },
+    "line": 2,
+    "message": "Insert \`foo=\`",
+    "messageId": "insert",
     "ruleId": "oxfmt/oxfmt",
     "severity": 2,
   },

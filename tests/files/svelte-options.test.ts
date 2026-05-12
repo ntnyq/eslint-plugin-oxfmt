@@ -6,7 +6,7 @@ run({
   rule,
   invalid: [
     {
-      code: `<script>let foo = 1</script>\n<Component foo={foo} />`,
+      code: `<script>let foo = 1</script>\n<Component {foo} />`,
       filename: 'allow-shorthand.svelte',
       options: [
         {
