@@ -13,7 +13,7 @@
 - 🔧 **Auto-fix** - Automatically format code on save or via ESLint's fix command
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
-- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.ts`
+- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.*`
 - 📝 **EditorConfig Integration** - Respects a subset of `.editorconfig` options via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
 - 🎨 **Highly Configurable** - Supports all oxfmt formatting options
 - 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
@@ -80,7 +80,7 @@ import pluginOxfmt from 'eslint-plugin-oxfmt'
 export default [
   {
     ...pluginOxfmt.configs.cliParity,
-    files: ['**/*.{js,ts,mjs,cjs,jsx,tsx,json,jsonc,yaml,yml}'],
+    files: ['**/*.{js,ts,mjs,cjs,jsx,tsx,svelte,json,jsonc,yaml,yml}'],
   },
 ]
 ```
@@ -188,7 +188,7 @@ All options are optional and default to sensible values.
 
 When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 
-- Config discovery order (from `cwd`, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts`
+- Config discovery order (from `cwd`, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` / `oxfmt.config.mts` / `oxfmt.config.cts` / `oxfmt.config.js` / `oxfmt.config.mjs` / `oxfmt.config.cjs`
 - `.editorconfig` support: nearest `.editorconfig` (including section overrides) is merged into the final options
 - Set `editorconfig: false` to disable `.editorconfig` merging
 - Set `editorconfig: { onlyCwd: true }` to read only the current `cwd`'s `.editorconfig` (no upward traversal)
@@ -292,6 +292,7 @@ Tip: `jsdoc: true` is equivalent to enabling JSDoc with default settings.
 | `sortImports`     | `boolean \| object` | disabled | Experimental import sorting configuration                                    |
 | `sortPackageJson` | `boolean \| object` | `true`   | Experimental package.json sorting (object form: `{ sortScripts?: boolean }`) |
 | `sortTailwindcss` | `boolean \| object` | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
+| `svelte`          | `boolean \| object` | disabled | Enable/configure `.svelte` formatting via `prettier-plugin-svelte`           |
 
 #### Import sorting (`sortImports`)
 
@@ -417,6 +418,8 @@ It respects:
 - `.editorconfig`
 - `ignorePatterns`
 - `.gitignore`
+- parent `.gitignore`
+- `.git/info/exclude`
 - `.prettierignore`
 - default ignored directories
 - default ignored lockfiles

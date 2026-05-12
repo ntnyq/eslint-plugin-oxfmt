@@ -124,6 +124,15 @@ export type OxfmtOxfmt = []|[{
     stylesheet?: string
   })
   
+  svelte?: (boolean | {
+    
+    allowShorthand?: boolean
+    
+    indentScriptAndStyle?: boolean
+    
+    sortOrder?: string
+  })
+  
   tabWidth?: number
   
   trailingComma?: ("all" | "es5" | "none")
@@ -267,6 +276,15 @@ export type OxfmtOxfmt = []|[{
         preserveWhitespace?: boolean
         
         stylesheet?: string
+      })
+      
+      svelte?: (boolean | {
+        
+        allowShorthand?: boolean
+        
+        indentScriptAndStyle?: boolean
+        
+        sortOrder?: string
       })
       
       tabWidth?: number

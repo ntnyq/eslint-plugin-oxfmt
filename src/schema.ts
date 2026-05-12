@@ -306,6 +306,32 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
         },
       ],
     },
+    svelte: {
+      description: `Options for prettier-plugin-svelte.\nPass true or an object to enable .svelte file formatting, or false/omit to disable.\n\nNOTE: prettier-plugin-svelte requires the svelte package (svelte/compiler) at runtime.\n\n- (Default: disabled)`,
+      oneOf: [
+        {
+          type: 'boolean',
+        },
+        {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            allowShorthand: {
+              description: `Whether to allow attribute shorthand if attribute name and expression are the same. (Default: true)`,
+              type: 'boolean',
+            },
+            indentScriptAndStyle: {
+              description: `Whether to indent code inside <script> and <style> tags in Svelte files. (Default: true)`,
+              type: 'boolean',
+            },
+            sortOrder: {
+              description: `The order in which Svelte sections are printed, e.g. "options-scripts-markup-styles", or "none" to keep order. (Default: "options-scripts-markup-styles")`,
+              type: 'string',
+            },
+          },
+        },
+      ],
+    },
     tabWidth: {
       description: `Number of spaces per indentation level. (Default: 2)`,
       type: 'integer',
@@ -415,7 +441,7 @@ export const oxfmtRuleSchema: JSONSchema4 = {
             },
           },
           files: {
-            description: `Glob patterns to match files for this override.\nAll patterns are relative to the Oxfmt configuration file.`,
+            description: `Glob patterns to match files for this override.\nWhen \`useConfig\` is true, patterns are resolved relative to the discovered/resolved Oxfmt config directory.\nWhen \`useConfig\` is false, patterns are resolved relative to ESLint cwd.`,
             type: 'array',
             items: {
               type: 'string',

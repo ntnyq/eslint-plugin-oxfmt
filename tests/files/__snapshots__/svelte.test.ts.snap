@@ -1,0 +1,27 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`oxfmt/oxfmt > invalid > Invalid #0: <script lang="ts">const name = "foo"</script>
+<h1 class="title">{name}</h1> 1`] = `
+[
+  {
+    "column": 19,
+    "endColumn": 46,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        18,
+        45,
+      ],
+      "text": "
+  const name = 'foo'
+</script>
+",
+    },
+    "line": 1,
+    "message": "Replace \`const·name·=·"foo"</script>\` with \`⏎··const·name·=·'foo'⏎</script>⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;

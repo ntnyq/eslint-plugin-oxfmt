@@ -1,0 +1,126 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`oxfmt/oxfmt > invalid > Invalid #0: <script>let foo = 1</script>
+<Component foo={foo} /> 1`] = `
+[
+  {
+    "column": 9,
+    "endColumn": 29,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        8,
+        28,
+      ],
+      "text": "
+  let foo = 1
+</script>
+",
+    },
+    "line": 1,
+    "message": "Replace \`let·foo·=·1</script>\` with \`⏎··let·foo·=·1⏎</script>⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #1: <script>let count = 0</script>
+<style>.box { color: red; }</style>
+<div class="box">{count}</div> 1`] = `
+[
+  {
+    "column": 9,
+    "endColumn": 31,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        8,
+        30,
+      ],
+      "text": "
+let count = 0
+</script>
+
+<div class="box">{count}</div>
+",
+    },
+    "line": 1,
+    "message": "Replace \`let·count·=·0</script>\` with \`⏎let·count·=·0⏎</script>⏎⏎<div·class="box">{count}</div>⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 8,
+    "endColumn": 31,
+    "endLine": 3,
+    "fix": {
+      "range": [
+        38,
+        97,
+      ],
+      "text": "
+.box {
+  color: red;
+}
+</style>",
+    },
+    "line": 2,
+    "message": "Replace \`.box·{·color:·red;·}</style>⏎<div·class="box">{count}</div>\` with \`⏎.box·{⏎··color:·red;⏎}⏎</style>\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #2: <style>.box { color: red; }</style>
+<div class="box">Hello</div>
+<script>const name = "x"</script> 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 36,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        2,
+        35,
+      ],
+      "text": "cript>
+  const name = 'x'
+</script>
+",
+    },
+    "line": 1,
+    "message": "Replace \`tyle>.box·{·color:·red;·}</style>\` with \`cript>⏎··const·name·=·'x'⏎</script>⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 1,
+    "endColumn": 33,
+    "endLine": 3,
+    "fix": {
+      "range": [
+        65,
+        97,
+      ],
+      "text": "
+<style>
+  .box {
+    color: red;
+  }
+</style",
+    },
+    "line": 3,
+    "message": "Replace \`<script>const·name·=·"x"</script\` with \`⏎<style>⏎··.box·{⏎····color:·red;⏎··}⏎</style\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
