@@ -61,7 +61,13 @@
   },
   "peerDependencies": {
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.49.0"
+    "oxfmt": ">=0.49.0",
+    "svelte": "*"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
