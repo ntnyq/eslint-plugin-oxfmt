@@ -14,3 +14,6 @@ lib-cov
 **/.vitepress/cache
 
 !tests/fixtures/**/node_modules/
+
+# pnpm
+**/.pnpm-store/**

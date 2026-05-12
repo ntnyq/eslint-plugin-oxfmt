@@ -1,7 +1,7 @@
 // @ts-check
 
 import { dirname, relative } from 'node:path'
-import { isOxfmtIgnored, loadOxfmtConfigResult } from 'load-oxfmt-config'
+import { isOxfmtIgnored, loadOxfmtConfig } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
 import picomatch from 'picomatch'
 import { runAsWorker } from 'synckit'
@@ -178,7 +178,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
         ? cwd
         : dirname(filename)
 
-    const loaded = await loadOxfmtConfigResult({
+    const loaded = await loadOxfmtConfig({
       configPath: pluginOptions.configPath,
       cwd: configResolutionCwd,
       editorconfig: pluginOptions.editorconfig,
