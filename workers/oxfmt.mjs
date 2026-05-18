@@ -172,16 +172,12 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
   let finalOptions
 
   if (useConfig) {
-    const configResolutionCwd = pluginOptions.configPath
-      ? cwd
-      : pluginOptions.disableNestedConfig
-        ? cwd
-        : dirname(filename)
-
     const loaded = await loadOxfmtConfig({
       configPath: pluginOptions.configPath,
-      cwd: configResolutionCwd,
+      cwd: cwd ?? dirname(filename),
+      disableNestedConfig: pluginOptions.disableNestedConfig,
       editorconfig: pluginOptions.editorconfig,
+      filepath: filename,
       useCache: pluginOptions.useCache,
     })
     const { overrides: configOverrides, ...loadedConfig } = loaded.config
