@@ -186,7 +186,7 @@ it('should fail when linting files under package with invalid nested config', as
 
   expect(result.messages.length).toBeGreaterThan(0)
   expect(result.messages[0]?.message).toContain('Failed to format file:')
-  expect(result.messages[0]?.message).toContain('packages/a/index.ts')
+  expect(result.messages[0]?.message).toMatch(/packages[\\/]+a[\\/]+index\.ts/)
 })
 
 it('should not read nested config when disableNestedConfig is true', async () => {
