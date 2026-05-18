@@ -190,8 +190,8 @@ All options are optional and default to sensible values.
 
 When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 
-- Config discovery order (from `cwd`, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` / `oxfmt.config.mts` / `oxfmt.config.cts` / `oxfmt.config.js` / `oxfmt.config.mjs` / `oxfmt.config.cjs`
-- `.editorconfig` support: nearest `.editorconfig` (including section overrides) is merged into the final options
+- Config discovery order (from the formatted file's directory, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` / `oxfmt.config.mts` / `oxfmt.config.cts` / `oxfmt.config.js` / `oxfmt.config.mjs` / `oxfmt.config.cjs`
+- `.editorconfig` support follows oxfmt behavior: only the nearest `.editorconfig` is loaded for the current file (with section overrides in that file)
 - Set `editorconfig: false` to disable `.editorconfig` merging
 - Set `editorconfig: { onlyCwd: true }` to read only the current `cwd`'s `.editorconfig` (no upward traversal)
 - Set `editorconfig: { cwd: '/path/to/base' }` to customize editorconfig resolution base directory

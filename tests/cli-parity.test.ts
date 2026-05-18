@@ -10,6 +10,9 @@ import type { RuleOxfmtOptions, WorkerFormatResult } from '../src/types'
 
 const FIXTURE_CWD = resolve('tests/fixtures/cli-parity')
 const FIXTURE_NESTED_CWD = resolve('tests/fixtures/cli-parity/nested')
+const FIXTURE_NESTED_INVALID_CWD = resolve(
+  'tests/fixtures/cli-parity/nested-invalid',
+)
 const runWorker = createSyncFn(join(dirWorkers, 'oxfmt.mjs')) as unknown as (
   filename: string,
   sourceText: string,
@@ -154,6 +157,50 @@ it('should disable nested config lookup when disableNestedConfig is true', async
   )
 
   expect(result.output).toBe(`export const nested = "hello";\n`)
+})
+
+it('should not fail sibling files when another package has invalid nested config', async () => {
+  const result = await lintFile(
+    FIXTURE_NESTED_INVALID_CWD,
+    'packages/b/index.ts',
+    undefined,
+    true,
+  )
+
+  expect(result.messages.some(message => message.fatal)).toBe(false)
+  expect(
+    result.messages.some(message =>
+      message.message.includes('Failed to format file:'),
+    ),
+  ).toBe(false)
+  expect(result.output ?? `export const healthy = "hello"\n`).toBe(
+    `export const healthy = "hello";\n`,
+  )
+})
+
+it('should fail when linting files under package with invalid nested config', async () => {
+  const result = await lintFile(
+    FIXTURE_NESTED_INVALID_CWD,
+    'packages/a/index.ts',
+  )
+
+  expect(result.messages.length).toBeGreaterThan(0)
+  expect(result.messages[0]?.message).toContain('Failed to format file:')
+  expect(result.messages[0]?.message).toContain('packages/a/index.ts')
+})
+
+it('should not read nested config when disableNestedConfig is true', async () => {
+  const result = await lintFile(
+    FIXTURE_NESTED_INVALID_CWD,
+    'packages/a/index.ts',
+    {
+      disableNestedConfig: true,
+    },
+    true,
+  )
+
+  expect(result.messages.some(message => message.fatal)).toBe(false)
+  expect(result.output).toBe(`export const broken = "hello";\n`)
 })
 
 it('should skip oxfmt config loading when useConfig is false', async () => {
