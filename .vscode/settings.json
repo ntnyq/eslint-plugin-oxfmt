@@ -29,6 +29,7 @@
     "codecov",
     "esbuild",
     "lcov",
+    "Negotiables",
     "oxfmt",
     "oxfmtrc",
     "oxlint",
