@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       load-oxfmt-config:
-        specifier: ^0.9.0
-        version: 0.9.0(oxfmt@0.53.0(svelte@5.56.1(@typescript-eslint/types@8.60.1)))
+        specifier: ^0.10.0
+        version: 0.10.0(oxfmt@0.53.0(svelte@5.56.1(@typescript-eslint/types@8.60.1)))
       picomatch:
         specifier: ^4.0.4
         version: 4.0.4
@@ -31,7 +31,7 @@ importers:
         specifier: ^25.9.1
         version: 25.9.1
       '@typescript/native-preview':
-        specifier: ^7.0.0-dev.20260527.2
+        specifier: ^7.0.0-dev.20260601.1
         version: 7.0.0-dev.20260601.1
       bumpp:
         specifier: ^11.1.0
@@ -70,7 +70,7 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2
       svelte:
-        specifier: ^5.56.0
+        specifier: ^5.56.1
         version: 5.56.1(@typescript-eslint/types@8.60.1)
       tinyglobby:
         specifier: ^0.2.17
@@ -85,7 +85,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
-        specifier: ^4.1.7
+        specifier: ^4.1.8
         version: 4.1.8(@types/node@25.9.1)(vite@8.0.16(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
 
 packages:
@@ -1943,6 +1943,11 @@ packages:
   lightningcss@1.32.0:
     resolution: {integrity: sha512-NXYBzinNrblfraPGyrbPoD19C1h9lfI/1mzgWYvXUTe414Gz/X1FD2XBZSZM7rRTrMA8JL3OtAaGifrIKhQ5yQ==}
     engines: {node: '>= 12.0.0'}
+
+  load-oxfmt-config@0.10.0:
+    resolution: {integrity: sha512-F2QwGhC97Yy6iqgYuvtADonODAnxzq0f0m1oc2ZthRtkWw1WcLOL7rZqhPVG5DtwgiCKgWewWTKEiN8jlqlTfA==}
+    peerDependencies:
+      oxfmt: '>=0.53.0'
 
   load-oxfmt-config@0.9.0:
     resolution: {integrity: sha512-v19zP1ht1GwDJt6mcs48EjS+KFlG+4SA8POt1BlXG/xSRdkd2gRZhsnd9fLZjuuGQR/guchUrD0xKmnirQ5TxA==}
@@ -4344,6 +4349,16 @@ snapshots:
       lightningcss-linux-x64-musl: 1.32.0
       lightningcss-win32-arm64-msvc: 1.32.0
       lightningcss-win32-x64-msvc: 1.32.0
+
+  load-oxfmt-config@0.10.0(oxfmt@0.53.0(svelte@5.56.1(@typescript-eslint/types@8.60.1))):
+    dependencies:
+      '@ntnyq/utils': 0.13.3
+      editorconfig: 3.0.2
+      ignore: 7.0.5
+      jiti: 2.7.0
+      jsonc-parser: 3.3.1
+      oxfmt: 0.53.0(svelte@5.56.1(@typescript-eslint/types@8.60.1))
+      picomatch: 4.0.4
 
   load-oxfmt-config@0.9.0(oxfmt@0.53.0(svelte@5.56.1(@typescript-eslint/types@8.60.1))):
     dependencies:
