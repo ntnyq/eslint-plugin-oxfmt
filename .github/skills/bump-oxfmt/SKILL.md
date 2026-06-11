@@ -3,7 +3,7 @@ name: bump-oxfmt
 description: Upgrade workflow for this ESLint oxfmt plugin when oxfmt releases a new version. Use when comparing behavior drift between current plugin output and new oxfmt output, then updating implementation, tests, schemas, and docs.
 metadata:
   owner: oxfmt-plugin
-  version: '2026.05.27'
+  version: '2026.06.11'
 ---
 
 ## Goal
@@ -50,11 +50,31 @@ Collect what changed in oxfmt:
 Suggested commands:
 
 ```bash
-pnpm up oxfmt@<new-version>
+pnpm up oxfmt@<new-version> load-oxfmt-config@latest
 pnpm install
 ```
 
 Then inspect lockfile and package metadata changes.
+
+### 2.5. Changelog Diff Is Required
+
+Before touching source code, compare upstream release notes against the version currently used in this repo.
+
+Required checks:
+
+- Read the latest oxfmt changelog/release notes.
+- Diff current-in-repo version -> target version and list concrete behavior deltas.
+- Classify each delta as:
+  - no plugin impact,
+  - tests/snapshots only,
+  - schema/type/runtime code update required.
+
+Your PR/work summary must include a clear "Update Points" list:
+
+- dependency changes,
+- schema/type/runtime changes,
+- test/snapshot changes,
+- docs/migration notes.
 
 ### 3. Compare Plugin Surface Against Upstream
 
@@ -77,6 +97,12 @@ Files to review first:
 ### 4. Apply Required Code Updates
 
 1. Dependency bump in package.json and lockfile.
+   - Upgrade both packages to latest:
+     - `oxfmt` (dev dependency)
+     - `load-oxfmt-config` (runtime dependency)
+   - Keep range policy stable:
+     - `peerDependencies.oxfmt` must use `>=` range.
+     - `dependencies.load-oxfmt-config` must use `^` range.
 2. If upstream options changed:
    - Update schema in src/schema.ts.
    - Regenerate option types via:
@@ -149,7 +175,10 @@ pnpm typecheck
 PR description should include:
 
 - oxfmt version old -> new.
+- load-oxfmt-config version old -> new.
 - Summary of behavior changes observed.
+- Changelog diff highlights and impact classification.
+- Explicit "Update Points" list (deps/code/tests/docs).
 - Files/snapshots updated and why.
 - Backward-compatibility and migration impact.
 
@@ -166,3 +195,5 @@ PR description should include:
 - Always run pnpm check:schema when option surface changes.
 - Keep virtual-file skip behavior intact unless intentionally redesigned.
 - Keep preset exports and flat-config ergonomics stable unless documented.
+- Always review upstream changelog and compare against in-repo version before deciding code changes.
+- Always upgrade both `oxfmt` and `load-oxfmt-config` to latest together unless explicitly justified.
