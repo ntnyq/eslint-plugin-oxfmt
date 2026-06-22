@@ -120,6 +120,40 @@ if (extraInPlugin.length > 0) {
   )
 }
 
+const upstreamFormatConfig = upstreamSchema.definitions
+  ?.FormatConfig as JSONSchema4
+const upstreamFormatProperties = upstreamFormatConfig.properties ?? {}
+const overridesSchema = pluginProperties.overrides
+const overrideItemSchema = overridesSchema?.items as JSONSchema4
+const overrideOptionsSchema = overrideItemSchema.properties
+  ?.options as JSONSchema4
+const pluginOverrideOptionProperties = overrideOptionsSchema.properties ?? {}
+
+const upstreamFormatKeys = Object.keys(upstreamFormatProperties).sort()
+const pluginOverrideOptionKeys = Object.keys(
+  pluginOverrideOptionProperties,
+).sort()
+const missingOverrideOptions = upstreamFormatKeys.filter(
+  key => !pluginOverrideOptionKeys.includes(key),
+)
+const extraOverrideOptions = pluginOverrideOptionKeys.filter(
+  key => !upstreamFormatKeys.includes(key),
+)
+
+if (missingOverrideOptions.length > 0) {
+  hasError = true
+  printFailure(
+    `Missing override format options in plugin schema: ${formatList(missingOverrideOptions)}`,
+  )
+}
+
+if (extraOverrideOptions.length > 0) {
+  hasError = true
+  printFailure(
+    `Unexpected override format options in plugin schema: ${formatList(extraOverrideOptions)}`,
+  )
+}
+
 for (const key of upstreamKeys) {
   const upstreamEnum = resolveEnum(
     upstreamProperties[key] as JSONSchema4,

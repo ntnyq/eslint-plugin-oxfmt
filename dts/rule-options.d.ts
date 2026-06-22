@@ -180,8 +180,6 @@ export type OxfmtOxfmt = []|[{
       
       htmlWhitespaceSensitivity?: ("css" | "ignore" | "strict")
       
-      ignorePatterns?: string[]
-      
       insertFinalNewline?: boolean
       
       jsdoc?: (boolean | {

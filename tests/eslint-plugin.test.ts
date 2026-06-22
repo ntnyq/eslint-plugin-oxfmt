@@ -160,6 +160,42 @@ it('should work with jsonc-eslint-parser when using recommendedWithoutParser', a
   )
 })
 
+it('should reject ignorePatterns inside rule-level override options', async () => {
+  const eslint = new ESLint({
+    cwd: FIXTURE_BASE_CWD,
+    ignore: false,
+    overrideConfigFile: true,
+    overrideConfig: [
+      {
+        ...pluginOxfmt.configs.recommended,
+        files: ['**/*.js'],
+        rules: {
+          'oxfmt/oxfmt': [
+            'error',
+            {
+              useConfig: false,
+              overrides: [
+                {
+                  files: ['**/*.js'],
+                  options: {
+                    ignorePatterns: ['**/ignored/**'],
+                  },
+                },
+              ],
+            } as unknown as RuleOxfmtOptions,
+          ],
+        },
+      },
+    ],
+  })
+
+  await expect(
+    eslint.lintText('const value=1\n', {
+      filePath: resolve(FIXTURE_BASE_CWD, 'example.js'),
+    }),
+  ).rejects.toThrow('ignorePatterns')
+})
+
 async function runFixture(cwd: string, ruleOptions?: RuleOxfmtOptions) {
   const files = (
     await glob(['src/**/*.{js,ts}', 'scripts/**/*.{js,ts}'], {

@@ -352,6 +352,11 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
   },
 }
 
+const oxfmtOverrideOptionsSchemaProperties = {
+  ...oxfmtOptionsSchema.properties,
+}
+delete oxfmtOverrideOptionsSchemaProperties.ignorePatterns
+
 export const oxfmtConfigSchema: JSONSchema4 = {
   additionalProperties: false,
   type: 'object',
@@ -452,7 +457,7 @@ export const oxfmtRuleSchema: JSONSchema4 = {
             description: `Format options to apply for matched files.`,
             type: 'object',
             properties: {
-              ...oxfmtOptionsSchema.properties,
+              ...oxfmtOverrideOptionsSchemaProperties,
             },
           },
         },

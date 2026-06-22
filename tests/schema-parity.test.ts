@@ -76,6 +76,32 @@ it('should keep top-level schema options aligned with oxfmt + plugin extras', as
   expect(pluginKeys).toEqual(expectedPluginKeys)
 })
 
+it('should keep override option schema aligned with upstream format options', async () => {
+  const upstreamRaw = await readFile(UPSTREAM_SCHEMA_PATH, 'utf8')
+  const upstreamSchema = JSON.parse(upstreamRaw) as JSONSchema4
+  const upstreamFormatConfig = upstreamSchema.definitions
+    ?.FormatConfig as JSONSchema4
+
+  const pluginProperties = (oxfmtRuleSchema.properties ?? {}) as Record<
+    string,
+    JSONSchema4
+  >
+  const overridesSchema = pluginProperties.overrides
+  const overrideItemSchema = overridesSchema?.items as JSONSchema4
+  const overrideOptionsSchema = overrideItemSchema.properties
+    ?.options as JSONSchema4
+
+  const upstreamFormatKeys = Object.keys(
+    upstreamFormatConfig.properties ?? {},
+  ).sort()
+  const pluginOverrideOptionKeys = Object.keys(
+    overrideOptionsSchema.properties ?? {},
+  ).sort()
+
+  expect(pluginOverrideOptionKeys).toEqual(upstreamFormatKeys)
+  expect(pluginOverrideOptionKeys).not.toContain('ignorePatterns')
+})
+
 it('should keep enum options aligned with oxfmt schema', async () => {
   const upstreamRaw = await readFile(UPSTREAM_SCHEMA_PATH, 'utf8')
   const upstreamSchema = JSON.parse(upstreamRaw) as JSONSchema4
