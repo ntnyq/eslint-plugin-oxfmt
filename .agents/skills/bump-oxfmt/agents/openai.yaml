@@ -1,0 +1,4 @@
+interface:
+  display_name: Bump Oxfmt
+  short_description: Bump oxfmt version safely in this repository
+  default_prompt: Use $bump-oxfmt upgrade oxfmt dependency
