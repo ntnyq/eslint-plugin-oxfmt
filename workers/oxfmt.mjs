@@ -1,6 +1,6 @@
 // @ts-check
 
-import { dirname, relative } from 'node:path'
+import { dirname, extname, relative } from 'node:path'
 import { isOxfmtIgnored, loadOxfmtConfig } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
 import picomatch from 'picomatch'
@@ -118,6 +118,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
 
   const cwd = pluginOptions.cwd
   const useConfig = pluginOptions.useConfig !== false
+  const useCache = getUseCacheOption(pluginOptions)
 
   const ruleIgnorePatterns = isStringArray(inlineFormatOptions.ignorePatterns)
     ? inlineFormatOptions.ignorePatterns
@@ -143,7 +144,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
       ignorePath: pluginOptions.ignorePath,
       includeConfigIgnorePatterns: useConfig,
       loadConfigForIgnorePatterns: useConfig,
-      useCache: pluginOptions.useCache,
+      useCache,
       withNodeModules: pluginOptions.withNodeModules,
     }
     const ignored = await isOxfmtIgnored(ignoredOptions)
@@ -178,7 +179,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
       disableNestedConfig: pluginOptions.disableNestedConfig,
       editorconfig: pluginOptions.editorconfig,
       filepath: filename,
-      useCache: pluginOptions.useCache,
+      useCache,
     })
     const { overrides: configOverrides, ...loadedConfig } = loaded.config
     const { overrides: ruleOverrides, ...inlineOptionsWithoutOverrides } =
@@ -239,6 +240,24 @@ function getCachedMatcher(patterns) {
  */
 function getRelativePath(baseDir, filename) {
   return relative(baseDir, filename).replace(/\\/g, '/')
+}
+
+/**
+ * Resolve the cache setting passed to load-oxfmt-config.
+ * Explicit CommonJS config files need the loader's non-cached CJS path so
+ * `module.exports = {}` configs are read as config objects.
+ * @param {PluginOnlyOptions} pluginOptions - Plugin orchestration options.
+ * @returns {boolean | undefined} Cache setting for config/ignore loading.
+ */
+function getUseCacheOption(pluginOptions) {
+  if (
+    pluginOptions.configPath &&
+    extname(pluginOptions.configPath) === '.cjs'
+  ) {
+    return false
+  }
+
+  return pluginOptions.useCache
 }
 
 /**

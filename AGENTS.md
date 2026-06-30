@@ -1,54 +1,56 @@
-# AGENTS
+# Repository Guidelines
 
-Guidance for AI coding agents working in this repository.
+## Project Structure & Module Organization
 
-## Project Snapshot
+This package is an ESLint flat-config plugin that formats files through `oxfmt`.
+Core source lives in `src/`: plugin exports in `src/index.ts`, presets in
+`src/configs.ts`, the rule in `src/rules/oxfmt.ts`, schema definitions in
+`src/schema.ts`, and reporting helpers in `src/reporter.ts`. Worker-side
+formatting and config loading live in `workers/oxfmt.mjs`. Tests are under
+`tests/`, with rule tests in `tests/rules/`, file-format fixtures in
+`tests/files/`, and integration/config fixtures in `tests/fixtures/`.
+Generated rule option types live in `dts/rule-options.d.ts`; do not hand-edit
+that file.
 
-- Package: ESLint flat-config plugin that formats files through oxfmt.
-- Runtime requirements: ESLint >= 9, Node ^20.19.0 or >=22.12.0.
-- Package manager: pnpm.
+## Build, Test, and Development Commands
 
-See: [README.md](README.md)
+- `pnpm install`: install dependencies using the pinned pnpm workspace setup.
+- `pnpm dev`: run `tsdown` in watch mode for local development.
+- `pnpm build`: regenerate rule option types, then build `dist/`.
+- `pnpm test`: run the Vitest suite.
+- `pnpm lint`: run ESLint.
+- `pnpm typecheck`: run `tsgo --noEmit`.
+- `pnpm check:schema`: verify plugin option schema parity with upstream oxfmt.
+- `pnpm release:check`: full gate: schema, format, lint, typecheck, tests, build.
 
-## Commands To Use
+## Coding Style & Naming Conventions
 
-- Install: `pnpm install`
-- Build: `pnpm build`
-- Test: `pnpm test`
-- Lint: `pnpm lint`
-- Typecheck: `pnpm typecheck`
-- Schema parity check: `pnpm check:schema`
-- Regenerate rule option types: `pnpm update:rule-options`
-- Full release gate: `pnpm release:check`
+Use TypeScript ESM in `src/` and plain ESM JavaScript in `workers/`. Formatting
+is enforced by `oxfmt`: two spaces, LF line endings, no semicolons, single
+quotes for JS/TS, and trailing commas. Keep public exports and preset names
+stable (`recommended`, `recommendedWithoutParser`, `cliParity`). Prefer clear
+camelCase option names matching upstream oxfmt and `load-oxfmt-config`.
 
-Source of truth: [package.json](package.json)
+## Testing Guidelines
 
-## High-Signal Constraints
+Tests use Vitest. Add targeted tests near the changed behavior: rule behavior in
+`tests/rules/`, config loading in `tests/eslint-plugin.test.ts`, CLI parity in
+`tests/cli-parity.test.ts`, and schema checks in `tests/schema-parity.test.ts`.
+For formatter output changes, update snapshots only after confirming the new
+upstream oxfmt output is intentional. Run targeted tests first, then
+`pnpm release:check` before finalizing.
 
-- Keep changes aligned with flat-config usage and exported presets in [src/configs.ts](src/configs.ts).
-- Do not hand-edit generated types in [dts/rule-options.d.ts](dts/rule-options.d.ts); regenerate via `pnpm update:rule-options`.
-- If schema or option enums change, update [src/schema.ts](src/schema.ts) and run `pnpm check:schema` (script: [scripts/checkSchemaParity.ts](scripts/checkSchemaParity.ts)).
-- Preserve virtual-file skip behavior in rule execution (processor-extracted files) covered by [tests/rules/error-reporting.test.ts](tests/rules/error-reporting.test.ts).
-- Keep config-loading semantics test-aligned, especially when `useConfig` is true (rule-level overrides are still merged), covered by [tests/eslint-plugin.test.ts](tests/eslint-plugin.test.ts).
+## Commit & Pull Request Guidelines
 
-## Architecture Map
+Use Conventional Commits seen in history, such as `feat: require oxfmt v0.57.0`,
+`fix: align override option schema`, `docs: add bump oxfmt skill`, or
+`chore: release v0.11.0`. Pull requests should describe behavior changes,
+dependency bumps, tests run, and any schema or snapshot updates. Link related
+issues when available.
 
-- Plugin entry and exports: [src/index.ts](src/index.ts)
-- ESLint presets (`recommended`, `recommendedWithoutParser`, `cliParity`): [src/configs.ts](src/configs.ts)
-- Core rule implementation: [src/rules/oxfmt.ts](src/rules/oxfmt.ts)
-- Worker bridge and formatting execution: [workers/oxfmt.mjs](workers/oxfmt.mjs)
-- Diff/report generation: [src/reporter.ts](src/reporter.ts)
-- Rule/config types: [src/types.ts](src/types.ts)
+## Agent-Specific Instructions
 
-## Testing Strategy For Changes
-
-- Prefer targeted test runs first, then full suite before finalizing.
-- For preset or config behavior changes: run [tests/configs.test.ts](tests/configs.test.ts), [tests/cli-parity.test.ts](tests/cli-parity.test.ts), and [tests/eslint-plugin.test.ts](tests/eslint-plugin.test.ts).
-- For formatter/rule behavior changes: run [tests/rules/oxfmt.test.ts](tests/rules/oxfmt.test.ts) and [tests/rules/error-reporting.test.ts](tests/rules/error-reporting.test.ts).
-- For schema-related changes: run [tests/schema-parity.test.ts](tests/schema-parity.test.ts) and `pnpm check:schema`.
-
-## Link-First Docs
-
-- User-facing usage and options: [README.md](README.md)
-- Build and release scripts: [package.json](package.json)
-- Type generation implementation: [scripts/updateRuleOptions.ts](scripts/updateRuleOptions.ts)
+When oxfmt options change, update `src/schema.ts`, run
+`pnpm update:rule-options`, and verify with `pnpm check:schema`. Preserve
+virtual-file skip behavior in the rule and keep `useConfig` merge semantics
+aligned with existing integration tests.
