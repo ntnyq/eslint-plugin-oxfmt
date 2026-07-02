@@ -1,6 +1,7 @@
 // @ts-check
 
 import { dirname, extname, relative } from 'node:path'
+import ignore from 'ignore'
 import { isOxfmtIgnored, loadOxfmtConfig } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
 import picomatch from 'picomatch'
@@ -65,7 +66,9 @@ const PLUGIN_ONLY_OPTIONS = new Set([
   'withNodeModules',
 ])
 /** @type {Map<string, import('picomatch').Matcher>} */
-const matcherCache = new Map()
+const overrideMatcherCache = new Map()
+/** @type {Map<string, import('ignore').Ignore>} */
+const ignoreMatcherCache = new Map()
 
 /**
  * Apply override entries to a base options object.
@@ -85,11 +88,11 @@ function applyOverrides(relativePath, baseOptions, overrides) {
       continue
     }
 
-    const fileMatcher = getCachedMatcher(override.files)
+    const fileMatcher = getCachedOverrideMatcher(override.files)
     const matches = !!fileMatcher && fileMatcher(relativePath)
 
     const excludeMatcher = override.excludeFiles?.length
-      ? getCachedMatcher(override.excludeFiles)
+      ? getCachedOverrideMatcher(override.excludeFiles)
       : undefined
     const excluded = excludeMatcher ? excludeMatcher(relativePath) : false
 
@@ -216,19 +219,39 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
 }
 
 /**
- * Get or create a cached picomatch matcher.
- * @param {string[]} patterns - Glob patterns.
- * @returns {import('picomatch').Matcher} Compiled matcher.
+ * Get or create a cached ignore matcher for oxfmt ignorePatterns.
+ * @param {string[]} patterns - Gitignore-style patterns.
+ * @returns {import('ignore').Ignore} Compiled ignore matcher.
  */
-function getCachedMatcher(patterns) {
+function getCachedIgnoreMatcher(patterns) {
   const key = patterns.join('\0')
-  const cached = matcherCache.get(key)
+  const cached = ignoreMatcherCache.get(key)
   if (cached) {
     return cached
   }
 
-  const matcher = picomatch(patterns)
-  setCacheEntry(matcherCache, key, matcher)
+  const matcher = ignore().add(patterns)
+  setCacheEntry(ignoreMatcherCache, key, matcher)
+  return matcher
+}
+
+/**
+ * Get or create a cached picomatch matcher for oxfmt override globs.
+ * @param {string[]} patterns - Glob patterns.
+ * @returns {import('picomatch').Matcher} Compiled matcher.
+ */
+function getCachedOverrideMatcher(patterns) {
+  const key = patterns.join('\0')
+  const cached = overrideMatcherCache.get(key)
+  if (cached) {
+    return cached
+  }
+
+  const matcher = picomatch(patterns, {
+    dot: true,
+    noextglob: true,
+  })
+  setCacheEntry(overrideMatcherCache, key, matcher)
   return matcher
 }
 
@@ -297,8 +320,8 @@ function shouldIgnoreFile(relativePath, ignorePatterns) {
     return false
   }
 
-  const matcher = getCachedMatcher(ignorePatterns)
-  return !!matcher && matcher(relativePath)
+  const matcher = getCachedIgnoreMatcher(ignorePatterns)
+  return matcher.ignores(relativePath)
 }
 
 /**

@@ -480,6 +480,32 @@ it('should match config-derived overrides relative to config directory, not ESLi
   )
 })
 
+it('should match config-derived overrides through dot directories', async () => {
+  const cwd = resolve('tests/fixtures/config-loading/dot-directory-overrides')
+  const filePath = resolve(cwd, 'docs/.vitepress/theme/app.css')
+  const sourceText = normalizeLineEndings(await readFile(filePath, 'utf8'))
+  const eslint = new ESLint({
+    cwd,
+    fix: true,
+    ignore: false,
+    overrideConfigFile: true,
+    overrideConfig: [
+      {
+        ...pluginOxfmt.configs.recommended,
+        files: ['**/*.css'],
+      },
+    ],
+  })
+
+  const [result] = await eslint.lintText(sourceText, { filePath })
+
+  expect(normalizeLineEndings(result.output ?? '')).toBe(`.app {
+  font-family: "Inter";
+  content: "docs";
+}
+`)
+})
+
 it('should merge rule-level overrides when useConfig is true', async () => {
   const cwd = resolve('tests/fixtures/config-loading/rule-overrides-ignored')
   const ruleOptions: RuleOxfmtOptions = {

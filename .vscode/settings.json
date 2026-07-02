@@ -30,6 +30,7 @@
     "esbuild",
     "lcov",
     "Negotiables",
+    "noextglob",
     "oxfmt",
     "oxfmtrc",
     "oxlint",

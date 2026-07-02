@@ -1508,6 +1508,72 @@ run({
       ],
     },
     {
+      description: `Should skip formatting in dot directories when rule-level ignorePatterns match`,
+      filename: 'docs/.vitepress/theme/app.js',
+      name: 'ignored dot directory file keeps original text',
+      code: $`
+        const value = "foo"
+      `,
+      options: [
+        {
+          ignorePatterns: ['**/*.js'],
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+    },
+    {
+      description: `Should apply base options when a dot directory file matches override excludeFiles`,
+      filename: 'docs/.vitepress/theme/app.css',
+      name: 'overrides exclude dot directory files',
+      code: $`
+        .app {
+          content: 'docs';
+        }
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          singleQuote: true,
+          useConfig: false,
+          overrides: [
+            {
+              excludeFiles: ['**/*.css'],
+              files: ['**/.vitepress/**'],
+              options: {
+                singleQuote: false,
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      description: `Should treat extglob override patterns like oxfmt`,
+      filename: 'docs/vitepress/theme/app.css',
+      name: 'overrides do not enable extglob syntax',
+      code: $`
+        .app {
+          content: 'docs';
+        }
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          singleQuote: true,
+          useConfig: false,
+          overrides: [
+            {
+              files: ['**/*.@(css|scss)'],
+              options: {
+                singleQuote: false,
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
       description: `Should fall back to base options when file is excluded from override`,
       filename: 'tests/skip.ts',
       name: 'overrides exclude files',
