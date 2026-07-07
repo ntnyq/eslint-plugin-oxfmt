@@ -22,7 +22,7 @@
 
 - **ESLint**: `>= 9.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^20.19.0 || >=22.12.0`
-- **oxfmt**: `>= 0.57.0`
+- **oxfmt**: `>= 0.58.0`
 
 ## Installation
 
