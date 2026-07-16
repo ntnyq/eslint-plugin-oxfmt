@@ -21,3 +21,49 @@ exports[`oxfmt/oxfmt > invalid > Invalid #0: const numbers: number[] = [1,2,3] 1
   },
 ]
 `;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #1: enum Example { "valid" = 1, "not-valid" = 2 }
+interface Methods { "valid"(): void; "not-valid"(): void } 1`] = `
+[
+  {
+    "column": 15,
+    "endColumn": 45,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        14,
+        44,
+      ],
+      "text": "
+  valid = 1,
+  "not-valid" = 2,
+",
+    },
+    "line": 1,
+    "message": "Replace \`·"valid"·=·1,·"not-valid"·=·2·\` with \`⏎··valid·=·1,⏎··"not-valid"·=·2,⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 20,
+    "endColumn": 58,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        65,
+        103,
+      ],
+      "text": "
+  valid(): void;
+  "not-valid"(): void;
+",
+    },
+    "line": 2,
+    "message": "Replace \`·"valid"():·void;·"not-valid"():·void·\` with \`⏎··valid():·void;⏎··"not-valid"():·void;⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;

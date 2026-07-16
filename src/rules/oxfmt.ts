@@ -79,8 +79,8 @@ export const oxfmt: Rule.RuleModule = {
           } else {
             reportDifferences(context, sourceText, formatResult.code)
           }
-        } catch (err) {
-          const details = err instanceof Error ? `: ${err.message}` : ''
+        } catch (error) {
+          const details = error instanceof Error ? `: ${error.message}` : ''
 
           context.report({
             message: `Failed to format file: ${context.filename}${details}`,

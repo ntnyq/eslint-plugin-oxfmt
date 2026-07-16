@@ -24,3 +24,47 @@ exports[`oxfmt/oxfmt > invalid > Invalid #0: @primary:#fff;.btn{color:@primary} 
   },
 ]
 `;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #1: .a{&:extend( .b , .c )}
+.merge{box-shadow  +  :0 0 1px #000} 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 23,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        2,
+        22,
+      ],
+      "text": " {
+  &:extend(.b, .c);
+",
+    },
+    "line": 1,
+    "message": "Replace \`{&:extend(·.b·,·.c·)\` with \`·{⏎··&:extend(.b,·.c);⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 7,
+    "endColumn": 36,
+    "endLine": 2,
+    "fix": {
+      "range": [
+        30,
+        59,
+      ],
+      "text": " {
+  box-shadow+: 0 0 1px #000;
+",
+    },
+    "line": 2,
+    "message": "Replace \`{box-shadow··+··:0·0·1px·#000\` with \`·{⏎··box-shadow+:·0·0·1px·#000;⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;

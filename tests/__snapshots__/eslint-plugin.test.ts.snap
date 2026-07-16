@@ -518,6 +518,61 @@ format(reallyLongArg(), anotherLongArg());
 }
 `;
 
+exports[`should load oxfmt.config.mts 1`] = `
+{
+  "fixture": "mts-config",
+  "summary": [
+    {
+      "file": "src/example.js",
+      "messages": [
+        {
+          "column": 24,
+          "endColumn": 51,
+          "endLine": 1,
+          "fix": {
+            "text": " {
+  console.log(
+    'hello world',
+  )
+",
+          },
+          "line": 1,
+          "message": "Replace \`{console.log("hello·world")\` with \`·{⏎··console.log(⏎····'hello·world',⏎··)⏎\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+        {
+          "column": 8,
+          "endColumn": 1,
+          "endLine": 3,
+          "fix": {
+            "text": "
+  reallyLongArg(),
+  anotherLongArg(),
+)",
+          },
+          "line": 2,
+          "message": "Replace \`reallyLongArg(),anotherLongArg())⏎\` with \`⏎··reallyLongArg(),⏎··anotherLongArg(),⏎)\`",
+          "messageId": "replace",
+          "ruleId": "oxfmt/oxfmt",
+          "severity": 2,
+        },
+      ],
+      "output": "export function greet() {
+  console.log(
+    'hello world',
+  )
+}
+format(
+  reallyLongArg(),
+  anotherLongArg(),
+)",
+    },
+  ],
+}
+`;
+
 exports[`should load oxfmt.config.ts 1`] = `
 {
   "fixture": "ts-config",

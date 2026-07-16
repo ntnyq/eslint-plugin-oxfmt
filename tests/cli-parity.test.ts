@@ -135,6 +135,19 @@ it('should resolve config ignorePatterns relative to the config directory', asyn
   expect(normalResult.messages.length).toBeGreaterThan(0)
 })
 
+it('should reject config ignorePatterns that escape the config directory', async () => {
+  const result = await lintFile(
+    FIXTURE_CWD,
+    'invalid-ignore-pattern/src/example.ts',
+  )
+
+  expect(result.messages).toHaveLength(1)
+  expect(result.messages[0]?.message).toContain(
+    'Invalid pattern `../src/**` in `ignorePatterns`',
+  )
+  expect(result.messages[0]?.message).toContain('`..` is not supported')
+})
+
 it('should prefer nested config by default', async () => {
   const result = await lintFile(
     FIXTURE_NESTED_CWD,

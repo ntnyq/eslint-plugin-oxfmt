@@ -33,7 +33,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       type: 'string',
     },
     ignorePatterns: {
-      description: `Ignore files matching these glob patterns. Rule-level ignorePatterns are resolved relative to ESLint cwd. Config ignorePatterns are resolved relative to the config file directory.`,
+      description: `Ignore files matching these glob patterns. Rule-level ignorePatterns are resolved relative to ESLint cwd. Config ignorePatterns are resolved relative to the config file directory and reject parent-directory (\`..\`) path segments.`,
       type: 'array',
       items: {
         type: 'string',

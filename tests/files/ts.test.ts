@@ -25,5 +25,32 @@ run({
         )
       },
     },
+    {
+      filename: 'quote-props.ts',
+      code: `enum Example { "valid" = 1, "not-valid" = 2 }
+interface Methods { "valid"(): void; "not-valid"(): void }`,
+      options: [
+        {
+          insertFinalNewline: false,
+          quoteProps: 'as-needed',
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "enum Example {
+            valid = 1,
+            \"not-valid\" = 2,
+          }
+          interface Methods {
+            valid(): void;
+            \"not-valid\"(): void;
+          }"
+        `)
+      },
+    },
   ],
 })

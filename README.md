@@ -13,7 +13,7 @@
 - 🔧 **Auto-fix** - Automatically format code on save or via ESLint's fix command
 - 🎯 **ESLint Integration** - Seamlessly integrates with ESLint v9+ flat config
 - 📦 **Zero Config** - Works out of the box with sensible defaults
-- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.{ts,mts,cts,js,mjs,cjs}`
+- 🧩 **Config File Discovery** - Auto-discovers `.oxfmtrc.json`, `.oxfmtrc.jsonc`, and `oxfmt.config.{ts,mts}`
 - 📝 **EditorConfig Integration** - Respects a subset of `.editorconfig` options via [oxfmt's strategy](https://oxc.rs/docs/guide/usage/formatter/config#editorconfig)
 - 🎨 **Highly Configurable** - Supports all oxfmt formatting options
 - 🌐 **Multi-language Support** - JavaScript, TypeScript, JSX, TSX and [more](https://oxc.rs/docs/guide/usage/formatter.html#supported-languages)
@@ -22,7 +22,7 @@
 
 - **ESLint**: `>= 9.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^20.19.0 || >=22.12.0`
-- **oxfmt**: `>= 0.58.0`
+- **oxfmt**: `>= 0.59.0`
 
 ## Installation
 
@@ -191,15 +191,15 @@ All options are optional and default to sensible values.
 
 When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 
-- Config discovery order (from the formatted file's directory, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` / `oxfmt.config.mts` / `oxfmt.config.cts` / `oxfmt.config.js` / `oxfmt.config.mjs` / `oxfmt.config.cjs`
-- `.editorconfig` support follows oxfmt behavior: only the nearest `.editorconfig` is loaded for the current file (with section overrides in that file)
+- Config discovery order (from the formatted file's directory, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` → `oxfmt.config.mts`
+- `.editorconfig` support follows oxfmt behavior: only the nearest `.editorconfig` is loaded for the current file, and its root and section values provide fallbacks for fields not set by the oxfmt config
 - Set `editorconfig: false` to disable `.editorconfig` merging
 - Set `editorconfig: { onlyCwd: true }` to read only the current `cwd`'s `.editorconfig` (no upward traversal)
 - Set `editorconfig: { cwd: '/path/to/base' }` to customize editorconfig resolution base directory
 - `configPath` overrides discovery and directly targets the specified config file
 - `configPath` supports explicit file paths with extensions: `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`
 - ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
-- Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory.
+- Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory and reject parent-directory (`..`) path segments.
 - When `useConfig` is `true`, config `overrides` are applied first and rule-level `overrides` are appended after them (later entries win on conflicts).
 - When `useConfig` is `false`, config discovery and config `ignorePatterns` are skipped, while global ignores still apply when `respectOxfmtDefaultIgnores` is enabled.
 
@@ -210,14 +210,14 @@ For detailed behavior, see:
 
 ### Basic Options
 
-| Option           | Type       | Default | Description                                                                                                                                            |
-| ---------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `semi`           | `boolean`  | `true`  | Add semicolons at the end of statements                                                                                                                |
-| `singleQuote`    | `boolean`  | `false` | Use single quotes instead of double quotes                                                                                                             |
-| `tabWidth`       | `number`   | `2`     | Number of spaces per indentation level                                                                                                                 |
-| `useTabs`        | `boolean`  | `false` | Use tabs for indentation                                                                                                                               |
-| `printWidth`     | `number`   | `100`   | Maximum line length for wrapping                                                                                                                       |
-| `ignorePatterns` | `string[]` | `[]`    | Glob patterns to skip formatting. Rule option patterns are resolved from ESLint cwd; config file patterns are resolved from the config file directory. |
+| Option           | Type       | Default | Description                                                                                                                                                                                  |
+| ---------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `semi`           | `boolean`  | `true`  | Add semicolons at the end of statements                                                                                                                                                      |
+| `singleQuote`    | `boolean`  | `false` | Use single quotes instead of double quotes                                                                                                                                                   |
+| `tabWidth`       | `number`   | `2`     | Number of spaces per indentation level                                                                                                                                                       |
+| `useTabs`        | `boolean`  | `false` | Use tabs for indentation                                                                                                                                                                     |
+| `printWidth`     | `number`   | `100`   | Maximum line length for wrapping                                                                                                                                                             |
+| `ignorePatterns` | `string[]` | `[]`    | Glob patterns to skip formatting. Rule option patterns are resolved from ESLint cwd; config file patterns are resolved from the config file directory and cannot contain `..` path segments. |
 
 ### Trailing Commas
 

@@ -1,0 +1,7 @@
+export default {
+  insertFinalNewline: false,
+  printWidth: 24,
+  semi: false,
+  singleQuote: true,
+  tabWidth: 2,
+}

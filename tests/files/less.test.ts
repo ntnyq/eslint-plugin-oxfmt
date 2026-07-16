@@ -26,5 +26,29 @@ run({
         `)
       },
     },
+    {
+      filename: 'extend-and-merge.less',
+      code: `.a{&:extend( .b , .c )}
+.merge{box-shadow  +  :0 0 1px #000}`,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          ".a {
+            &:extend(.b, .c);
+          }
+          .merge {
+            box-shadow+: 0 0 1px #000;
+          }"
+        `)
+      },
+    },
   ],
 })

@@ -371,6 +371,10 @@ const CONFIG_LOADER_FIXTURES = [
     title: 'should load oxfmt.config.ts',
   },
   {
+    cwd: resolve('tests/fixtures/config-loading/mts-config'),
+    title: 'should load oxfmt.config.mts',
+  },
+  {
     cwd: resolve('tests/fixtures/config-loading/json-with-editorconfig'),
     title: 'should merge .editorconfig with .oxfmtrc.json',
   },
@@ -610,7 +614,7 @@ EDITORCONFIG_QUOTE_TYPE_ROOT_CASES.forEach(
   },
 )
 
-it('should map section .editorconfig quote_type values for single, double, and auto', async () => {
+it('should keep root oxfmt options above section .editorconfig fallbacks', async () => {
   const summary = await runFixture(
     resolve('tests/fixtures/config-loading/editorconfig-quote-type-sections'),
   )
@@ -620,7 +624,7 @@ it('should map section .editorconfig quote_type values for single, double, and a
     `export const message = 'hello world';`,
   )
   expect(summaryByFile.get('src/double.js')?.output).toBe(
-    `export const message = "hello world";`,
+    `export const message = 'hello world';`,
   )
   expect(summaryByFile.get('src/auto.js')?.output).toBe(
     `export const message = 'hello world';`,
@@ -631,14 +635,13 @@ it('should map section .editorconfig quote_type values for single, double, and a
   expect(summaryByFile.get('src/auto.js')?.messages.length).toBeGreaterThan(0)
 })
 
-it('should treat .editorconfig [**] sections as overrides instead of root fallback options', async () => {
+it('should keep root oxfmt options above .editorconfig [**] fallbacks', async () => {
   const summary = await runFixture(
     resolve('tests/fixtures/config-loading/editorconfig-double-star'),
   )
 
   expect(summary).toHaveLength(1)
-  expect(summary[0]?.messages.length).toBeGreaterThan(0)
-  expect(summary[0]?.output).toBe(`export const message = "hello world";`)
+  expect(summary[0]?.messages).toHaveLength(0)
 })
 
 it('should align section indent_size fallback with oxfmt and keep inherited root indentation', async () => {
