@@ -247,10 +247,24 @@ function getCachedOverrideMatcher(patterns) {
     return cached
   }
 
-  const matcher = picomatch(patterns, {
+  const matcherOptions = {
     dot: true,
     noextglob: true,
-  })
+    strictBrackets: true,
+  }
+
+  for (const pattern of patterns) {
+    try {
+      picomatch(pattern, matcherOptions)
+    } catch (error) {
+      const details = error instanceof Error ? `: ${error.message}` : ''
+      throw new Error(`Invalid glob pattern \`${pattern}\`${details}`, {
+        cause: error,
+      })
+    }
+  }
+
+  const matcher = picomatch(patterns, matcherOptions)
   setCacheEntry(overrideMatcherCache, key, matcher)
   return matcher
 }

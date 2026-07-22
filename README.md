@@ -22,7 +22,7 @@
 
 - **ESLint**: `>= 9.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^20.19.0 || >=22.12.0`
-- **oxfmt**: `>= 0.59.0`
+- **oxfmt**: `>= 0.60.0`
 
 ## Installation
 
@@ -201,6 +201,7 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
 - Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory and reject parent-directory (`..`) path segments.
 - When `useConfig` is `true`, config `overrides` are applied first and rule-level `overrides` are appended after them (later entries win on conflicts).
+- Invalid `files` or `excludeFiles` override glob patterns are reported as formatting errors.
 - When `useConfig` is `false`, config discovery and config `ignorePatterns` are skipped, while global ignores still apply when `respectOxfmtDefaultIgnores` is enabled.
 
 For detailed behavior, see:

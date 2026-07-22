@@ -1036,6 +1036,31 @@ run({
         expect(output).toMatchInlineSnapshot(`"/** Foo */\nconst a = 1;"`)
       },
     },
+    {
+      description: `Should keep Tailwind classes glued to template expressions when preserveWhitespace is true`,
+      filename: 'test.tsx',
+      name: 'Tailwind preserve whitespace template expression',
+      code: $`
+        const A = <div className={\`text-white flex bg-\${color}\`}>Hello</div>;
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          sortTailwindcss: {
+            preserveWhitespace: true,
+          },
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toBe($`
+          const A = <div className={\`flex text-white bg-\${color}\`}>Hello</div>;
+        `)
+      },
+    },
   ],
   valid: [
     {

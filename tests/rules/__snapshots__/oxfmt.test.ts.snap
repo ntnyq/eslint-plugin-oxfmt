@@ -550,3 +550,25 @@ exports[`oxfmt/oxfmt > invalid > Invalid #22: Should still format when file does
   },
 ]
 `;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #37: Should keep Tailwind classes glued to template expressions when preserveWhitespace is true 1`] = `
+[
+  {
+    "column": 28,
+    "endColumn": 43,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        27,
+        42,
+      ],
+      "text": "flex text-white",
+    },
+    "line": 1,
+    "message": "Replace \`text-white·flex\` with \`flex·text-white\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;

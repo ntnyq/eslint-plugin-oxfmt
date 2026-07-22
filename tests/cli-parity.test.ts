@@ -148,6 +148,19 @@ it('should reject config ignorePatterns that escape the config directory', async
   expect(result.messages[0]?.message).toContain('`..` is not supported')
 })
 
+it('should reject invalid config override glob patterns', async () => {
+  const result = await lintFile(
+    FIXTURE_CWD,
+    'invalid-override-pattern/src/example.ts',
+  )
+
+  expect(result.messages).toHaveLength(1)
+  expect(result.messages[0]?.message).toContain(
+    'Invalid glob pattern `src/**/*.{js,ts`',
+  )
+  expect(result.messages[0]?.message).toContain('Missing closing: "}"')
+})
+
 it('should prefer nested config by default', async () => {
   const result = await lintFile(
     FIXTURE_NESTED_CWD,
