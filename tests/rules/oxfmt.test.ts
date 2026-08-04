@@ -1061,6 +1061,38 @@ run({
         `)
       },
     },
+    {
+      description: `Should format JSX in Vue script blocks declared as TSX`,
+      filename: 'component.vue',
+      name: 'tsx in vue script block',
+      code: $`
+        <script lang="tsx">
+        export default {
+          render( h ): VNode {return <div>{ this.foo   }</div>    },
+        }
+        </script>
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors.length).toBeGreaterThan(0)
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "<script lang=\"tsx\">
+          export default {
+            render(h): VNode {
+              return <div>{this.foo}</div>;
+            },
+          };
+          </script>"
+        `)
+      },
+    },
   ],
   valid: [
     {
