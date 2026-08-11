@@ -10,9 +10,11 @@ export default defineESLintConfig({
     all: true,
   },
   test: {
-    overridesVitestRules: {
-      // in favor of eslint-vitest-rule-tester
-      'vitest/no-standalone-expect': 'off',
+    vitest: {
+      overrides: {
+        // in favor of eslint-vitest-rule-tester
+        'vitest/no-standalone-expect': 'off',
+      },
     },
   },
 })
