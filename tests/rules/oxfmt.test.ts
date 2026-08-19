@@ -1093,6 +1093,33 @@ run({
         `)
       },
     },
+    {
+      description: `Should print wrapped operators at the start of lines when experimentalOperatorPosition is start`,
+      filename: 'test.js',
+      name: 'move wrapped operators to line starts',
+      code: $`
+        const value = firstCondition && secondCondition && thirdCondition;
+      `,
+      options: [
+        {
+          experimentalOperatorPosition: 'start',
+          insertFinalNewline: false,
+          printWidth: 30,
+          useConfig: false,
+        },
+      ],
+      errors(errors) {
+        expect(errors).toMatchSnapshot()
+      },
+      output(output) {
+        expect(output).toMatchInlineSnapshot(`
+          "const value =
+            firstCondition
+            && secondCondition
+            && thirdCondition;"
+        `)
+      },
+    },
   ],
   valid: [
     {

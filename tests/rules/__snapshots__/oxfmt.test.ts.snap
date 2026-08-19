@@ -572,3 +572,28 @@ exports[`oxfmt/oxfmt > invalid > Invalid #37: Should keep Tailwind classes glued
   },
 ]
 `;
+
+exports[`oxfmt/oxfmt > invalid > Invalid #39: Should print wrapped operators at the start of lines when experimentalOperatorPosition is start 1`] = `
+[
+  {
+    "column": 14,
+    "endColumn": 48,
+    "endLine": 1,
+    "fix": {
+      "range": [
+        13,
+        47,
+      ],
+      "text": "
+  firstCondition
+  && secondCondition
+ ",
+    },
+    "line": 1,
+    "message": "Replace \`·firstCondition·&&·secondCondition\` with \`⏎··firstCondition⏎··&&·secondCondition⏎·\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;

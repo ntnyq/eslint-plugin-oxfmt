@@ -27,6 +27,11 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       enum: ['lf', 'crlf', 'cr'],
       type: 'string',
     },
+    experimentalOperatorPosition: {
+      description: `When expressions wrap lines, print operators at the start of new lines ("start") or at the end of previous lines ("end").\n\n- Languages: JS, JSX, TS, TSX\n- (Default: "end")`,
+      enum: ['start', 'end'],
+      type: 'string',
+    },
     htmlWhitespaceSensitivity: {
       description: `Specify the global whitespace sensitivity for HTML, Vue, Angular, and Handlebars.\n\n- (Default: "css")`,
       enum: ['css', 'ignore', 'strict'],

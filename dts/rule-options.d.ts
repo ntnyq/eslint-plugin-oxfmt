@@ -24,6 +24,8 @@ export type OxfmtOxfmt = []|[{
   
   endOfLine?: ("lf" | "crlf" | "cr")
   
+  experimentalOperatorPosition?: ("start" | "end")
+  
   htmlWhitespaceSensitivity?: ("css" | "ignore" | "strict")
   
   ignorePatterns?: string[]
@@ -177,6 +179,8 @@ export type OxfmtOxfmt = []|[{
       embeddedLanguageFormatting?: ("auto" | "off")
       
       endOfLine?: ("lf" | "crlf" | "cr")
+      
+      experimentalOperatorPosition?: ("start" | "end")
       
       htmlWhitespaceSensitivity?: ("css" | "ignore" | "strict")
       
