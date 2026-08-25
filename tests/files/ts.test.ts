@@ -53,4 +53,18 @@ interface Methods { "valid"(): void; "not-valid"(): void }`,
       },
     },
   ],
+  valid: [
+    {
+      filename: 'decorated-class.ts',
+      code: `// prettier-ignore
+@Decorator({ values: [1,   2] })
+export   class Example {}`,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+    },
+  ],
 })
