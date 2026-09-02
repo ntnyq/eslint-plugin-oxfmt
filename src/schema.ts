@@ -154,7 +154,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
           type: 'object',
           properties: {
             customGroups: {
-              description: `Define your own groups for matching very specific imports.\n\nThe customGroups list is ordered: The first definition that matches an element will be used.\nCustom groups have a higher priority than any predefined group.\n\nIf you want a predefined group to take precedence over a custom group,\nyou must write a custom group definition that does the same as what the predefined group does, and put it first in the list.\n\n- (Default: [])`,
+              description: `Define your own groups for matching very specific imports.\n\nThe customGroups list is ordered: The first definition that matches an element will be used.\nCustom groups have a higher priority than any predefined group.\n\nIf you want a predefined group to take precedence over a custom group,\nyou must write a custom group definition that does the same as what the predefined group does, and put it first in the list.\n\nIf you specify multiple conditions like elementNamePattern, selector, and modifiers,\nall conditions must be met for an import to match the custom group (AND logic).\n\nNOTE: Predefined group names (e.g. side_effect, external) and unknown are reserved and cannot be used as groupName.\n\n- (Default: [])`,
               type: 'array',
               items: {
                 additionalProperties: false,

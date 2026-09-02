@@ -10,8 +10,10 @@ it('should include worker error details in the reported lint message', async () 
   const report = vi.fn()
 
   vi.doMock('synckit', () => ({
-    createSyncFn: () => () => {
-      throw new Error('mock worker failure')
+    createSyncFn() {
+      return () => {
+        throw new Error('mock worker failure')
+      }
     },
   }))
 
@@ -71,15 +73,17 @@ it('should report formatter diagnostics using label ranges when available', asyn
   const report = vi.fn()
 
   vi.doMock('synckit', () => ({
-    createSyncFn: () => () => ({
-      code: 'const value = 1;',
-      errors: [
-        {
-          labels: [{ end: 11, start: 6 }],
-          message: 'labelled formatter error',
-        },
-      ],
-    }),
+    createSyncFn() {
+      return () => ({
+        code: 'const value = 1;',
+        errors: [
+          {
+            labels: [{ end: 11, start: 6 }],
+            message: 'labelled formatter error',
+          },
+        ],
+      })
+    },
   }))
 
   const { oxfmt } = await import('../../src/rules/oxfmt')
@@ -116,14 +120,16 @@ it('should report formatter diagnostics at fallback location when labels are mis
   const report = vi.fn()
 
   vi.doMock('synckit', () => ({
-    createSyncFn: () => () => ({
-      code: 'const value = 1;',
-      errors: [
-        {
-          message: 'unlabelled formatter error',
-        },
-      ],
-    }),
+    createSyncFn() {
+      return () => ({
+        code: 'const value = 1;',
+        errors: [
+          {
+            message: 'unlabelled formatter error',
+          },
+        ],
+      })
+    },
   }))
 
   const { oxfmt } = await import('../../src/rules/oxfmt')

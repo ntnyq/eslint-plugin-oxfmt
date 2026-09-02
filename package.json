@@ -2,7 +2,7 @@
   "name": "eslint-plugin-oxfmt",
   "type": "module",
   "version": "0.20.0",
-  "packageManager": "pnpm@11.23.0",
+  "packageManager": "pnpm@11.25.0",
   "description": "An ESLint plugin for formatting code with oxfmt.",
   "keywords": [
     "eslint",
@@ -18,7 +18,10 @@
     "email": "ntnyq13@gmail.com"
   },
   "homepage": "https://github.com/ntnyq/eslint-plugin-oxfmt#readme",
-  "repository": "ntnyq/eslint-plugin-oxfmt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntnyq/eslint-plugin-oxfmt.git"
+  },
   "bugs": {
     "url": "https://github.com/ntnyq/eslint-plugin-oxfmt/issues"
   },
@@ -61,7 +64,7 @@
   },
   "peerDependencies": {
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.65.0",
+    "oxfmt": ">=0.66.0",
     "svelte": "*"
   },
   "peerDependenciesMeta": {
@@ -71,17 +74,17 @@
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "ignore": "^7.0.6",
-    "load-oxfmt-config": "^0.21.0",
+    "ignore": "^7.0.8",
+    "load-oxfmt-config": "^0.22.0",
     "picomatch": "^4.0.7",
     "synckit": "^0.11.13"
   },
   "devDependencies": {
-    "@ntnyq/eslint-config": "^7.0.0-beta.17",
+    "@ntnyq/eslint-config": "^7.0.0-beta.19",
     "@types/json-schema": "^7.0.15",
-    "@types/node": "^26.3.0",
+    "@types/node": "^26.4.1",
     "@typescript/native-preview": "^7.0.0-dev.20260707.2",
-    "bumpp": "^12.2.1",
+    "bumpp": "^12.2.2",
     "eslint": "^10.9.1",
     "eslint-parser-plain": "^0.1.1",
     "eslint-plugin-oxfmt": "workspace:*",
@@ -91,12 +94,12 @@
     "jsonc-eslint-parser": "^3.3.0",
     "nano-staged": "^1.0.2",
     "npm-run-all2": "^9.0.3",
-    "oxfmt": "^0.65.0",
+    "oxfmt": "^0.66.0",
     "show-invisibles": "^0.0.2",
-    "svelte": "^5.56.10",
+    "svelte": "^5.57.0",
     "tinyglobby": "^0.2.17",
     "tsdown": "^0.22.14",
-    "tsx": "^4.23.12",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
   },
