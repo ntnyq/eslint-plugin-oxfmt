@@ -1,10 +1,53 @@
+import { ESLint } from 'eslint'
 import { afterEach, expect, it, vi } from 'vitest'
+import { resolve } from '../../scripts/utils'
 
 afterEach(() => {
   vi.resetModules()
   vi.clearAllMocks()
   vi.doUnmock('synckit')
 })
+
+it.each([
+  { column: 15, endColumn: 16, line: 1, source: 'const value = ;' },
+  { column: 14, endColumn: 15, line: 1, source: 'const éééé = ;' },
+  { column: 12, endColumn: 13, line: 1, source: 'const 中文 = ;' },
+  { column: 25, endColumn: 26, line: 1, source: 'const a="😀"; const b = ;' },
+  { column: 15, endColumn: 16, line: 2, source: '// 中文😀\nconst value = ;' },
+  { column: 11, endColumn: 11, line: 1, source: 'const 中文 =' },
+])(
+  'should report UTF-16 diagnostic locations for $source',
+  async ({ column, endColumn, line, source }) => {
+    const { default: pluginOxfmt } = await import('../../src')
+    const cwd = resolve('tests/fixtures/base')
+    const eslint = new ESLint({
+      cwd,
+      overrideConfigFile: true,
+      overrideConfig: [
+        {
+          ...pluginOxfmt.configs.recommended,
+          rules: {
+            'oxfmt/oxfmt': ['error', { useConfig: false }],
+          },
+        },
+      ],
+    })
+    const [result] = await eslint.lintText(source, {
+      filePath: resolve(cwd, 'diagnostic.js'),
+    })
+
+    expect(result.messages).toEqual([
+      expect.objectContaining({
+        column,
+        endColumn,
+        endLine: line,
+        line,
+        message: 'Failed to format code: Unexpected token',
+        ruleId: 'oxfmt/oxfmt',
+      }),
+    ])
+  },
+)
 
 it('should include worker error details in the reported lint message', async () => {
   const report = vi.fn()

@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { join } from 'node:path'
 import { createSyncFn } from 'synckit'
 import { dirWorkers } from '../dir'
@@ -57,11 +58,18 @@ export const oxfmt: Rule.RuleModule = {
           }
 
           if (formatResult.errors?.length) {
+            // Oxfmt labels use UTF-8 bytes; ESLint locations use UTF-16 indices.
+            const sourceBytes = Buffer.from(sourceText)
+
             for (const error of formatResult.errors) {
               const label = error.labels?.[0]
               if (label) {
-                const start = context.sourceCode.getLocFromIndex(label.start)
-                const end = context.sourceCode.getLocFromIndex(label.end)
+                const start = context.sourceCode.getLocFromIndex(
+                  sourceBytes.toString('utf8', 0, label.start).length,
+                )
+                const end = context.sourceCode.getLocFromIndex(
+                  sourceBytes.toString('utf8', 0, label.end).length,
+                )
                 context.report({
                   loc: { end, start },
                   message: `Failed to format code: ${error.message}`,
