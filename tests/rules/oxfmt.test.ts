@@ -1120,8 +1120,61 @@ run({
         `)
       },
     },
+    {
+      errors: 1,
+      filename: 'query.graphql',
+      name: 'move GraphQL opening brace comment to its own line',
+      code: $`
+        query { # keep
+          user {
+            id
+          }
+        }
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+      output: $`
+        query {
+          # keep
+          user {
+            id
+          }
+        }
+      `,
+    },
   ],
   valid: [
+    {
+      filename: 'cast.js',
+      name: 'preserve JSDoc cast parentheses containing a trailing comment',
+      code: $`
+        const declared = /** @type {string} */ (
+          value // trailing
+        );
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+        },
+      ],
+    },
+    {
+      code: '$items: (red,);',
+      filename: 'list.scss',
+      name: 'preserve single-item SCSS list comma with trailingComma none',
+      options: [
+        {
+          insertFinalNewline: false,
+          trailingComma: 'none',
+          useConfig: false,
+        },
+      ],
+    },
     {
       description: `Code with semicolons should be accepted when semi is true (default)`,
       filename: 'test.js',

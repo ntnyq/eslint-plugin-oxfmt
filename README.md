@@ -22,7 +22,14 @@
 
 - **ESLint**: `>= 9.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^20.19.0 || >=22.12.0`
-- **oxfmt**: `>= 0.66.0`
+- **oxfmt**: `>= 0.67.0`
+
+Oxfmt 0.67.0 preserves JSDoc cast parentheses containing comments, fixes
+CSS/SCSS/Less comment and list formatting, and moves GraphQL comments after
+an opening brace onto their own line. Existing files may receive formatting
+fixes after upgrading. No formatting options were renamed or removed, and
+config merge precedence is unchanged. See the
+[upstream release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.67.0).
 
 ## Installation
 
