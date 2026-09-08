@@ -366,6 +366,8 @@ You can pass the Tailwind plugin options to control which attributes/functions a
 }
 ```
 
+Paths in `sortTailwindcss.config` and `sortTailwindcss.stylesheet` are resolved relative to the oxfmt config file when set in that file or its overrides. Paths set in ESLint rule options or rule-level overrides are resolved relative to ESLint `cwd`. Absolute paths are used directly.
+
 ## File-specific overrides
 
 Use `overrides` to apply different oxfmt options per file glob (later entries win on conflicts):

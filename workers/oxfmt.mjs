@@ -1,6 +1,6 @@
 // @ts-check
 
-import { dirname, extname, relative } from 'node:path'
+import { dirname, extname, relative, resolve } from 'node:path'
 import ignore from 'ignore'
 import { isOxfmtIgnored, loadOxfmtConfig } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
@@ -8,6 +8,7 @@ import picomatch from 'picomatch'
 import { runAsWorker } from 'synckit'
 
 /**
+ * Options consumed by the worker instead of the formatter.
  * @typedef {object} PluginOnlyOptions
  * @property {string} [cwd] - Base working directory used for path resolution.
  * @property {string} [configPath] - Explicit path to oxfmt config file.
@@ -21,10 +22,17 @@ import { runAsWorker } from 'synckit'
  */
 
 /**
- * @typedef {PluginOnlyOptions & import('load-oxfmt-config').LoadOxfmtConfigOptions & import('oxfmt').FormatConfig} PluginOptions
+ * Formatting options, ignore patterns, and file-specific overrides.
+ * @typedef {import('load-oxfmt-config').OxfmtOptions} OxfmtOptions
  */
 
 /**
+ * Combined rule options accepted by the worker.
+ * @typedef {PluginOnlyOptions & import('load-oxfmt-config').LoadOxfmtConfigOptions & OxfmtOptions} PluginOptions
+ */
+
+/**
+ * Result returned when ignore handling skips a file.
  * @typedef {object} WorkerIgnoredResult
  * @property {true} ignored - Indicates formatting was skipped due to ignore rules.
  * @property {import('load-oxfmt-config').IsOxfmtIgnoredResult['reason']} [reason] - Ignore reason from resolution step.
@@ -33,6 +41,7 @@ import { runAsWorker } from 'synckit'
  */
 
 /**
+ * Result returned after attempting to format a file.
  * @typedef {object} WorkerFormattedResult
  * @property {false} [ignored] - False or undefined when formatting was attempted.
  * @property {string} code - Formatted source code.
@@ -40,20 +49,31 @@ import { runAsWorker } from 'synckit'
  */
 
 /**
+ * Worker response for either ignored or formatted source text.
  * @typedef {WorkerIgnoredResult | WorkerFormattedResult} WorkerFormatResult
  */
 
 /**
+ * Worker controls separated from formatting and file-matching options.
  * @typedef {object} SplitOptionsResult
  * @property {PluginOnlyOptions} pluginOptions - Plugin orchestration options.
- * @property {import('oxfmt').FormatConfig} formatOptions - Pure oxfmt options.
+ * @property {OxfmtOptions} formatOptions - Oxfmt options including ignorePatterns and overrides.
  */
 
 /**
+ * A file-matching override loaded from config or supplied inline.
  * @typedef {import('load-oxfmt-config').OxfmtConfigOverride} OxfmtConfigOverride
  */
 
+/**
+ * Maximum number of compiled matchers retained in each worker cache.
+ * @type {number}
+ */
 const MAX_CACHE_SIZE = 200
+/**
+ * Option names consumed by worker orchestration.
+ * @type {Set<string>}
+ */
 const PLUGIN_ONLY_OPTIONS = new Set([
   'configPath',
   'cwd',
@@ -65,9 +85,15 @@ const PLUGIN_ONLY_OPTIONS = new Set([
   'useConfig',
   'withNodeModules',
 ])
-/** @type {Map<string, import('picomatch').Matcher>} */
+/**
+ * Compiled override globs keyed by their ordered pattern list.
+ * @type {Map<string, import('picomatch').Matcher>}
+ */
 const overrideMatcherCache = new Map()
-/** @type {Map<string, import('ignore').Ignore>} */
+/**
+ * Compiled gitignore-style rules keyed by their ordered pattern list.
+ * @type {Map<string, import('ignore').Ignore>}
+ */
 const ignoreMatcherCache = new Map()
 
 /**
@@ -75,13 +101,18 @@ const ignoreMatcherCache = new Map()
  * @param {string} relativePath - Relative file path used for matching.
  * @param {import('oxfmt').FormatConfig} baseOptions - Base format options.
  * @param {OxfmtConfigOverride[] | undefined} overrides - Override entries.
+ * @param {string} optionsBaseDir - Base directory for paths inside override options.
  * @returns {import('oxfmt').FormatConfig} Options after override merge.
  */
-function applyOverrides(relativePath, baseOptions, overrides) {
+function applyOverrides(relativePath, baseOptions, overrides, optionsBaseDir) {
   if (!overrides?.length) {
     return baseOptions
   }
 
+  /**
+   * Format options after applying each matching override in order.
+   * @type {import('oxfmt').FormatConfig}
+   */
   let merged = baseOptions
   for (const override of overrides) {
     if (!override?.files?.length) {
@@ -99,7 +130,7 @@ function applyOverrides(relativePath, baseOptions, overrides) {
     if (matches && !excluded && override.options) {
       merged = {
         ...merged,
-        ...override.options,
+        ...resolveTailwindPaths(override.options, optionsBaseDir),
       }
     }
   }
@@ -123,6 +154,10 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
   const useConfig = pluginOptions.useConfig !== false
   const useCache = getUseCacheOption(pluginOptions)
 
+  /**
+   * Inline ignore patterns matched relative to ESLint cwd.
+   * @type {string[] | undefined}
+   */
   const ruleIgnorePatterns = isStringArray(inlineFormatOptions.ignorePatterns)
     ? inlineFormatOptions.ignorePatterns
     : undefined
@@ -138,7 +173,10 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
   }
 
   if (pluginOptions.respectOxfmtDefaultIgnores !== false && cwd) {
-    /** @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions} */
+    /**
+     * Config and ignore resolution settings for the current file.
+     * @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions}
+     */
     const ignoredOptions = {
       configPath: pluginOptions.configPath,
       cwd,
@@ -168,12 +206,30 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
     }
   }
 
-  /** @type {OxfmtConfigOverride[] | undefined} */
-  let effectiveOverrides
-  /** @type {string} */
-  let overrideBaseDir = cwd ?? dirname(filename)
-  /** @type {import('oxfmt').FormatConfig} */
-  let finalOptions
+  /**
+   * Base directory for paths supplied in inline rule options.
+   * @type {string}
+   */
+  const inlineBaseDir = cwd ?? dirname(filename)
+  /**
+   * Base for override globs and config-derived paths, updated after discovery.
+   * @type {string}
+   */
+  let overrideBaseDir = inlineBaseDir
+  /**
+   * Inline overrides separated from root options to preserve merge order.
+   * @type {OxfmtOptions}
+   */
+  const { overrides: ruleOverrides, ...inlineOptionsWithoutOverrides } =
+    inlineFormatOptions
+  /**
+   * Effective formatter options with paths resolved against their source.
+   * @type {import('oxfmt').FormatConfig}
+   */
+  let finalOptions = resolveTailwindPaths(
+    inlineOptionsWithoutOverrides,
+    inlineBaseDir,
+  )
 
   if (useConfig) {
     const loaded = await loadOxfmtConfig({
@@ -185,34 +241,26 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
       useCache,
     })
     const { overrides: configOverrides, ...loadedConfig } = loaded.config
-    const { overrides: ruleOverrides, ...inlineOptionsWithoutOverrides } =
-      inlineFormatOptions
-    effectiveOverrides = [
-      ...(configOverrides ?? []),
-      ...(Array.isArray(ruleOverrides) ? ruleOverrides : []),
-    ]
     overrideBaseDir = loaded.dirname ?? overrideBaseDir
 
     finalOptions = {
-      ...loadedConfig,
-      ...inlineOptionsWithoutOverrides,
+      ...resolveTailwindPaths(loadedConfig, overrideBaseDir),
+      ...finalOptions,
     }
-  } else {
-    const { overrides: ruleOverrides, ...inlineOptionsWithoutOverrides } =
-      inlineFormatOptions
-    effectiveOverrides = Array.isArray(ruleOverrides)
-      ? ruleOverrides
-      : undefined
-    finalOptions = {
-      ...inlineOptionsWithoutOverrides,
-    }
+    finalOptions = applyOverrides(
+      getRelativePath(overrideBaseDir, filename),
+      finalOptions,
+      configOverrides,
+      overrideBaseDir,
+    )
   }
 
   const overrideRelativePath = getRelativePath(overrideBaseDir, filename)
   finalOptions = applyOverrides(
     overrideRelativePath,
     finalOptions,
-    effectiveOverrides,
+    Array.isArray(ruleOverrides) ? ruleOverrides : undefined,
+    inlineBaseDir,
   )
 
   return format(filename, sourceText, finalOptions)
@@ -239,6 +287,7 @@ function getCachedIgnoreMatcher(patterns) {
  * Get or create a cached picomatch matcher for oxfmt override globs.
  * @param {string[]} patterns - Glob patterns.
  * @returns {import('picomatch').Matcher} Compiled matcher.
+ * @throws {Error} If a pattern contains invalid glob syntax.
  */
 function getCachedOverrideMatcher(patterns) {
   const key = patterns.join('\0')
@@ -247,6 +296,10 @@ function getCachedOverrideMatcher(patterns) {
     return cached
   }
 
+  /**
+   * Match oxfmt's dotfile and literal-extglob behavior.
+   * @type {{dot: boolean, noextglob: boolean, strictBrackets: boolean}}
+   */
   const matcherOptions = {
     dot: true,
     noextglob: true,
@@ -307,6 +360,33 @@ function isStringArray(value) {
 }
 
 /**
+ * Resolve Tailwind paths before merging options from different sources.
+ * @param {import('oxfmt').FormatConfig} options - Format options to normalize.
+ * @param {string} baseDir - Config directory or ESLint cwd for inline options.
+ * @returns {import('oxfmt').FormatConfig} Options with absolute Tailwind paths.
+ */
+function resolveTailwindPaths(options, baseDir) {
+  const { sortTailwindcss } = options
+  if (!sortTailwindcss || typeof sortTailwindcss !== 'object') {
+    return options
+  }
+
+  /**
+   * Copy paths before resolving them to avoid mutating cached config objects.
+   * @type {import('oxfmt').SortTailwindcssConfig}
+   */
+  const resolved = { ...sortTailwindcss }
+  if (resolved.config) {
+    resolved.config = resolve(baseDir, resolved.config)
+  }
+  if (resolved.stylesheet) {
+    resolved.stylesheet = resolve(baseDir, resolved.stylesheet)
+  }
+
+  return { ...options, sortTailwindcss: resolved }
+}
+
+/**
  * Store a value in a FIFO cache map with a bounded size.
  * @template T Cache value type.
  * @param {Map<string, T>} cache - Cache map.
@@ -324,9 +404,9 @@ function setCacheEntry(cache, key, value) {
 }
 
 /**
- * Check if a file should be ignored by provided glob patterns.
+ * Check if a file should be ignored by provided gitignore-style patterns.
  * @param {string} relativePath - Relative path against pattern base.
- * @param {string[] | undefined} ignorePatterns - Glob patterns.
+ * @param {string[] | undefined} ignorePatterns - Ordered gitignore-style patterns.
  * @returns {boolean} Whether file is ignored.
  */
 function shouldIgnoreFile(relativePath, ignorePatterns) {
@@ -339,14 +419,20 @@ function shouldIgnoreFile(relativePath, ignorePatterns) {
 }
 
 /**
- * Split worker options into plugin orchestration options and pure format options.
+ * Split worker controls from oxfmt options, ignore patterns, and overrides.
  * @param {PluginOptions} [options] - Raw worker options.
  * @returns {SplitOptionsResult} Split option buckets.
  */
 function splitOptions(options = {}) {
-  /** @type {Record<string, unknown>} */
+  /**
+   * Options consumed by config loading and ignore orchestration.
+   * @type {Record<string, unknown>}
+   */
   const pluginOptions = {}
-  /** @type {Record<string, unknown>} */
+  /**
+   * Remaining oxfmt options, including file-matching configuration.
+   * @type {Record<string, unknown>}
+   */
   const formatOptions = {}
 
   for (const [key, value] of Object.entries(options)) {
@@ -358,7 +444,7 @@ function splitOptions(options = {}) {
   }
 
   return {
-    formatOptions: /** @type {import('oxfmt').FormatConfig} */ (formatOptions),
+    formatOptions: /** @type {OxfmtOptions} */ (formatOptions),
     pluginOptions: /** @type {PluginOnlyOptions} */ (pluginOptions),
   }
 }
@@ -366,11 +452,19 @@ function splitOptions(options = {}) {
 /**
  * Validate plugin-only options before dispatching to helper libraries.
  * @param {PluginOnlyOptions} pluginOptions - Plugin-only options.
+ * @returns {void}
+ * @throws {TypeError} If a supported plugin option has an invalid value type.
  */
 function validatePluginOptions(pluginOptions) {
-  /** @type {('cwd' | 'configPath')[]} */
+  /**
+   * Plugin options validated as strings when provided.
+   * @type {('cwd' | 'configPath')[]}
+   */
   const stringKeys = ['configPath', 'cwd']
-  /** @type {('disableNestedConfig' | 'respectOxfmtDefaultIgnores' | 'useConfig' | 'useCache' | 'withNodeModules')[]} */
+  /**
+   * Plugin switches validated as booleans when provided.
+   * @type {('disableNestedConfig' | 'respectOxfmtDefaultIgnores' | 'useConfig' | 'useCache' | 'withNodeModules')[]}
+   */
   const booleanKeys = [
     'disableNestedConfig',
     'respectOxfmtDefaultIgnores',
