@@ -28,6 +28,7 @@
     "changelogithub",
     "codecov",
     "esbuild",
+    "Gopkg",
     "lcov",
     "Negotiables",
     "noextglob",

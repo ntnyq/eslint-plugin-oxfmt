@@ -14,25 +14,11 @@
     "**/*.min.*",
     "**/dist/**",
     "**/fixtures/**",
-    "dts/rule-options.d.ts",
+    "**/dts/rule-options.d.ts",
   ],
   "insertFinalNewline": true,
   "jsxSingleQuote": true,
   "objectWrap": "preserve",
-  "overrides": [
-    {
-      "files": ["**/*.{css,scss}"],
-      "options": {
-        "singleQuote": false,
-      },
-    },
-    {
-      "files": ["**/*.html"],
-      "options": {
-        "singleAttributePerLine": false,
-      },
-    },
-  ],
   "printWidth": 80,
   "proseWrap": "preserve",
   "quoteProps": "as-needed",

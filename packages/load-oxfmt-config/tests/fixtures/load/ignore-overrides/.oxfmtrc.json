@@ -1,0 +1,1 @@
+{"ignorePatterns":["dist/**","build/**"],"overrides":[{"files":["src/**/*.ts"],"options":{"printWidth":100}}]}

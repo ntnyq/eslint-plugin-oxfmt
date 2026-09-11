@@ -1,0 +1,63 @@
+{
+  "name": "load-oxfmt-config",
+  "type": "module",
+  "version": "0.23.0",
+  "description": "Load and resolve oxfmt configuration files, including explicit JS/TS config paths, and merge supported `.editorconfig` settings for Oxfmt.",
+  "keywords": [
+    "editorconfig",
+    "jsonc-parser",
+    "load-config",
+    "load-oxfmt-config",
+    "load-oxfmtrc",
+    "oxfmt",
+    "oxfmtrc"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "homepage": "https://github.com/ntnyq/eslint-plugin-oxfmt/tree/main/packages/load-oxfmt-config#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntnyq/eslint-plugin-oxfmt.git",
+    "directory": "packages/load-oxfmt-config"
+  },
+  "bugs": {
+    "url": "https://github.com/ntnyq/eslint-plugin-oxfmt/issues"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run --root . --config ../../vitest.config.ts"
+  },
+  "peerDependencies": {
+    "oxfmt": ">=0.67.0"
+  },
+  "dependencies": {
+    "@ntnyq/utils": "^0.22.0",
+    "editorconfig": "^3.0.2",
+    "ignore": "^7.0.8",
+    "jiti": "^2.7.0",
+    "jsonc-parser": "^3.3.1"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  }
+}

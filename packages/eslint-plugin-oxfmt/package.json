@@ -1,0 +1,87 @@
+{
+  "name": "eslint-plugin-oxfmt",
+  "type": "module",
+  "version": "0.23.0",
+  "description": "An ESLint plugin for formatting code with oxfmt.",
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "oxc",
+    "oxfmt",
+    "oxlint",
+    "prettier"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "homepage": "https://github.com/ntnyq/eslint-plugin-oxfmt/tree/main/packages/eslint-plugin-oxfmt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntnyq/eslint-plugin-oxfmt.git",
+    "directory": "packages/eslint-plugin-oxfmt"
+  },
+  "bugs": {
+    "url": "https://github.com/ntnyq/eslint-plugin-oxfmt/issues"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./rule-options": {
+      "types": "./dts/rule-options.d.ts"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist",
+    "dts",
+    "workers"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "pnpm run update:rule-options && tsdown",
+    "check:schema": "tsx scripts/checkSchemaParity.ts",
+    "dev": "tsdown --watch",
+    "test": "vitest run --root . --config ../../vitest.config.ts",
+    "update:rule-options": "tsx scripts/updateRuleOptions.ts"
+  },
+  "peerDependencies": {
+    "eslint": "^9.5.0 || ^10.0.0",
+    "oxfmt": ">=0.67.0",
+    "svelte": "*"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "generate-differences": "^0.1.1",
+    "ignore": "^7.0.9",
+    "load-oxfmt-config": "workspace:^",
+    "picomatch": "^4.0.7",
+    "synckit": "^0.11.13"
+  },
+  "devDependencies": {
+    "@types/json-schema": "^7.0.15",
+    "eslint-parser-plain": "^0.1.1",
+    "eslint-plugin-oxfmt": "workspace:*",
+    "eslint-typegen": "^2.3.1",
+    "eslint-vitest-rule-tester": "^3.1.0",
+    "jsonc-eslint-parser": "^3.3.0",
+    "show-invisibles": "^0.0.2",
+    "svelte": "^5.57.0",
+    "tinyglobby": "^0.2.17"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  }
+}

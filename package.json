@@ -1,102 +1,37 @@
 {
-  "name": "eslint-plugin-oxfmt",
+  "name": "root",
   "type": "module",
-  "version": "0.22.0",
+  "version": "0.23.0",
+  "private": true,
   "packageManager": "pnpm@12.3.4",
-  "description": "An ESLint plugin for formatting code with oxfmt.",
-  "keywords": [
-    "eslint",
-    "eslint-plugin",
-    "oxc",
-    "oxfmt",
-    "oxlint",
-    "prettier"
-  ],
   "license": "MIT",
-  "author": {
-    "name": "ntnyq",
-    "email": "ntnyq13@gmail.com"
-  },
-  "homepage": "https://github.com/ntnyq/eslint-plugin-oxfmt#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ntnyq/eslint-plugin-oxfmt.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ntnyq/eslint-plugin-oxfmt/issues"
-  },
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    },
-    "./rule-options": {
-      "types": "./dts/rule-options.d.ts"
-    }
-  },
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
-  "files": [
-    "dist",
-    "dts",
-    "workers"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
   "scripts": {
-    "build": "pnpm run update:rule-options && tsdown",
-    "check:schema": "tsx scripts/checkSchemaParity.ts",
-    "dev": "tsdown --watch",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
+    "build": "pnpm -r run build",
+    "check:package": "pnpm --filter \"./packages/*\" pack --dry-run",
+    "check:schema": "pnpm --filter eslint-plugin-oxfmt run check:schema",
+    "check:versions": "tsx scripts/checkVersions.ts",
+    "dev": "pnpm build && pnpm -r --parallel run dev",
+    "format": "oxfmt --disable-nested-config",
+    "format:check": "oxfmt --check --disable-nested-config",
     "lint": "eslint",
     "prepare": "husky",
-    "prepublishOnly": "pnpm run build",
     "release": "run-s release:check release:version",
-    "release:check": "run-s check:schema format:check lint typecheck test build",
+    "release:check": "run-s check:versions build check:schema format:check lint typecheck test check:package",
     "release:version": "bumpp",
-    "test": "vitest",
+    "test": "pnpm -r run test",
     "typecheck": "tsgo --noEmit",
-    "update:rule-options": "tsx scripts/updateRuleOptions.ts"
-  },
-  "peerDependencies": {
-    "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.67.0",
-    "svelte": "*"
-  },
-  "peerDependenciesMeta": {
-    "svelte": {
-      "optional": true
-    }
-  },
-  "dependencies": {
-    "generate-differences": "^0.1.1",
-    "ignore": "^7.0.8",
-    "load-oxfmt-config": "^0.23.0",
-    "picomatch": "^4.0.7",
-    "synckit": "^0.11.13"
+    "update:rule-options": "pnpm --filter eslint-plugin-oxfmt run update:rule-options"
   },
   "devDependencies": {
     "@ntnyq/eslint-config": "^7.0.0-beta.19",
-    "@types/json-schema": "^7.0.15",
-    "@types/node": "^26.5.0",
+    "@types/node": "^26.5.1",
     "@typescript/native-preview": "^7.0.0-dev.20260707.2",
     "bumpp": "^12.3.0",
     "eslint": "^10.10.0",
-    "eslint-parser-plain": "^0.1.1",
-    "eslint-plugin-oxfmt": "workspace:*",
-    "eslint-typegen": "^2.3.1",
-    "eslint-vitest-rule-tester": "^3.1.0",
     "husky": "^9.1.7",
-    "jsonc-eslint-parser": "^3.3.0",
     "nano-staged": "^1.0.2",
     "npm-run-all2": "^9.0.3",
     "oxfmt": "^0.67.0",
-    "show-invisibles": "^0.0.2",
-    "svelte": "^5.57.0",
     "tinyglobby": "^0.2.17",
     "tsdown": "^0.23.0",
     "tsx": "^4.23.13",
@@ -104,10 +39,10 @@
     "vitest": "^5.0.0"
   },
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^22.13.0 || >=24"
   },
   "nano-staged": {
     "*.{js,ts,mjs,tsx,md,vue,yml,yaml,toml,json}": "eslint --fix",
-    "*": "oxfmt --no-error-on-unmatched-pattern"
+    "*": "oxfmt --disable-nested-config --no-error-on-unmatched-pattern"
   }
 }

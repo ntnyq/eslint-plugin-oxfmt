@@ -20,10 +20,8 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run format:check
-      - run: pnpm run build
-      - run: pnpm run lint
-      - run: pnpm run typecheck
+      - run: pnpm run release:check
+      - run: git diff --exit-code
 
   test:
     runs-on: ${{ matrix.os }}

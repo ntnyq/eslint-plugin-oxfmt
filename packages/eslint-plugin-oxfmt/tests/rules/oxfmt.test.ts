@@ -1,4 +1,5 @@
 import { expect } from 'vitest'
+import { resolve } from '../../scripts/utils'
 import { oxfmt as rule } from '../../src/rules/oxfmt'
 import { $, run } from '../internal'
 
@@ -1510,7 +1511,7 @@ run({
           insertFinalNewline: false,
           useConfig: false,
           sortTailwindcss: {
-            config: './tests/fixtures/tailwind.config.js',
+            config: resolve('tests/fixtures/tailwind.config.js'),
           },
         },
       ],

@@ -3,7 +3,7 @@ name: bump-oxfmt
 description: Upgrade workflow for this ESLint oxfmt plugin when oxfmt releases a new version. Use when comparing behavior drift between current plugin output and new oxfmt output, then updating implementation, tests, schemas, and docs.
 metadata:
   owner: oxfmt-plugin
-  version: '2026.06.11'
+  version: '2026.09.11'
 ---
 
 ## Goal
@@ -21,7 +21,7 @@ Keep this plugin aligned with upstream oxfmt after each release while avoiding r
 
 - Current plugin branch with green baseline tests.
 - Target oxfmt version and release notes.
-- Access to fixture files under tests/fixtures and tests/files.
+- Access to fixtures under `packages/eslint-plugin-oxfmt/tests/fixtures`, plugin format tests under `packages/eslint-plugin-oxfmt/tests/files`, and loader tests under `packages/load-oxfmt-config/tests`.
 
 ## Upgrade Checklist
 
@@ -30,7 +30,8 @@ Keep this plugin aligned with upstream oxfmt after each release while avoiding r
 Run a clean baseline to know what changed because of the bump only.
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
+pnpm build
 pnpm test
 pnpm check:schema
 ```
@@ -50,7 +51,7 @@ Collect what changed in oxfmt:
 Suggested commands:
 
 ```bash
-pnpm up oxfmt@<new-version> load-oxfmt-config@latest
+pnpm up -w oxfmt@<new-version>
 pnpm install
 ```
 
@@ -88,23 +89,21 @@ Audit all places where plugin behavior mirrors oxfmt:
 
 Files to review first:
 
-- src/schema.ts
-- src/types.ts
-- src/rules/oxfmt.ts
-- workers/oxfmt.mjs
-- src/reporter.ts
+- packages/eslint-plugin-oxfmt/src/schema.ts
+- packages/eslint-plugin-oxfmt/src/types.ts
+- packages/eslint-plugin-oxfmt/src/rules/oxfmt.ts
+- packages/eslint-plugin-oxfmt/workers/oxfmt.mjs
+- packages/eslint-plugin-oxfmt/src/reporter.ts
 
 ### 4. Apply Required Code Updates
 
-1. Dependency bump in package.json and lockfile.
-   - Upgrade both packages to latest:
-     - `oxfmt` (dev dependency)
-     - `load-oxfmt-config` (runtime dependency)
-   - Keep range policy stable:
-     - `peerDependencies.oxfmt` must use `>=` range.
-     - `dependencies.load-oxfmt-config` must use `^` range.
+1. Update root `devDependencies.oxfmt` and the lockfile.
+   - Update `peerDependencies.oxfmt` in both package manifests using a `>=` range.
+   - Keep the plugin dependency on `load-oxfmt-config` as `workspace:^`.
+   - Update loader implementation in `packages/load-oxfmt-config/src/` when upstream config or ignore behavior changes; do not install a registry loader release.
+   - Package versions share one release cycle managed by root `bump.config.ts`; dependency maintenance does not itself require publishing.
 2. If upstream options changed:
-   - Update schema in src/schema.ts.
+   - Update schema in packages/eslint-plugin-oxfmt/src/schema.ts.
    - Regenerate option types via:
 
 ```bash
@@ -112,8 +111,8 @@ pnpm update:rule-options
 ```
 
 3. If runtime semantics changed:
-   - Update rule implementation in src/rules/oxfmt.ts.
-   - Update worker bridge in workers/oxfmt.mjs.
+   - Update rule implementation in packages/eslint-plugin-oxfmt/src/rules/oxfmt.ts.
+   - Update worker bridge in packages/eslint-plugin-oxfmt/workers/oxfmt.mjs.
    - Preserve virtual-file skip behavior.
 
 4. If config precedence changed upstream:
@@ -122,15 +121,17 @@ pnpm update:rule-options
 
 ### 5. Update and Expand Tests
 
-Run targeted suites first:
+Build the workspace, then run targeted suites first:
 
 ```bash
-pnpm test tests/rules/oxfmt.test.ts
-pnpm test tests/rules/error-reporting.test.ts
-pnpm test tests/configs.test.ts
-pnpm test tests/cli-parity.test.ts
-pnpm test tests/eslint-plugin.test.ts
-pnpm test tests/schema-parity.test.ts
+pnpm build
+pnpm --filter eslint-plugin-oxfmt test tests/rules/oxfmt.test.ts
+pnpm --filter eslint-plugin-oxfmt test tests/rules/error-reporting.test.ts
+pnpm --filter eslint-plugin-oxfmt test tests/configs.test.ts
+pnpm --filter eslint-plugin-oxfmt test tests/cli-parity.test.ts
+pnpm --filter eslint-plugin-oxfmt test tests/eslint-plugin.test.ts
+pnpm --filter eslint-plugin-oxfmt test tests/schema-parity.test.ts
+pnpm --filter load-oxfmt-config test
 ```
 
 Then run full gate:
@@ -150,7 +151,7 @@ Test update guidance:
 
 Update user-facing docs when behavior or options changed:
 
-- README option tables and examples.
+- Root README requirements and both package README option tables and examples.
 - Preset behavior notes.
 - Any migration notes for breaking or user-visible changes.
 
@@ -175,7 +176,7 @@ pnpm typecheck
 PR description should include:
 
 - oxfmt version old -> new.
-- load-oxfmt-config version old -> new.
+- Loader implementation changes and their effect on the plugin.
 - Summary of behavior changes observed.
 - Changelog diff highlights and impact classification.
 - Explicit "Update Points" list (deps/code/tests/docs).
@@ -185,15 +186,16 @@ PR description should include:
 ## Fast Triage Matrix
 
 - Only snapshot diffs changed: verify output intent, then snapshot update.
-- Schema parity failed: sync src/schema.ts and regenerate dts.
+- Schema parity failed: sync packages/eslint-plugin-oxfmt/src/schema.ts and regenerate dts.
 - Config-loading tests failed: inspect useConfig merge and precedence logic.
 - Error-reporting tests failed: inspect reporter output and virtual-file guards.
 
 ## Non-Negotiables
 
-- Do not hand-edit dts/rule-options.d.ts.
+- Do not hand-edit packages/eslint-plugin-oxfmt/dts/rule-options.d.ts.
 - Always run pnpm check:schema when option surface changes.
 - Keep virtual-file skip behavior intact unless intentionally redesigned.
 - Keep preset exports and flat-config ergonomics stable unless documented.
 - Always review upstream changelog and compare against in-repo version before deciding code changes.
-- Always upgrade both `oxfmt` and `load-oxfmt-config` to latest together unless explicitly justified.
+- Keep the loader local via `workspace:^` and verify both packages together with `pnpm release:check`.
+- Root formatter commands disable nested config discovery to avoid loading intentionally invalid fixture configs.

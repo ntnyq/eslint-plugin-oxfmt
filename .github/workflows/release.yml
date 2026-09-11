@@ -9,6 +9,10 @@ on:
     tags:
       - 'v*'
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -22,10 +26,14 @@ jobs:
           node-version: lts/*
           cache: pnpm
 
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check:versions "$GITHUB_REF_NAME"
+      - run: pnpm run release:check
+      - run: git diff --exit-code
+      - name: Select npm dist-tag
+        run: |
+          node --input-type=module -e 'import { appendFileSync } from "node:fs"; import pkg from "./package.json" with { type: "json" }; appendFileSync(process.env.GITHUB_ENV, `NPM_DIST_TAG=${pkg.version.includes("-") ? "next" : "latest"}\n`)'
+      - run: pnpm --filter './packages/*' -r publish --no-git-checks --provenance --tag "$NPM_DIST_TAG"
       - run: pnpm dlx changelogithub
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - run: pnpm install --frozen-lockfile
-      - run: npm install -g npm@latest
-      - run: pnpm publish --no-git-checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
