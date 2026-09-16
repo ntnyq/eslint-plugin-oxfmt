@@ -24,14 +24,15 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.67.0`
+- **oxfmt**: `>= 0.68.0`
 
-Oxfmt 0.67.0 preserves JSDoc cast parentheses containing comments, fixes
-CSS/SCSS/Less comment and list formatting, and moves GraphQL comments after
-an opening brace onto their own line. Existing files may receive formatting
-fixes after upgrading. No formatting options were renamed or removed, and
-config merge precedence is unchanged. See the
-[upstream release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.67.0).
+Oxfmt 0.68.0 fixes suppression comments (including trailing enum-member
+comments), JSDoc cast and parameter layouts, JSX comment wrapping, and
+TSX text wrapping inside Vue files. CSS/SCSS/Less formatting and YAML parsing
+also receive fixes. YAML now treats `tabWidth: 0` as `1` to preserve nesting.
+Existing files may receive formatting fixes after upgrading. No formatting
+options were renamed or removed, and config merge precedence is unchanged.
+See the [upstream release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.68.0).
 
 The monorepo migration aligns the Node.js requirement with `load-oxfmt-config`; Node.js 20 is no longer supported.
 

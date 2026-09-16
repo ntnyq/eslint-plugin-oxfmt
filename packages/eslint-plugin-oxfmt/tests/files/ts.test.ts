@@ -52,6 +52,18 @@ interface Methods { "valid"(): void; "not-valid"(): void }`,
         `)
       },
     },
+    {
+      filename: 'enum-trailing-suppression.ts',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      code: `enum Example {
+  A   = 1, // prettier-ignore
+  B   = 2 // prettier-ignore
+}`,
+      output: `enum Example {
+  A   = 1, // prettier-ignore
+  B   = 2, // prettier-ignore
+}`,
+    },
   ],
   valid: [
     {

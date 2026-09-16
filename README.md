@@ -15,7 +15,7 @@ This pnpm monorepo maintains two npm packages together:
 
 ## Quick Start
 
-Requires Node.js `^22.13.0 || >=24`, ESLint `^9.5.0 || ^10.0.0`, and oxfmt `>=0.67.0`.
+Requires Node.js `^22.13.0 || >=24`, ESLint `^9.5.0 || ^10.0.0`, and oxfmt `>=0.68.0`.
 The monorepo migration aligns the plugin's Node.js requirement with its loader dependency; Node.js 20 is no longer supported.
 
 ```shell

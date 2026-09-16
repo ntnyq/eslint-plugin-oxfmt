@@ -51,4 +51,15 @@ run({
       },
     },
   ],
+  valid: [
+    {
+      filename: 'escaped-string-gap-and-lookup.less',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      code: `@quotes: "~" "~";
+.a {
+  value: #namespace[$@prop-name];
+  width: .add(10px, 10px)[];
+}`,
+    },
+  ],
 })

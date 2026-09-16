@@ -33,7 +33,7 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.67.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.68.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
 
 ## Usage

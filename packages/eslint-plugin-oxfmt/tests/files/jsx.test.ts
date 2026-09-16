@@ -25,4 +25,18 @@ run({
       },
     },
   ],
+  valid: [
+    {
+      filename: 'logical-chain-comment.jsx',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      code: `const element = (
+  <div>
+    {ready && visible && (
+      // Keep the conditions together
+      <span />
+    )}
+  </div>
+);`,
+    },
+  ],
 })
