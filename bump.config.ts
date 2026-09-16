@@ -3,7 +3,7 @@ import { defineConfig } from 'bumpp'
 export default defineConfig({
   all: true,
   commit: 'chore: release v%s',
-  execute: 'pnpm install --lockfile-only && pnpm release:check',
+  execute: 'pnpm run release:prepare',
   noGitCheck: false,
   files: [
     'package.json',

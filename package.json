@@ -1,7 +1,7 @@
 {
   "name": "root",
   "type": "module",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
   "packageManager": "pnpm@12.4.2",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "prepare": "husky",
     "release": "run-s release:check release:version",
     "release:check": "run-s check:versions build check:schema format:check lint typecheck test check:package",
+    "release:prepare": "pnpm install --lockfile-only && pnpm release:check",
     "release:version": "bumpp",
     "test": "pnpm -r run test",
     "typecheck": "tsgo --noEmit",
