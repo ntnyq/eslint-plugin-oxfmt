@@ -208,7 +208,11 @@ All options are optional and default to sensible values.
 
 ### Config Discovery & Precedence
 
-When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
+When `useConfig` is `true`, the plugin loads config using
+`loadOxfmtConfigForFile()` from `load-oxfmt-config`. EditorConfig sections are
+matched relative to their own directory, including when the oxfmt config is in
+a nested package. Matching sections apply in source order, and basename patterns
+such as `[*.js]` also match files in descendant directories.
 
 - Config discovery order (from the formatted file's directory, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` → `oxfmt.config.mts`
 - `.editorconfig` support follows oxfmt behavior: only the nearest `.editorconfig` is loaded for the current file, and its root and section values provide fallbacks for fields not set by the oxfmt config
@@ -219,6 +223,8 @@ When `useConfig` is `true`, the plugin loads config using `load-oxfmt-config`.
 - `configPath` supports explicit file paths with extensions: `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`
 - ESLint rule options generally take highest priority because inline rule options are merged after loaded config.
 - Rule-level `ignorePatterns` are resolved relative to ESLint `cwd`; config-level `ignorePatterns` are resolved relative to the resolved config file directory and reject parent-directory (`..`) path segments.
+- Providing rule-level `ignorePatterns` replaces config-level patterns, including `[]` to clear them. Default ignores still apply independently.
+- `respectOxfmtDefaultIgnores: false` disables default directories, lockfiles, and ignore files, while retaining config-level `ignorePatterns` when `useConfig` is enabled.
 - When `useConfig` is `true`, config `overrides` are applied first and rule-level `overrides` are appended after them (later entries win on conflicts).
 - Invalid `files` or `excludeFiles` override glob patterns are reported as formatting errors.
 - When `useConfig` is `false`, config discovery and config `ignorePatterns` are skipped, while global ignores still apply when `respectOxfmtDefaultIgnores` is enabled.

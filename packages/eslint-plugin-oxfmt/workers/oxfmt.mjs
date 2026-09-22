@@ -2,7 +2,7 @@
 
 import { dirname, extname, relative, resolve } from 'node:path'
 import ignore from 'ignore'
-import { isOxfmtIgnored, loadOxfmtConfig } from 'load-oxfmt-config'
+import { isOxfmtIgnored, loadOxfmtConfigForFile } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
 import picomatch from 'picomatch'
 import { runAsWorker } from 'synckit'
@@ -172,7 +172,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
     }
   }
 
-  if (pluginOptions.respectOxfmtDefaultIgnores !== false && cwd) {
+  if (cwd) {
     /**
      * Config and ignore resolution settings for the current file.
      * @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions}
@@ -183,25 +183,20 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
       disableNestedConfig: pluginOptions.disableNestedConfig,
       filepath: filename,
       ignorePath: pluginOptions.ignorePath,
-      includeConfigIgnorePatterns: useConfig,
+      includeDefaultIgnores: pluginOptions.respectOxfmtDefaultIgnores,
       loadConfigForIgnorePatterns: useConfig,
       useCache,
       withNodeModules: pluginOptions.withNodeModules,
+      includeConfigIgnorePatterns:
+        useConfig && ruleIgnorePatterns === undefined,
     }
     const ignored = await isOxfmtIgnored(ignoredOptions)
 
     if (ignored.ignored) {
-      if (
-        ruleIgnorePatterns?.length &&
-        ignored.reason === 'config-ignore-patterns'
-      ) {
-        // Rule-level ignorePatterns should take precedence over config ignorePatterns.
-      } else {
-        return {
-          code: sourceText,
-          ignored: true,
-          reason: ignored.reason,
-        }
+      return {
+        code: sourceText,
+        ignored: true,
+        reason: ignored.reason,
       }
     }
   }
@@ -232,7 +227,7 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
   )
 
   if (useConfig) {
-    const loaded = await loadOxfmtConfig({
+    const loaded = await loadOxfmtConfigForFile({
       configPath: pluginOptions.configPath,
       cwd: cwd ?? dirname(filename),
       disableNestedConfig: pluginOptions.disableNestedConfig,
