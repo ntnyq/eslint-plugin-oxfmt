@@ -55,7 +55,8 @@
     "editorconfig": "^3.0.2",
     "ignore": "^7.0.9",
     "jiti": "^2.7.0",
-    "jsonc-parser": "^3.3.1"
+    "jsonc-parser": "^3.3.1",
+    "minimatch": "~10.2.6"
   },
   "engines": {
     "node": "^22.13.0 || >=24"
