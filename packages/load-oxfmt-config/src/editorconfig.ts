@@ -2,14 +2,27 @@ import { readFile, stat } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import { isBoolean, isNumber } from '@ntnyq/utils'
 import { parseBuffer } from 'editorconfig'
+import { Minimatch } from 'minimatch'
 import {
   EDITORCONFIG_FILE,
   EDITORCONFIG_GLOBAL_SECTION_NAMES,
 } from './constants'
-import { toPosixPath } from './utils'
-import type { SectionBody, SectionName } from 'editorconfig'
+import {
+  cachePromise,
+  getCacheValue,
+  isPathOutsideBase,
+  setCacheValue,
+  toPosixPath,
+} from './utils'
+import type { ParseStringResult, SectionBody, SectionName } from 'editorconfig'
 import type { FormatConfig } from 'oxfmt'
 import type { OxfmtConfigOverride, OxfmtOptions } from './types'
+
+/**
+ * Shared input caches for static and per-file EditorConfig resolution.
+ */
+const sectionCache = new Map<string, Promise<ParseStringResult>>()
+const matcherCache = new Map<string, Minimatch>()
 
 /**
  * Parsed EditorConfig data split into root options and generated override entries.
@@ -119,17 +132,31 @@ export function mergeRootOptions(
  *
  * @param editorconfigPath - The absolute path to the .editorconfig file.
  * @param anchorDir - The directory used to rebase section patterns.
+ * @param options - Optional per-file resolution and cache controls.
+ * @param options.filepath - Resolve matching sections for this absolute file path.
+ * @param options.useCache - Reuse parsed sections and compiled matchers.
  * @returns Parsed EditorConfig data ready to merge into oxfmt config.
  */
 export async function readEditorconfigFromFile(
   editorconfigPath: string,
   anchorDir: string,
+  options: { filepath?: string; useCache?: boolean } = {},
 ): Promise<EditorconfigData> {
-  const content = await readFile(editorconfigPath)
-  const parsedSections = parseBuffer(content)
+  const useCache = options.useCache !== false
+  const readSections = async () => parseBuffer(await readFile(editorconfigPath))
+  const parsedSections = useCache
+    ? await cachePromise(sectionCache, editorconfigPath, readSections)
+    : await readSections()
   const editorconfigDir = dirname(editorconfigPath)
   const rootOptions: EditorconfigOptions = {}
   const overrides: OxfmtConfigOverride[] = []
+  const relativeFile = options.filepath
+    ? toPosixPath(relative(editorconfigDir, options.filepath))
+    : undefined
+
+  if (relativeFile !== undefined && isPathOutsideBase(relativeFile)) {
+    return { overrides, rootOptions }
+  }
 
   for (const [sectionName, sectionBody] of parsedSections) {
     if (!sectionName) {
@@ -141,9 +168,19 @@ export async function readEditorconfigFromFile(
       continue
     }
 
+    if (relativeFile !== undefined) {
+      if (matchesEditorconfigSection(sectionName, relativeFile, useCache)) {
+        Object.assign(rootOptions, mappedOptions)
+      }
+      continue
+    }
+
     if (isEditorconfigGlobalSection(sectionName)) {
       Object.assign(rootOptions, mappedOptions)
-      continue
+      // A later global section must also override earlier scoped sections.
+      if (overrides.length === 0) {
+        continue
+      }
     }
 
     overrides.push({
@@ -267,6 +304,47 @@ function mapEditorconfigSectionToOptions(
 }
 
 /**
+ * Match a section against its source-relative file path without oxfmt rebasing.
+ *
+ * @param pattern - Original section name.
+ * @param filepath - File path relative to the EditorConfig directory.
+ * @param useCache - Whether compiled matchers can be reused.
+ * @returns Whether the section applies to the file.
+ */
+function matchesEditorconfigSection(
+  pattern: string,
+  filepath: string,
+  useCache: boolean,
+) {
+  let matcher = useCache ? getCacheValue(matcherCache, pattern) : undefined
+  if (!matcher) {
+    matcher = new Minimatch(normalizeEditorconfigPattern(pattern), {
+      dot: true,
+      nocomment: true,
+      noext: true,
+      nonegate: true,
+    })
+    if (useCache) {
+      setCacheValue(matcherCache, pattern, matcher)
+    }
+  }
+  return matcher.match(filepath)
+}
+
+/**
+ * Keep basename patterns recursive without changing path-scoped patterns.
+ *
+ * @param pattern - Original EditorConfig section name.
+ * @returns Pattern suitable for matching a path relative to EditorConfig.
+ */
+function normalizeEditorconfigPattern(pattern: string) {
+  if (pattern === '*' || pattern === '**') {
+    return '**'
+  }
+  return pattern.includes('/') ? pattern : `**/${pattern}`
+}
+
+/**
  * Parses an EditorConfig boolean string.
  *
  * @param value - The raw EditorConfig value.
@@ -366,10 +444,11 @@ function rebaseEditorconfigPattern(
   editorconfigDir: string,
   anchorDir: string,
 ) {
+  const normalizedPattern = normalizeEditorconfigPattern(pattern)
   const relativePrefix = toPosixPath(relative(anchorDir, editorconfigDir))
   if (!relativePrefix || relativePrefix === '.') {
-    return pattern
+    return normalizedPattern
   }
 
-  return `${relativePrefix}/${pattern.replace(/^\//u, '')}`
+  return `${relativePrefix}/${normalizedPattern.replace(/^\//u, '')}`
 }

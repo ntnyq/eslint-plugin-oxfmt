@@ -33,6 +33,11 @@ const resolveCache = new Map<string, Promise<string | undefined>>()
 const configCache = new Map<string, Promise<OxfmtOptions>>()
 
 /**
+ * Share raw config reads across files without caching file-specific fallbacks.
+ */
+const sourceCache = new Map<string, Promise<OxfmtOptions>>()
+
+/**
  * Resolve config + editorconfig and return merged config with metadata.
  *
  * @param options - Loader settings.
@@ -48,6 +53,33 @@ const configCache = new Map<string, Promise<OxfmtOptions>>()
  */
 export async function loadOxfmtConfig(
   options: LoadOxfmtConfigOptions = {},
+): Promise<LoadOxfmtConfigResult> {
+  return loadConfig(options)
+}
+
+/**
+ * Load config with EditorConfig fallbacks resolved for one file.
+ * Explicit oxfmt overrides remain unevaluated and retain their config-relative globs.
+ *
+ * @param options - Loader settings with the target file path.
+ * @returns Config with per-file EditorConfig defaults and config metadata.
+ */
+export async function loadOxfmtConfigForFile(
+  options: LoadOxfmtConfigOptions & { filepath: string },
+): Promise<LoadOxfmtConfigResult> {
+  return loadConfig(options, true)
+}
+
+/**
+ * Share discovery and caches between static and per-file loading.
+ *
+ * @param options - Loader settings.
+ * @param resolveEditorconfig - Resolve EditorConfig sections against the target file.
+ * @returns Loaded config and metadata.
+ */
+async function loadConfig(
+  options: LoadOxfmtConfigOptions,
+  resolveEditorconfig = false,
 ): Promise<LoadOxfmtConfigResult> {
   const useCache = options.useCache !== false
   const cwd = resolve(options.cwd || process.cwd())
@@ -96,18 +128,28 @@ export async function loadOxfmtConfig(
     : undefined
 
   const anchorDir = dirname(resolvedPath || editorconfigPath || cwd)
+  const configKey = getConfigCacheKey(
+    resolvedPath,
+    editorconfigPath,
+    JSON.stringify([resolveKey, resolveEditorconfig ? filepath : null]),
+  )
 
   const loadTask = async () => {
-    const oxfmtConfig = resolvedPath
-      ? await readConfigFromFile(resolvedPath, { useCache }).catch(error => {
-          throw new Error(
-            `Failed to parse oxfmt configuration file at ${resolvedPath}: ${error instanceof Error ? error.message : String(error)}`,
-            {
-              cause: error,
-            },
-          )
-        })
-      : {}
+    const readConfig = async () =>
+      resolvedPath
+        ? await readConfigFromFile(resolvedPath, { useCache }).catch(error => {
+            throw new Error(
+              `Failed to parse oxfmt configuration file at ${resolvedPath}: ${error instanceof Error ? error.message : String(error)}`,
+              {
+                cause: error,
+              },
+            )
+          })
+        : {}
+    const oxfmtConfig =
+      useCache && resolvedPath
+        ? await cachePromise(sourceCache, resolvedPath, readConfig)
+        : await readConfig()
 
     if (!editorconfigPath) {
       return oxfmtConfig
@@ -116,6 +158,7 @@ export async function loadOxfmtConfig(
     const editorconfigData = await readEditorconfigFromFile(
       editorconfigPath,
       anchorDir,
+      { filepath: resolveEditorconfig ? filepath : undefined, useCache },
     )
 
     const mergedConfig = mergeRootOptions(
@@ -137,26 +180,9 @@ export async function loadOxfmtConfig(
     }
   }
 
-  const hasNoConfigSources = !resolvedPath && !editorconfigPath
-  const config: OxfmtOptions = await (async () => {
-    if (hasNoConfigSources) {
-      return useCache
-        ? await cachePromise(
-            configCache,
-            getConfigCacheKey(resolvedPath, editorconfigPath, resolveKey),
-            () => Promise.resolve({}),
-          )
-        : {}
-    }
-
-    return useCache
-      ? await cachePromise(
-          configCache,
-          getConfigCacheKey(resolvedPath, editorconfigPath, resolveKey),
-          loadTask,
-        )
-      : await loadTask()
-  })()
+  const config = useCache
+    ? await cachePromise(configCache, configKey, loadTask)
+    : await loadTask()
 
   return {
     config,

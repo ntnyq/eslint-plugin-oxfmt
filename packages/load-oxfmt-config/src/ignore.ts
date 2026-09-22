@@ -103,65 +103,15 @@ export async function isOxfmtIgnored(
     ? resolve(options.filepath)
     : resolve(cwd, options.filepath)
 
-  const defaultIgnoredDirOptions = options.withNodeModules
-    ? { withNodeModules: true }
-    : {}
-
-  if (isDefaultIgnoredDir(filepath, defaultIgnoredDirOptions)) {
-    return { ignored: true, reason: 'default-dir' }
-  }
-
-  if (isLockfile(filepath)) {
-    return { ignored: true, reason: 'lockfile' }
-  }
-
-  const normalizedIgnorePaths =
-    typeof options.ignorePath === 'string'
-      ? [options.ignorePath]
-      : options.ignorePath
-  const explicitIgnorePaths = normalizedIgnorePaths?.map(path =>
-    resolveIgnoreFilePath(path, cwd),
-  )
-
-  const { paths: gitignorePaths, repoRoot } =
-    await collectGitignorePaths(filepath)
-  const gitignoreEntries = [...gitignorePaths].reverse().map(path => ({
-    path,
-  }))
-  const gitignoreResult = await matchIgnoreFileChain(
-    filepath,
-    gitignoreEntries,
-    useCache,
-    true,
-  )
-  if (gitignoreResult.ignored) {
-    return { ignored: true, reason: 'gitignore' }
-  }
-
-  if (repoRoot && !gitignoreResult.matched) {
-    const infoExcludePath = await resolveGitInfoExcludePath(repoRoot)
-    if (
-      infoExcludePath &&
-      (await matchIgnoreFile(filepath, infoExcludePath, useCache, repoRoot))
-    ) {
-      return { ignored: true, reason: 'git-info-exclude' }
-    }
-  }
-
-  if (explicitIgnorePaths && explicitIgnorePaths.length > 0) {
-    const explicitIgnoreEntries = explicitIgnorePaths.map(path => ({ path }))
-    const explicitIgnoreResult = await matchIgnoreFileChain(
+  if (options.includeDefaultIgnores !== false) {
+    const defaultResult = await resolveDefaultIgnores(
       filepath,
-      explicitIgnoreEntries,
+      cwd,
+      options,
       useCache,
     )
-    if (explicitIgnoreResult.ignored) {
-      return { ignored: true, reason: 'ignore-path' }
-    }
-  } else {
-    const prettierignorePath = resolve(cwd, '.prettierignore')
-    if (await matchIgnoreFile(filepath, prettierignorePath, useCache)) {
-      return { ignored: true, reason: 'prettierignore' }
+    if (defaultResult.ignored) {
+      return defaultResult
     }
   }
 
@@ -488,6 +438,86 @@ function matchLoadedIgnoreMatchers(
  */
 function relativeSafe(from: string, to: string) {
   return toPosixPath(relative(from, to))
+}
+
+/**
+ * Evaluate global ignore rules separately from explicit config patterns.
+ *
+ * @param filepath - Absolute target file path.
+ * @param cwd - Base directory for ignore file resolution.
+ * @param options - Ignore file and node_modules settings.
+ * @param useCache - Whether ignore matchers can be reused.
+ * @returns Global ignore status.
+ */
+async function resolveDefaultIgnores(
+  filepath: string,
+  cwd: string,
+  options: IsOxfmtIgnoredOptions,
+  useCache: boolean,
+): Promise<IsOxfmtIgnoredResult> {
+  const defaultIgnoredDirOptions = options.withNodeModules
+    ? { withNodeModules: true }
+    : {}
+
+  if (isDefaultIgnoredDir(filepath, defaultIgnoredDirOptions)) {
+    return { ignored: true, reason: 'default-dir' }
+  }
+
+  if (isLockfile(filepath)) {
+    return { ignored: true, reason: 'lockfile' }
+  }
+
+  const normalizedIgnorePaths =
+    typeof options.ignorePath === 'string'
+      ? [options.ignorePath]
+      : options.ignorePath
+  const explicitIgnorePaths = normalizedIgnorePaths?.map(path =>
+    resolveIgnoreFilePath(path, cwd),
+  )
+
+  const { paths: gitignorePaths, repoRoot } =
+    await collectGitignorePaths(filepath)
+  const gitignoreEntries = [...gitignorePaths].reverse().map(path => ({
+    path,
+  }))
+  const gitignoreResult = await matchIgnoreFileChain(
+    filepath,
+    gitignoreEntries,
+    useCache,
+    true,
+  )
+  if (gitignoreResult.ignored) {
+    return { ignored: true, reason: 'gitignore' }
+  }
+
+  if (repoRoot && !gitignoreResult.matched) {
+    const infoExcludePath = await resolveGitInfoExcludePath(repoRoot)
+    if (
+      infoExcludePath &&
+      (await matchIgnoreFile(filepath, infoExcludePath, useCache, repoRoot))
+    ) {
+      return { ignored: true, reason: 'git-info-exclude' }
+    }
+  }
+
+  if (explicitIgnorePaths && explicitIgnorePaths.length > 0) {
+    const explicitIgnoreEntries = explicitIgnorePaths.map(path => ({ path }))
+    const explicitIgnoreResult = await matchIgnoreFileChain(
+      filepath,
+      explicitIgnoreEntries,
+      useCache,
+    )
+    if (explicitIgnoreResult.ignored) {
+      return { ignored: true, reason: 'ignore-path' }
+    }
+  } else {
+    const prettierignorePath = resolve(cwd, '.prettierignore')
+    if (await matchIgnoreFile(filepath, prettierignorePath, useCache)) {
+      return { ignored: true, reason: 'prettierignore' }
+    }
+  }
+
+  return { ignored: false }
 }
 
 /**

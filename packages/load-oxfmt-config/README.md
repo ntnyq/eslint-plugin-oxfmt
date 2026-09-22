@@ -78,6 +78,27 @@ const result = await loadOxfmtConfig({
 })
 ```
 
+### Resolve EditorConfig for One File
+
+Use `loadOxfmtConfigForFile()` when formatting a specific file, especially when
+its oxfmt config and `.editorconfig` live in different directories:
+
+```ts
+import { loadOxfmtConfigForFile } from 'load-oxfmt-config'
+
+const result = await loadOxfmtConfigForFile({
+  cwd: '/path/to/project',
+  filepath: 'packages/app/src/index.ts',
+})
+```
+
+This accepts the same options as `loadOxfmtConfig()`, with `filepath` required.
+EditorConfig sections are matched relative to their own directory and applied
+in source order, including later `[*]` sections. The resulting EditorConfig
+defaults are merged below explicit oxfmt root options. Explicit oxfmt `overrides`
+remain in the returned config and must still be applied by the caller, relative
+to `result.dirname`. Config metadata retains the same meaning as in the static API.
+
 ### Get Config Metadata
 
 ```ts
@@ -344,6 +365,16 @@ Whether to use in-memory cache.
 
 Whether to include ignore patterns defined in the resolved config file.
 
+#### `includeDefaultIgnores`
+
+- **Type:** `boolean`
+- **Default:** `true`
+
+Whether to apply default directories, lockfiles, and ignore files (`.gitignore`,
+Git info exclude, `.prettierignore`, and explicit `ignorePath` files).
+Set to `false` to evaluate only config `ignorePatterns`. This does not disable
+config loading or matching; use the separate config options for that.
+
 #### `loadConfigForIgnorePatterns`
 
 - **Type:** `boolean`
@@ -437,7 +468,12 @@ The loader reads the nearest `.editorconfig` file and maps the subset of fields 
 - `insert_final_newline` → `insertFinalNewline`
 - `quote_type` → `singleQuote`
 
-Only `[*]` is treated as a global section to match oxfmt. Other sections such as `[**]` and `[*.ts]` are converted into returned `overrides` entries.
+In the static API, `[*]` provides root defaults. A `[*]` section after scoped
+sections also generates an override to preserve source order. Other sections
+such as `[**]` and `[*.ts]` are converted into returned `overrides` entries;
+basename patterns such as `*.ts` are normalized to `**/*.ts` to match descendants.
+The per-file API evaluates matching sections directly, without rebasing them to
+the oxfmt config directory.
 
 ## Ignore Strategy
 
@@ -485,7 +521,12 @@ Section-specific `.editorconfig` entries are represented as generated `overrides
 
 ## Limitations
 
-`loadOxfmtConfig()` returns a static merged `OxfmtOptions` shape. That means `.editorconfig` support is represented as merged root + overrides config data, not as per-file runtime evaluation. In practice this works well for common root settings and section-based overrides, but it is not a full replacement for oxfmt's own file-by-file config resolution.
+`loadOxfmtConfig()` returns a static merged `OxfmtOptions` shape. Its generated
+EditorConfig globs cannot represent every relationship between config directories,
+particularly an ancestor EditorConfig with a nested oxfmt config. Use
+`loadOxfmtConfigForFile()` to resolve EditorConfig against its original directory
+for a specific target file. Both APIs retain the nearest-file discovery strategy;
+they do not merge multiple EditorConfig files.
 
 ## Error Handling
 
@@ -503,16 +544,19 @@ try {
 
 ## Caching Behavior
 
-The caching system maintains two separate caches:
+The caching system maintains bounded caches for:
 
 1. **Path Resolution Cache:** Stores resolved config file paths
-2. **Config Content Cache:** Stores parsed configuration objects
+2. **Config Sources:** Shares parsed oxfmt files and EditorConfig sections between target files
+3. **Config Results:** Stores merged static or per-file configuration objects
+4. **EditorConfig Matchers:** Reuses compiled section patterns
 
 **Cache keys are based on:**
 
 - `cwd` + `configPath` for path resolution
 - or `dirname(filepath)` + `configPath` when `filepath` is provided and nested lookup is enabled
 - Resolved oxfmt path and resolved `.editorconfig` path for config content
+- The target file path for per-file results, isolated from static results
 
 **Cache invalidation:**
 

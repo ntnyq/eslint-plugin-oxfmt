@@ -62,6 +62,12 @@ export interface IsOxfmtIgnoredOptions {
    */
   includeConfigIgnorePatterns?: boolean
   /**
+   * Apply default directories, lockfiles, and ignore files independently of config patterns.
+   *
+   * @default true
+   */
+  includeDefaultIgnores?: boolean
+  /**
    * Whether to load resolved oxfmt config when evaluating config ignore patterns.
    *
    * When false, only global ignore is applied and config loading is skipped.

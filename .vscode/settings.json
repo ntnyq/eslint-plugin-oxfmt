@@ -31,6 +31,8 @@
     "Gopkg",
     "lcov",
     "Negotiables",
+    "nocomment",
+    "noext",
     "noextglob",
     "oxfmt",
     "oxfmtrc",

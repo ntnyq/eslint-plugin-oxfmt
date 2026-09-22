@@ -863,7 +863,7 @@ describe('loadOxfmtConfig', () => {
           printWidth: 120,
           overrides: [
             {
-              files: ['*.ts'],
+              files: ['**/*.ts'],
               options: { tabWidth: 4, useTabs: false },
             },
           ],
@@ -879,7 +879,7 @@ describe('loadOxfmtConfig', () => {
       expect(result.config.tabWidth).toBeUndefined()
       expect(result.config.overrides).toStrictEqual([
         {
-          files: ['*.md'],
+          files: ['**/*.md'],
           options: { printWidth: 72 },
         },
         {
