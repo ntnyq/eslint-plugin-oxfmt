@@ -48,10 +48,10 @@
     "test": "vitest run --root . --config ../../vitest.config.ts"
   },
   "peerDependencies": {
-    "oxfmt": ">=0.68.0"
+    "oxfmt": ">=0.70.0"
   },
   "dependencies": {
-    "@ntnyq/utils": "^0.22.0",
+    "@ntnyq/utils": "^0.23.0",
     "editorconfig": "^3.0.2",
     "ignore": "^7.0.9",
     "jiti": "^2.7.0",

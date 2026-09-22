@@ -35,8 +35,38 @@ run({
       options: [{ insertFinalNewline: false, useConfig: false }],
       output: 'call(   ); // prettier-ignore\n[].sort();',
     },
+    {
+      code: 'const value = /* first */ // second\n  call( a,b )',
+      filename: 'after-operator-comments.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const value = /* first */ // second\n  call(a, b);',
+    },
+    {
+      code: 'const value = /* multi\n * line */ source;',
+      filename: 'assignment-block-comment.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const value =\n  /* multi\n   * line */ source;',
+    },
+    {
+      code: 'const [api] = useState(() => /** @type {Api} */ ({ setBlocker(id) { record(id); }, }));',
+      filename: 'typecast-arrow-body.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: `const [api] = useState(
+  () =>
+    /** @type {Api} */ ({
+      setBlocker(id) {
+        record(id);
+      },
+    }),
+);`,
+    },
   ],
   valid: [
+    {
+      code: 'const value = // prettier-ignore\n  call( a,b );',
+      filename: 'after-operator-suppression.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
     {
       filename: 'commented-parameter.js',
       options: [{ insertFinalNewline: false, useConfig: false }],

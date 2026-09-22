@@ -24,6 +24,16 @@ run({
         )
       },
     },
+    {
+      code: 'const text = <fbt desc="Greeting">Hello <fbt:param name="user">{user}</fbt:param>!</fbt>;',
+      filename: 'fbt-adjacent-text.jsx',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: `const text = (
+  <fbt desc="Greeting">
+    Hello <fbt:param name="user">{user}</fbt:param>!
+  </fbt>
+);`,
+    },
   ],
   valid: [
     {

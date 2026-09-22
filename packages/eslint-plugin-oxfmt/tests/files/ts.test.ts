@@ -64,6 +64,24 @@ interface Methods { "valid"(): void; "not-valid"(): void }`,
   B   = 2, // prettier-ignore
 }`,
     },
+    {
+      code: 'const value = 1 as // keep\nA | B;',
+      filename: 'union-after-as-comment.ts',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const value = 1 as // keep\n  A | B;',
+    },
+    {
+      code: 'const value = source satisfies // keep\nA | B;',
+      filename: 'union-after-satisfies-comment.ts',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const value = source satisfies // keep\n  A | B;',
+    },
+    {
+      code: '// oxfmt-ignore\ntype Example = (((string)))',
+      filename: 'suppressed-type-alias-parentheses.ts',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: '// oxfmt-ignore\ntype Example = (((string)));',
+    },
   ],
   valid: [
     {

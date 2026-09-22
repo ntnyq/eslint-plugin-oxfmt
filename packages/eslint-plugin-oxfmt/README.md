@@ -24,15 +24,21 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.68.0`
+- **oxfmt**: `>= 0.70.0`
 
-Oxfmt 0.68.0 fixes suppression comments (including trailing enum-member
-comments), JSDoc cast and parameter layouts, JSX comment wrapping, and
-TSX text wrapping inside Vue files. CSS/SCSS/Less formatting and YAML parsing
-also receive fixes. YAML now treats `tabWidth: 0` as `1` to preserve nesting.
-Existing files may receive formatting fixes after upgrading. No formatting
-options were renamed or removed, and config merge precedence is unchanged.
-See the [upstream release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.68.0).
+Upgrading from oxfmt 0.68.0 to 0.70.0 fixes comments after assignment operators,
+leading union comments after `as` and `satisfies`, multiline block comments,
+typecast arrow bodies, and parentheses in suppressed type aliases. JSX `fbt`
+elements now preserve adjacency between text and child components. Existing
+files may receive formatting fixes after upgrading. No formatting options were
+added, renamed, or removed, and config merge precedence is unchanged.
+
+The upstream native Markdown formatter is not yet used by the published
+formatting API; Markdown still uses Prettier, including frontmatter formatting.
+The Vite+ config discovery changes do not affect this plugin's standalone oxfmt
+config loading or nested config support.
+See the upstream [0.69.0 release notes](https://github.com/oxc-project/oxc/releases/tag/apps_v1.84.0)
+and [0.70.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.70.0).
 
 The monorepo migration aligns the Node.js requirement with `load-oxfmt-config`; Node.js 20 is no longer supported.
 

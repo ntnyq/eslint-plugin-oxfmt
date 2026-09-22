@@ -26,5 +26,11 @@ run({
         `)
       },
     },
+    {
+      code: '---\ntitle:   Home\n---\n\n\n#  Heading',
+      filename: 'frontmatter.md',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: '---\ntitle: Home\n---\n\n# Heading',
+    },
   ],
 })
