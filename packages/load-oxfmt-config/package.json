@@ -44,16 +44,15 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch",
-    "test": "vitest run --root . --config ../../vitest.config.ts"
+    "dev": "tsdown --watch"
   },
   "peerDependencies": {
-    "oxfmt": ">=0.70.0"
+    "oxfmt": ">=0.71.0"
   },
   "dependencies": {
     "@ntnyq/utils": "^0.23.0",
     "editorconfig": "^3.0.2",
-    "ignore": "^7.0.9",
+    "ignore": "^7.0.10",
     "jiti": "^2.7.0",
     "jsonc-parser": "^3.3.1",
     "minimatch": "~10.2.6"

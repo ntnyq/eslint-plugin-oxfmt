@@ -33,4 +33,21 @@ run({
       output: '---\ntitle: Home\n---\n\n# Heading',
     },
   ],
+  valid: [
+    {
+      code: 'H~2~O',
+      filename: 'single-tilde.md',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
+    {
+      code: 'An invalid value means a\n{{jsxref("TypeError")}} is thrown.',
+      filename: 'liquid-paragraph.md',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
+    {
+      code: '**Uses $INPUT** from `setup.sh` and `run.sh`, plus `$OUTPUT` from `end.sh`, before starting.',
+      filename: 'dollar-signs.md',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
+  ],
 })

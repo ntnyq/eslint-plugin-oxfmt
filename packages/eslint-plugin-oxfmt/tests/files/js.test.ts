@@ -60,8 +60,47 @@ run({
     }),
 );`,
     },
+    {
+      filename: 'test-call-comment-order.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      code: `test("x", () => {
+  run();
+}, // first
+// second
+60000);`,
+      output: `test(
+  "x",
+  () => {
+    run();
+  }, // first
+  // second
+  60000,
+);`,
+    },
+    {
+      code: 'const value /* before */\n= // after\n  1;',
+      filename: 'before-operator-comment.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const value /* before */ = // after\n  1;',
+    },
+    {
+      code: '/***\n * First line.  \n * Second line.\n */\nconst value = 1;',
+      filename: 'jsdoc-hard-break.js',
+      options: [{ insertFinalNewline: false, jsdoc: true, useConfig: false }],
+      output: '/**\n * First line.\\\n * Second line.\n */\nconst value = 1;',
+    },
   ],
   valid: [
+    {
+      code: 'const value = // keep\n  { key: 1 };',
+      filename: 'object-after-operator-comment.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
+    {
+      code: '/***\n * First line.  \n * Second line.\n */\nconst value = 1;',
+      filename: 'jsdoc-preserved-hard-break.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
     {
       code: 'const value = // prettier-ignore\n  call( a,b );',
       filename: 'after-operator-suppression.js',

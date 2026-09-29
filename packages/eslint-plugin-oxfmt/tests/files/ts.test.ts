@@ -82,6 +82,12 @@ interface Methods { "valid"(): void; "not-valid"(): void }`,
       options: [{ insertFinalNewline: false, useConfig: false }],
       output: '// oxfmt-ignore\ntype Example = (((string)));',
     },
+    {
+      code: 'type Value /* before */\n= // after\n  { key: 1 };',
+      filename: 'type-alias-operator-comments.ts',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'type Value /* before */ = // after\n  { key: 1 };',
+    },
   ],
   valid: [
     {

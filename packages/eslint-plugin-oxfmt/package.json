@@ -50,12 +50,11 @@
     "build": "pnpm run update:rule-options && tsdown",
     "check:schema": "tsx scripts/checkSchemaParity.ts",
     "dev": "tsdown --watch",
-    "test": "vitest run --root . --config ../../vitest.config.ts",
     "update:rule-options": "tsx scripts/updateRuleOptions.ts"
   },
   "peerDependencies": {
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.70.0",
+    "oxfmt": ">=0.71.0",
     "svelte": "*"
   },
   "peerDependenciesMeta": {
@@ -65,7 +64,7 @@
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "ignore": "^7.0.9",
+    "ignore": "^7.0.10",
     "load-oxfmt-config": "workspace:^",
     "picomatch": "^4.0.7",
     "synckit": "^0.11.13"
