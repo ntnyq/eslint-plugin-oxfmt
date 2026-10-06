@@ -24,22 +24,24 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.71.0`
+- **oxfmt**: `>= 0.72.0`
 
-Upgrading from oxfmt 0.70.0 to 0.71.0 preserves comment order around test-call
-arguments and comments on either side of assignment operators. It also fixes
-adjacent block comments, trailing spaces in block comments, and JSDoc hard
-breaks, including `/***` comments. The bundled Prettier upgrade from 3.9.6 to
-3.9.9 fixes embedded template indentation and Markdown handling of single
-tildes, dollar signs, Liquid syntax, blockquotes, and list indentation. Existing
-files may receive formatting fixes after upgrading. No formatting options were
-added, renamed, or removed, and config merge precedence is unchanged.
+Upgrading from oxfmt 0.71.0 to 0.72.0 switches Markdown to the native formatter.
+JavaScript and TypeScript code fences now use Oxc formatting, including
+`sortImports` and `sortTailwindcss` when enabled. Markdown block directives are
+supported, Chinese/Japanese line breaks are preserved across `proseWrap`
+settings, and list/container prefixes remain spaces with `useTabs`. Review
+Markdown and embedded code formatting changes after upgrading; YAML frontmatter
+formatting remains supported.
 
-The upstream native Markdown formatter is not yet used by the published
-formatting API; Markdown still uses Prettier, including frontmatter formatting.
-The upstream fix for repeated CLI calls in one process does not affect this
-plugin's worker, which uses the formatting API.
-See the upstream [0.71.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.71.0).
+The release also fixes `quoteProps: consistent` in destructuring patterns and
+around computed keys, comments between callees and their opening delimiters,
+assignment-target comments, embedded template layouts, and CSS/JSON formatting.
+No formatting options were added, renamed, or removed, and config merge
+precedence is unchanged. The loader already respects excluded parent
+directories and checks global ignores before loading nested configs; these
+upstream fixes require no loader API changes.
+See the upstream [0.72.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.72.0).
 
 The monorepo migration aligns the Node.js requirement with `load-oxfmt-config`; Node.js 20 is no longer supported.
 

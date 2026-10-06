@@ -214,3 +214,62 @@ it.each(IGNORE_CASES)(
     })
   },
 )
+
+it.each([
+  { expected: SOURCE, pattern: 'vendor/', source: 'config' },
+  { expected: DOUBLE_QUOTED, pattern: 'vendor/*', source: 'config' },
+  { expected: SOURCE, pattern: 'vendor/', source: '.prettierignore' },
+  {
+    expected: DOUBLE_QUOTED,
+    pattern: 'vendor/*',
+    source: '.prettierignore',
+  },
+])(
+  'matches CLI child negation after $pattern in $source',
+  async ({ expected, pattern, source }) => {
+    await withProject(async cwd => {
+      const file = 'vendor/keep.js'
+      const filepath = join(cwd, file)
+      const patterns = [pattern, `!${file}`]
+      await mkdir(dirname(filepath))
+      await writeFile(filepath, SOURCE)
+      await writeFile(
+        join(cwd, '.oxfmtrc.json'),
+        JSON.stringify(source === 'config' ? { ignorePatterns: patterns } : {}),
+      )
+      if (source === '.prettierignore') {
+        await writeFile(join(cwd, '.prettierignore'), patterns.join('\n'))
+      }
+
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, '--stdin-filepath', file],
+        { cwd, encoding: 'utf8', input: SOURCE },
+      )
+      expect(cli.status).toBe(0)
+      expect(cli.stdout).toBe(expected)
+      expect(await lint(cwd, filepath)).toBe(expected)
+    })
+  },
+)
+
+it('matches CLI global ignores before loading an invalid nested config', async () => {
+  await withProject(async cwd => {
+    const file = 'vendor/keep.js'
+    const filepath = join(cwd, file)
+    await mkdir(dirname(filepath))
+    await writeFile(filepath, SOURCE)
+    await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
+    await writeFile(join(cwd, '.prettierignore'), 'vendor/\n')
+    await writeFile(join(cwd, 'vendor/.oxfmtrc.json'), '{ invalid json')
+
+    const cli = spawnSync(
+      process.execPath,
+      [OXFMT_CLI, '--stdin-filepath', file],
+      { cwd, encoding: 'utf8', input: SOURCE },
+    )
+    expect(cli.status).toBe(0)
+    expect(cli.stdout).toBe(SOURCE)
+    expect(await lint(cwd, filepath)).toBe(SOURCE)
+  })
+})

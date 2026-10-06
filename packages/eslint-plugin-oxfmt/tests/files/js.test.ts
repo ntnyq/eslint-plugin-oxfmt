@@ -89,6 +89,37 @@ run({
       options: [{ insertFinalNewline: false, jsdoc: true, useConfig: false }],
       output: '/**\n * First line.\\\n * Second line.\n */\nconst value = 1;',
     },
+    {
+      code: 'const { text, class: className, "data-id": id } = props;\nconst value = { "color": 1, ["meta.nonce"]: 2 };',
+      filename: 'consistent-pattern-and-computed-keys.js',
+      options: [
+        {
+          insertFinalNewline: false,
+          quoteProps: 'consistent',
+          useConfig: false,
+        },
+      ],
+      output:
+        'const { text, "class": className, "data-id": id } = props;\nconst value = { color: 1, ["meta.nonce"]: 2 };',
+    },
+    {
+      code: '({ value:\n  // keep\n  target } = source);',
+      filename: 'assignment-target-comment.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: '({\n  value:\n    // keep\n    target,\n} = source);',
+    },
+    {
+      code: 'run /* keep block */ (value);\nrun // keep line\n(value);',
+      filename: 'callee-opener-comments.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'run /* keep block */(value);\nrun // keep line\n(value);',
+    },
+    {
+      code: 'const style = css`font-family:Arial,-apple-system;`;',
+      filename: 'embedded-css-signed-value.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const style = css`\n  font-family: Arial, -apple-system;\n`;',
+    },
   ],
   valid: [
     {

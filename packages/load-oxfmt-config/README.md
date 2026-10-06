@@ -33,7 +33,7 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.71.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.72.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
 
 ## Usage
@@ -501,6 +501,7 @@ Notes:
 
 - The default lockfile list mirrors oxfmt documentation intent (`package-lock.json`, `pnpm-lock.yaml`, etc.) and common ecosystem lockfiles. It is not guaranteed to be a complete internal oxfmt list.
 - `ignorePatterns` use gitignore semantics and are interpreted relative to the resolved oxfmt config directory. Parent-directory (`..`) path segments are rejected because patterns cannot match files outside that directory.
+- Within `ignorePatterns` or a single ignore file, `vendor/` followed by `!vendor/keep.js` still ignores the file because its parent directory is excluded. Use `vendor/*` followed by `!vendor/keep.js` to include that child. This matches oxfmt 0.72.0's corrected parent-directory handling.
 - `includeConfigIgnorePatterns` defaults to `true` to preserve current behavior.
 - `loadConfigForIgnorePatterns` defaults to `true` to preserve current behavior.
 - Nested config behavior follows oxfmt semantics:
@@ -508,6 +509,7 @@ Notes:
   - `disableNestedConfig: true`: resolve from `cwd` only
   - `configPath`: also disables nested lookup (same intent as CLI `-c`)
   - invalid nested config only fails files that resolve to that config (no project-wide pre-scan)
+  - files matched by global ignores are skipped before loading nested configs, even when those configs are invalid
 
 ## Precedence
 

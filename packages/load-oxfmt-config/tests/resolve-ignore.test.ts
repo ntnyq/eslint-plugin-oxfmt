@@ -543,6 +543,54 @@ describe('isOxfmtIgnored', () => {
     })
   })
 
+  it.each([
+    { ignored: true, pattern: 'vendor/', source: 'config-ignore-patterns' },
+    { ignored: false, pattern: 'vendor/*', source: 'config-ignore-patterns' },
+    { ignored: true, pattern: 'vendor/', source: 'prettierignore' },
+    { ignored: false, pattern: 'vendor/*', source: 'prettierignore' },
+  ])(
+    'resolves child negation after $pattern in $source',
+    async ({ ignored, pattern, source }) => {
+      await withTempDir('oxfmt-ignore-parent-negation-', async cwd => {
+        const filepath = join(cwd, 'vendor', 'keep.ts')
+        const patterns = [pattern, '!vendor/keep.ts']
+        await mkdir(join(cwd, 'vendor'))
+        await writeFile(filepath, 'export const keep = true\n')
+        await writeFile(
+          join(cwd, '.oxfmtrc.json'),
+          JSON.stringify(
+            source === 'config-ignore-patterns'
+              ? { ignorePatterns: patterns }
+              : {},
+          ),
+        )
+        if (source === 'prettierignore') {
+          await writeFile(join(cwd, '.prettierignore'), patterns.join('\n'))
+        }
+
+        expect(await isOxfmtIgnored({ cwd, filepath })).toStrictEqual(
+          ignored ? { ignored: true, reason: source } : { ignored: false },
+        )
+      })
+    },
+  )
+
+  it('applies global ignores before reading invalid nested config', async () => {
+    await withTempDir('oxfmt-ignore-invalid-nested-', async cwd => {
+      const filepath = join(cwd, 'vendor', 'keep.ts')
+      await mkdir(join(cwd, 'vendor'))
+      await writeFile(filepath, 'export const keep = true\n')
+      await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
+      await writeFile(join(cwd, '.prettierignore'), 'vendor/\n')
+      await writeFile(join(cwd, 'vendor', '.oxfmtrc.json'), '{ invalid json')
+
+      expect(await isOxfmtIgnored({ cwd, filepath })).toStrictEqual({
+        ignored: true,
+        reason: 'prettierignore',
+      })
+    })
+  })
+
   it.each(['../src/**', '!../src/**', 'src/../dist/**', '.. '])(
     'rejects parent-directory config ignore pattern %s',
     async pattern => {
