@@ -16,6 +16,15 @@ export type OxfmtOxfmt = []|[{
   
   arrowParens?: ("always" | "avoid")
   
+  astro?: (boolean | {
+    
+    allowShorthand?: boolean
+    
+    compressHTML?: ("jsx" | "html" | "none")
+    
+    skipFrontmatter?: boolean
+  })
+  
   bracketSameLine?: boolean
   
   bracketSpacing?: boolean
@@ -162,6 +171,15 @@ export type OxfmtOxfmt = []|[{
   
   withNodeModules?: boolean
   
+  associations?: {
+    
+    excludeFiles?: string[]
+    
+    files: string[]
+    
+    language: ("javascript" | "jsx" | "typescript" | "tsx" | "json" | "jsonc" | "json5" | "css" | "scss" | "less" | "graphql" | "yaml" | "markdown" | "toml" | "html" | "angular-html" | "vue" | "svelte" | "astro" | "handlebars" | "mdx")
+  }[]
+  
   overrides?: {
     
     excludeFiles?: string[]
@@ -171,6 +189,15 @@ export type OxfmtOxfmt = []|[{
     options?: {
       
       arrowParens?: ("always" | "avoid")
+      
+      astro?: (boolean | {
+        
+        allowShorthand?: boolean
+        
+        compressHTML?: ("jsx" | "html" | "none")
+        
+        skipFrontmatter?: boolean
+      })
       
       bracketSameLine?: boolean
       

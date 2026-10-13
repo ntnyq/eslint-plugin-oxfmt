@@ -2,8 +2,9 @@ import type { Linter, Rule } from 'eslint'
 import type {
   IsOxfmtIgnoredResult,
   LoadOxfmtConfigOptions,
+  OxfmtOptions,
 } from 'load-oxfmt-config'
-import type { format, FormatConfig } from 'oxfmt'
+import type { format } from 'oxfmt'
 
 export interface PluginOxfmt {
   configs: {
@@ -23,8 +24,8 @@ export interface PluginOxfmt {
 /**
  * Options for the oxfmt rule
  */
-export type RuleOxfmtOptions = FormatConfig &
-  LoadOxfmtConfigOptions & {
+export type RuleOxfmtOptions = LoadOxfmtConfigOptions &
+  OxfmtOptions & {
     disableNestedConfig?: boolean
     ignorePath?: string | string[]
     respectOxfmtDefaultIgnores?: boolean

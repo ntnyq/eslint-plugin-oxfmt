@@ -9,6 +9,53 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
       enum: ['always', 'avoid'],
       type: 'string',
     },
+    astro: {
+      anyOf: [
+        {
+          type: 'boolean',
+        },
+        {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            allowShorthand: {
+              type: 'boolean',
+              description:
+                'Whether to normalize matching identifier attributes to shorthand or explicit form.\nWhen unset, the form that was written stays as-is.\n\n- Default: Unset',
+            },
+            compressHTML: {
+              description:
+                'Mirror of Astro\'s `compressHTML` config.\nTells the formatter which whitespace the compiler will collapse.\n\n- Default: `"jsx"`',
+              oneOf: [
+                {
+                  enum: ['jsx'],
+                  type: 'string',
+                  description:
+                    'Whitespace runs containing a newline are dropped; same-line spaces are content.',
+                },
+                {
+                  description: 'Browser HTML whitespace rules.',
+                  enum: ['html'],
+                  type: 'string',
+                },
+                {
+                  description: 'No collapsing.',
+                  enum: ['none'],
+                  type: 'string',
+                },
+              ],
+            },
+            skipFrontmatter: {
+              type: 'boolean',
+              description:
+                'Whether to skip formatting the frontmatter.\n\n- Default: `false`',
+            },
+          },
+        },
+      ],
+      description:
+        'Options for `prettier-plugin-astro`.\n\nPass `true` or an object to enable `.astro` file formatting, `false` to disable (handy in overrides).\nSetting `true` resets to defaults, dropping options inherited from a parent scope.\n\nNOTE: `prettier-plugin-astro` requires the `@astrojs/compiler-rs` package at runtime.\nOxfmt does NOT bundle it, so install it in your project, otherwise formatting fails.\n\n- Languages: Astro\n- Default: Disabled',
+    },
     bracketSameLine: {
       description: `Put the > of a multi-line JSX element at the end of the last line\ninstead of being alone on the next line. (Default: false)`,
       type: 'boolean',
@@ -435,6 +482,62 @@ export const oxfmtRuleSchema: JSONSchema4 = {
   properties: {
     ...oxfmtOptionsSchema.properties,
     ...oxfmtConfigSchema.properties,
+    associations: {
+      type: 'array',
+      description:
+        'Format matched files as the given language, instead of detecting it from the file name.\ne.g. Angular templates named `*.html`, or `*.wxml` files formatted as HTML.\nWhen a file matches multiple associations, the later one takes precedence (array order matters).\n\n- Default: `[]`',
+      items: {
+        additionalProperties: false,
+        required: ['files', 'language'],
+        type: 'object',
+        properties: {
+          excludeFiles: {
+            type: 'array',
+            description:
+              'Glob patterns excluded from this association, relative to the config directory or ESLint cwd for inline associations.',
+            items: {
+              type: 'string',
+            },
+          },
+          files: {
+            type: 'array',
+            description:
+              'Glob patterns matched relative to the config directory, or ESLint cwd for inline associations.',
+            items: {
+              type: 'string',
+            },
+          },
+          language: {
+            type: 'string',
+            description:
+              'The language to format matched files as, named by its Shiki id (as in Markdown code fences).',
+            enum: [
+              'javascript',
+              'jsx',
+              'typescript',
+              'tsx',
+              'json',
+              'jsonc',
+              'json5',
+              'css',
+              'scss',
+              'less',
+              'graphql',
+              'yaml',
+              'markdown',
+              'toml',
+              'html',
+              'angular-html',
+              'vue',
+              'svelte',
+              'astro',
+              'handlebars',
+              'mdx',
+            ],
+          },
+        },
+      },
+    },
     overrides: {
       description: `File-specific overrides.\nWhen a file matches multiple overrides, the later override takes precedence (array order matters).\n\n- (Default: [])`,
       type: 'array',

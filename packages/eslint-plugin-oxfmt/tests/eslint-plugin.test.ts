@@ -26,7 +26,10 @@ const TAILWIND_PATH_CASES = (['config', 'stylesheet'] as const).flatMap(
         'inline without config',
         'absolute',
       ] as const
-    ).map(origin => ({ origin, pathOption })),
+    ).map(origin => ({
+      origin,
+      pathOption,
+    })),
 )
 
 it.each(TAILWIND_PATH_CASES)(

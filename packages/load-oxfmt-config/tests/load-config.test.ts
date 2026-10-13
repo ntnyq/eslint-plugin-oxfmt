@@ -7,6 +7,19 @@ import { fixturePath, withTempDir } from './helpers'
 
 describe('loadOxfmtConfig', () => {
   describe('basic loading', () => {
+    it('preserves associations and Astro options for formatter consumers', async () => {
+      await withTempDir('oxfmt-config-associations-', async cwd => {
+        const config = {
+          associations: [{ files: ['src/*.conf'], language: 'json' }],
+          astro: { skipFrontmatter: true },
+        }
+        await writeFile(join(cwd, '.oxfmtrc.json'), JSON.stringify(config))
+        const result = await loadOxfmtConfig({ cwd, editorconfig: false })
+        expect(result.config).toStrictEqual(config)
+        expect(result.dirname).toBe(cwd)
+      })
+    })
+
     it('returns empty object when config is missing', async () => {
       const cwd = fixturePath('load', 'missing')
 

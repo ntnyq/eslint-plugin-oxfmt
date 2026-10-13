@@ -1,4 +1,4 @@
-import type { FormatConfig } from 'oxfmt'
+import type { FormatConfig, OxfmtAssociationConfig } from 'oxfmt'
 
 /**
  * Object-form `.editorconfig` option for fine-grained lookup control.
@@ -190,9 +190,14 @@ export interface OxfmtConfigOverride {
 }
 
 /**
- * Final oxfmt options, including config `ignorePatterns` and `overrides`.
+ * Final oxfmt options, including config associations, ignore patterns, and overrides.
  */
 export interface OxfmtOptions extends FormatConfig {
+  /**
+   * File language associations, relative to the config directory.
+   * Later matching entries take precedence. The loader preserves these for consumers.
+   */
+  associations?: OxfmtAssociationConfig[]
   /**
    * Ignore files matching these glob patterns.
    *

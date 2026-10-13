@@ -33,8 +33,15 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.72.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.73.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
+
+Oxfmt 0.73.0 adds `associations` and `astro` options. The loader preserves
+association entries and Astro options in `OxfmtOptions`; it does not select a
+formatter. Association globs are relative to the returned config `dirname`, and
+later matching entries win. Consumers must resolve these before calling oxfmt's
+`format()` API, which does not evaluate `associations`. Symlinked configs are
+already discovered, with relative patterns based on the link's directory.
 
 ## Usage
 

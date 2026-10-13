@@ -143,3 +143,32 @@ it('should keep enum options aligned with oxfmt schema', async () => {
 
   expect(objectWrap).toEqual(['preserve', 'collapse'])
 })
+
+it('keeps association languages and Astro options aligned with upstream', async () => {
+  const upstream = JSON.parse(
+    await readFile(UPSTREAM_SCHEMA_PATH, 'utf8'),
+  ) as JSONSchema4
+  const association = oxfmtRuleSchema.properties?.associations
+    .items as JSONSchema4
+  const upstreamAssociation = upstream.definitions?.OxfmtAssociationConfig
+  expect(association.required).toEqual(upstreamAssociation?.required)
+  expect(Object.keys(association.properties ?? {}).sort()).toEqual(
+    Object.keys(upstreamAssociation?.properties ?? {}).sort(),
+  )
+  expect(association.properties?.language.enum).toEqual(
+    upstream.definitions?.Language.enum,
+  )
+  const astro = oxfmtRuleSchema.properties?.astro.anyOf?.find(
+    option => option.type === 'object',
+  )
+  expect(Object.keys(astro?.properties ?? {}).sort()).toEqual(
+    Object.keys(upstream.definitions?.AstroConfig.properties ?? {}).sort(),
+  )
+  expect(
+    astro?.properties?.compressHTML.oneOf?.flatMap(option => option.enum ?? []),
+  ).toEqual(
+    upstream.definitions?.AstroCompressHtmlConfig.oneOf?.flatMap(
+      option => option.enum ?? [],
+    ),
+  )
+})

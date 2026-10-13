@@ -24,24 +24,18 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.72.0`
+- **oxfmt**: `>= 0.73.0`
 
-Upgrading from oxfmt 0.71.0 to 0.72.0 switches Markdown to the native formatter.
-JavaScript and TypeScript code fences now use Oxc formatting, including
-`sortImports` and `sortTailwindcss` when enabled. Markdown block directives are
-supported, Chinese/Japanese line breaks are preserved across `proseWrap`
-settings, and list/container prefixes remain spaces with `useTabs`. Review
-Markdown and embedded code formatting changes after upgrading; YAML frontmatter
-formatting remains supported.
+Upgrading from oxfmt 0.72.0 to 0.73.0 adds language `associations` and opt-in
+Astro formatting. Install `@astrojs/compiler-rs` to use `astro: true` or an Astro
+options object. No existing options were renamed or removed.
 
-The release also fixes `quoteProps: consistent` in destructuring patterns and
-around computed keys, comments between callees and their opening delimiters,
-assignment-target comments, embedded template layouts, and CSS/JSON formatting.
-No formatting options were added, renamed, or removed, and config merge
-precedence is unchanged. The loader already respects excluded parent
-directories and checks global ignores before loading nested configs; these
-upstream fixes require no loader API changes.
-See the upstream [0.72.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.72.0).
+TOML now supports TOML 1.1 syntax and formats TOML frontmatter and Markdown code
+fences. Review these outputs after upgrading. Upstream also fixes CSS-in-JS
+interpolations, TypeScript instantiation parentheses, export wrapping, JSDoc
+paragraphs, and nested Svelte embeds. Config merge precedence is unchanged, and
+the loader already follows symlinked config files.
+See the upstream [0.73.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.73.0).
 
 The monorepo migration aligns the Node.js requirement with `load-oxfmt-config`; Node.js 20 is no longer supported.
 
@@ -324,6 +318,7 @@ Tip: `jsdoc: true` is equivalent to enabling JSDoc with default settings.
 | `sortImports`     | `boolean \| object` | disabled | Experimental import sorting configuration                                    |
 | `sortPackageJson` | `boolean \| object` | `true`   | Experimental package.json sorting (object form: `{ sortScripts?: boolean }`) |
 | `sortTailwindcss` | `boolean \| object` | disabled | Experimental Tailwind CSS class sorting (enable with `{}` for defaults)      |
+| `astro`           | `boolean \| object` | disabled | Enable/configure Astro formatting; requires `@astrojs/compiler-rs`           |
 | `svelte`          | `boolean \| object` | disabled | Enable/configure `.svelte` formatting via `prettier-plugin-svelte`           |
 
 #### Import sorting (`sortImports`)
@@ -387,6 +382,68 @@ You can pass the Tailwind plugin options to control which attributes/functions a
 ```
 
 Paths in `sortTailwindcss.config` and `sortTailwindcss.stylesheet` are resolved relative to the oxfmt config file when set in that file or its overrides. Paths set in ESLint rule options or rule-level overrides are resolved relative to ESLint `cwd`. Absolute paths are used directly.
+
+## Language associations
+
+Use `associations` in your oxfmt config or inline rule options to format files
+as a language regardless of their extension:
+
+```js
+// eslint.config.mjs
+import pluginOxfmt from 'eslint-plugin-oxfmt'
+
+export default [
+  {
+    ...pluginOxfmt.configs.recommended,
+    files: ['**/*.{html,wxml,conf}'],
+    rules: {
+      'oxfmt/oxfmt': [
+        'error',
+        {
+          associations: [
+            {
+              files: ['**/*.html'],
+              excludeFiles: ['index.html'],
+              language: 'angular-html',
+            },
+            { files: ['**/*.wxml'], language: 'html' },
+            { files: ['**/*.conf'], language: 'json' },
+          ],
+        },
+      ],
+    },
+  },
+]
+```
+
+Each entry requires `files: string[]` and `language`; `excludeFiles: string[]`
+is optional. Later matching entries win. Languages are `javascript`, `jsx`,
+`typescript`, `tsx`, `json`, `jsonc`, `json5`, `css`, `scss`, `less`, `graphql`,
+`yaml`, `markdown`, `toml`, `html`, `angular-html`, `vue`, `svelte`, `astro`,
+`handlebars`, and `mdx`.
+
+Config associations match paths relative to the resolved config directory.
+Inline associations match relative to ESLint `cwd` and replace config
+associations entirely; `associations: []` clears them. `useConfig: false` keeps
+inline associations active. Ignores, EditorConfig, and overrides use the original
+file path. Upstream's excluded lockfiles remain excluded. Associations do not
+change ESLint file discovery or enable optional formatters automatically.
+
+### Astro options
+
+Install `@astrojs/compiler-rs` alongside this plugin, then set `astro: true`
+or an object. The compiler is an optional peer dependency.
+
+| Option                  | Type                        | Default | Description                                                                                              |
+| ----------------------- | --------------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `astro.allowShorthand`  | `boolean`                   | unset   | Normalize matching identifier attributes to shorthand or explicit form; unset preserves the written form |
+| `astro.compressHTML`    | `'jsx' \| 'html' \| 'none'` | `'jsx'` | Match Astro compiler whitespace collapsing                                                               |
+| `astro.skipFrontmatter` | `boolean`                   | `false` | Preserve frontmatter without formatting                                                                  |
+
+`astro: false` disables Astro formatting, including in overrides. `astro: true`
+resets inherited Astro options to defaults. With
+`embeddedLanguageFormatting: 'off'`, Astro frontmatter is still formatted by
+Prettier; use `astro.skipFrontmatter` to preserve it.
 
 ## File-specific overrides
 

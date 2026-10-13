@@ -10,6 +10,7 @@ afterEach(() => {
 
 it.each([
   { column: 15, endColumn: 16, line: 1, source: 'const value = ;' },
+  // cSpell: disable-next-line
   { column: 14, endColumn: 15, line: 1, source: 'const éééé = ;' },
   { column: 12, endColumn: 13, line: 1, source: 'const 中文 = ;' },
   { column: 25, endColumn: 26, line: 1, source: 'const a="😀"; const b = ;' },
@@ -87,7 +88,9 @@ it('should include worker error details in the reported lint message', async () 
 
 it('should skip processor-extracted virtual files', async () => {
   const report = vi.fn()
-  const createSyncFn = vi.fn(() => () => ({ code: 'const value = 1;' }))
+  const createSyncFn = vi.fn(() => () => ({
+    code: 'const value = 1;',
+  }))
 
   vi.doMock('synckit', () => ({
     createSyncFn,
@@ -141,7 +144,10 @@ it('should report formatter diagnostics using label ranges when available', asyn
       ast: { type: 'Program' },
       text: 'const value = 1;',
       getLocFromIndex(index: number) {
-        return { column: index, line: 1 }
+        return {
+          column: index,
+          line: 1,
+        }
       },
     },
   } as never)

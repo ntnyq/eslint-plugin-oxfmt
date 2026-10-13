@@ -1,6 +1,6 @@
 // @ts-check
 
-import { dirname, extname, relative, resolve } from 'node:path'
+import { basename, dirname, extname, join, relative, resolve } from 'node:path'
 import ignore from 'ignore'
 import { isOxfmtIgnored, loadOxfmtConfigForFile } from 'load-oxfmt-config'
 import { format } from 'oxfmt'
@@ -95,6 +95,59 @@ const overrideMatcherCache = new Map()
  * @type {Map<string, import('ignore').Ignore>}
  */
 const ignoreMatcherCache = new Map()
+
+/**
+ * Filename suffixes selecting the same formatter as upstream Language routes.
+ * The format() API does not accept a language, unlike the CLI.
+ * @type {Record<import('oxfmt').Language, string>}
+ */
+const LANGUAGE_SUFFIXES = {
+  'angular-html': 'component.html',
+  astro: 'astro',
+  css: 'css',
+  graphql: 'graphql',
+  handlebars: 'hbs',
+  html: 'html',
+  javascript: 'js',
+  json: 'json',
+  json5: 'json5',
+  jsonc: 'jsonc',
+  jsx: 'jsx',
+  less: 'less',
+  markdown: 'md',
+  mdx: 'mdx',
+  scss: 'scss',
+  svelte: 'svelte',
+  toml: 'toml',
+  tsx: 'tsx',
+  typescript: 'ts',
+  vue: 'vue',
+  yaml: 'yaml',
+}
+
+/**
+ * Upstream classify_as excludes these even when associations explicitly match.
+ * Keep this guard before substituting a formatter filename.
+ * @type {Set<string>}
+ */
+const ASSOCIATION_EXCLUDED_FILENAMES = new Set([
+  'bun.lock',
+  'Cargo.lock',
+  'composer.lock',
+  'deno.lock',
+  'flake.lock',
+  'Gopkg.lock',
+  'mcmod.info',
+  'MODULE.bazel.lock',
+  'package-lock.json',
+  'Package.resolved',
+  'pdm.lock',
+  'Pipfile.lock',
+  'pnpm-lock.yaml',
+  'poetry.lock',
+  'uv.lock',
+  'yarn.lock',
+])
 
 /**
  * Apply override entries to a base options object.
@@ -215,8 +268,13 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
    * Inline overrides separated from root options to preserve merge order.
    * @type {OxfmtOptions}
    */
-  const { overrides: ruleOverrides, ...inlineOptionsWithoutOverrides } =
-    inlineFormatOptions
+  const {
+    associations: ruleAssociations,
+    overrides: ruleOverrides,
+    ...inlineOptionsWithoutOverrides
+  } = inlineFormatOptions
+  let associations = ruleAssociations
+  let associationBaseDir = inlineBaseDir
   /**
    * Effective formatter options with paths resolved against their source.
    * @type {import('oxfmt').FormatConfig}
@@ -235,8 +293,16 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
       filepath: filename,
       useCache,
     })
-    const { overrides: configOverrides, ...loadedConfig } = loaded.config
+    const {
+      associations: configAssociations,
+      overrides: configOverrides,
+      ...loadedConfig
+    } = loaded.config
     overrideBaseDir = loaded.dirname ?? overrideBaseDir
+    if (ruleAssociations === undefined) {
+      associations = configAssociations
+      associationBaseDir = overrideBaseDir
+    }
 
     finalOptions = {
       ...resolveTailwindPaths(loadedConfig, overrideBaseDir),
@@ -258,7 +324,27 @@ async function formatViaOxfmt(filename, sourceText, options = {}) {
     inlineBaseDir,
   )
 
-  return format(filename, sourceText, finalOptions)
+  const formatFilename = resolveAssociationFilename(
+    filename,
+    associations,
+    associationBaseDir,
+  )
+  if (
+    formatFilename !== filename &&
+    ASSOCIATION_EXCLUDED_FILENAMES.has(basename(filename))
+  ) {
+    return {
+      code: sourceText,
+      ignored: true,
+    }
+  }
+  const result = await format(formatFilename, sourceText, finalOptions)
+  if (formatFilename !== filename) {
+    for (const error of result.errors) {
+      error.message = error.message.replaceAll(formatFilename, () => filename)
+    }
+  }
+  return result
 }
 
 /**
@@ -355,6 +441,52 @@ function isStringArray(value) {
 }
 
 /**
+ * Resolve the last matching association, validating entries even if unmatched.
+ * @param {string} filename - Original file path.
+ * @param {OxfmtOptions['associations']} associations - Ordered associations.
+ * @param {string} baseDir - Directory that owns the association patterns.
+ * @returns {string} Filename used only for selecting the formatter.
+ */
+function resolveAssociationFilename(filename, associations, baseDir) {
+  if (associations === undefined) {
+    return filename
+  }
+  if (!Array.isArray(associations)) {
+    throw new TypeError('oxfmt associations must be an array.')
+  }
+
+  const relativePath = getRelativePath(baseDir, filename)
+  let formatFilename = filename
+  for (const association of associations) {
+    if (
+      !association ||
+      !isStringArray(association.files) ||
+      (association.excludeFiles !== undefined &&
+        !isStringArray(association.excludeFiles)) ||
+      !Object.hasOwn(LANGUAGE_SUFFIXES, association.language)
+    ) {
+      throw new TypeError(
+        'Invalid oxfmt association: expected files, optional excludeFiles, and a supported language.',
+      )
+    }
+
+    const matches = getCachedOverrideMatcher(association.files)(relativePath)
+    const excluded = association.excludeFiles
+      ? getCachedOverrideMatcher(association.excludeFiles)(relativePath)
+      : false
+    if (matches && !excluded) {
+      // Use a neutral basename to avoid package.json sorting and .component.html
+      // detection overriding the explicitly selected language.
+      formatFilename = join(
+        dirname(filename),
+        `__oxfmt__.${LANGUAGE_SUFFIXES[association.language]}`,
+      )
+    }
+  }
+  return formatFilename
+}
+
+/**
  * Resolve Tailwind paths before merging options from different sources.
  * @param {import('oxfmt').FormatConfig} options - Format options to normalize.
  * @param {string} baseDir - Config directory or ESLint cwd for inline options.
@@ -378,7 +510,10 @@ function resolveTailwindPaths(options, baseDir) {
     resolved.stylesheet = resolve(baseDir, resolved.stylesheet)
   }
 
-  return { ...options, sortTailwindcss: resolved }
+  return {
+    ...options,
+    sortTailwindcss: resolved,
+  }
 }
 
 /**

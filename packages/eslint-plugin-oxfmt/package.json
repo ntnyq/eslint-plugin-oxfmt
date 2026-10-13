@@ -53,11 +53,15 @@
     "update:rule-options": "tsx scripts/updateRuleOptions.ts"
   },
   "peerDependencies": {
+    "@astrojs/compiler-rs": "*",
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.72.0",
+    "oxfmt": ">=0.73.0",
     "svelte": "*"
   },
   "peerDependenciesMeta": {
+    "@astrojs/compiler-rs": {
+      "optional": true
+    },
     "svelte": {
       "optional": true
     }
@@ -67,9 +71,10 @@
     "ignore": "^7.0.12",
     "load-oxfmt-config": "workspace:^",
     "picomatch": "^4.0.7",
-    "synckit": "^0.11.13"
+    "synckit": "^0.12.3"
   },
   "devDependencies": {
+    "@astrojs/compiler-rs": "^0.5.1",
     "@types/json-schema": "^7.0.15",
     "eslint-parser-plain": "^0.1.1",
     "eslint-plugin-oxfmt": "workspace:*",

@@ -307,7 +307,9 @@ async function importFreshJavaScriptConfigModule(
       return namespace
     }
 
-    return { default: readConfigModuleExports(configModule) }
+    return {
+      default: readConfigModuleExports(configModule),
+    }
   } catch (error) {
     if (!isJavaScriptLoaderFallbackError(error, loaderPaths)) {
       throw error

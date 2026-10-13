@@ -155,7 +155,10 @@ export async function readEditorconfigFromFile(
     : undefined
 
   if (relativeFile !== undefined && isPathOutsideBase(relativeFile)) {
-    return { overrides, rootOptions }
+    return {
+      overrides,
+      rootOptions,
+    }
   }
 
   for (const [sectionName, sectionBody] of parsedSections) {

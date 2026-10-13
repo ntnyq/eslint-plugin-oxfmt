@@ -28,8 +28,9 @@
     "changelogithub",
     "codecov",
     "esbuild",
-    "Gopkg",
+    "gopkg",
     "lcov",
+    "mcmod",
     "Negotiables",
     "nocomment",
     "noext",
@@ -38,12 +39,14 @@
     "oxfmtrc",
     "oxlint",
     "pnpm",
+    "shiki",
     "tsdown",
     "tsgo",
     "unrs",
     "vite",
     "vitepress",
-    "vitest"
+    "vitest",
+    "wxml"
   ],
   "cSpell.allowCompoundWords": true
 }
