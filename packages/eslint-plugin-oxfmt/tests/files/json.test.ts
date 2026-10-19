@@ -23,5 +23,27 @@ run({
         )
       },
     },
+    {
+      code: '{"value": true + false}',
+      filename: 'invalid.json',
+      options: [{ useConfig: false }],
+      output: null,
+      errors: [
+        {
+          message: 'Failed to format code: This syntax is not allowed in JSON',
+        },
+      ],
+    },
+    {
+      code: '{"value": !1}',
+      filename: 'invalid.json',
+      options: [{ useConfig: false }],
+      output: null,
+      errors: [
+        {
+          message: 'Failed to format code: This syntax is not allowed in JSON',
+        },
+      ],
+    },
   ],
 })

@@ -148,7 +148,8 @@ export async function readEditorconfigFromFile(
     ? await cachePromise(sectionCache, editorconfigPath, readSections)
     : await readSections()
   const editorconfigDir = dirname(editorconfigPath)
-  const rootOptions: EditorconfigOptions = {}
+  let rootOptions: EditorconfigOptions = {}
+  const resolvedSection: SectionBody = {}
   const overrides: OxfmtConfigOverride[] = []
   const relativeFile = options.filepath
     ? toPosixPath(relative(editorconfigDir, options.filepath))
@@ -166,24 +167,29 @@ export async function readEditorconfigFromFile(
       continue
     }
 
-    const mappedOptions = mapEditorconfigSectionToOptions(sectionBody)
-    if (Object.keys(mappedOptions).length === 0) {
-      continue
-    }
-
     if (relativeFile !== undefined) {
       if (matchesEditorconfigSection(sectionName, relativeFile, useCache)) {
-        Object.assign(rootOptions, mappedOptions)
+        Object.assign(resolvedSection, sectionBody)
       }
       continue
     }
 
+    const mappedOptions = mapEditorconfigSectionToOptions(
+      sectionBody,
+      resolvedSection,
+    )
+
     if (isEditorconfigGlobalSection(sectionName)) {
-      Object.assign(rootOptions, mappedOptions)
+      Object.assign(resolvedSection, sectionBody)
+      rootOptions = mapEditorconfigSectionToOptions(resolvedSection)
       // A later global section must also override earlier scoped sections.
       if (overrides.length === 0) {
         continue
       }
+    }
+
+    if (Object.keys(mappedOptions).length === 0) {
+      continue
     }
 
     overrides.push({
@@ -196,7 +202,10 @@ export async function readEditorconfigFromFile(
 
   return {
     overrides,
-    rootOptions,
+    rootOptions:
+      relativeFile === undefined
+        ? rootOptions
+        : mapEditorconfigSectionToOptions(resolvedSection),
   }
 }
 
@@ -261,10 +270,12 @@ function isEditorconfigGlobalSection(sectionName: SectionName) {
  * Maps a parsed EditorConfig section to the subset of oxfmt formatter options it supports.
  *
  * @param section - The parsed EditorConfig section body.
+ * @param inheritedSection - Global properties inherited by a static override.
  * @returns Formatter options derived from the section.
  */
 function mapEditorconfigSectionToOptions(
   section: SectionBody,
+  inheritedSection: SectionBody = {},
 ): EditorconfigOptions {
   const options: EditorconfigOptions = {}
 
@@ -284,9 +295,18 @@ function mapEditorconfigSectionToOptions(
     options.singleQuote = singleQuote
   }
 
-  const tabWidth = parseEditorconfigTabWidth(section, options.useTabs)
-  if (isNumber(tabWidth)) {
-    options.tabWidth = tabWidth
+  if (
+    section.indent_style !== undefined ||
+    section.indent_size !== undefined ||
+    section.tab_width !== undefined
+  ) {
+    // Select the width after inheriting raw properties, before collapsing both
+    // indent_size and tab_width into the single oxfmt tabWidth option.
+    const effectiveSection = { ...inheritedSection, ...section }
+    const tabWidth = parseEditorconfigTabWidth(effectiveSection)
+    if (isNumber(tabWidth)) {
+      options.tabWidth = tabWidth
+    }
   }
 
   if (section.max_line_length && section.max_line_length !== 'unset') {
@@ -402,32 +422,22 @@ function parseEditorconfigQuoteType(value: string | undefined) {
  * Resolves the effective tab width from an EditorConfig section.
  *
  * @param section - The parsed EditorConfig section body.
- * @param useTabs - The resolved indent style from the same section, when available.
  * @returns The resolved tab width, or undefined when no numeric value is available.
  */
-function parseEditorconfigTabWidth(
-  section: SectionBody,
-  useTabs: boolean | undefined,
-) {
-  const indentSize = section.indent_size
-  const tabWidth = section.tab_width
+function parseEditorconfigTabWidth(section: SectionBody) {
+  const values =
+    section.indent_style === 'space'
+      ? [section.indent_size, section.tab_width]
+      : [section.tab_width, section.indent_size]
 
-  if (
-    useTabs === false &&
-    indentSize &&
-    indentSize !== 'unset' &&
-    indentSize !== 'tab'
-  ) {
-    const parsedIndentSize = Number(indentSize)
-    if (Number.isFinite(parsedIndentSize)) {
-      return parsedIndentSize
+  for (const value of values) {
+    if (!value || value === 'unset' || value === 'tab') {
+      continue
     }
-  }
 
-  if (tabWidth && tabWidth !== 'unset') {
-    const parsedTabWidth = Number(tabWidth)
-    if (Number.isFinite(parsedTabWidth)) {
-      return parsedTabWidth
+    const parsedWidth = Number(value)
+    if (Number.isFinite(parsedWidth)) {
+      return parsedWidth
     }
   }
 

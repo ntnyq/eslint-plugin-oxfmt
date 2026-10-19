@@ -55,7 +55,7 @@
   "peerDependencies": {
     "@astrojs/compiler-rs": "*",
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.73.0",
+    "oxfmt": ">=0.74.0",
     "svelte": "*"
   },
   "peerDependenciesMeta": {
@@ -68,13 +68,13 @@
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "ignore": "^7.0.12",
+    "ignore": "^7.0.13",
     "load-oxfmt-config": "workspace:^",
     "picomatch": "^4.0.7",
     "synckit": "^0.12.3"
   },
   "devDependencies": {
-    "@astrojs/compiler-rs": "^0.5.1",
+    "@astrojs/compiler-rs": "^0.5.2",
     "@types/json-schema": "^7.0.15",
     "eslint-parser-plain": "^0.1.1",
     "eslint-plugin-oxfmt": "workspace:*",

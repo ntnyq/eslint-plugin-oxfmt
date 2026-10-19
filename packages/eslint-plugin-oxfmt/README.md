@@ -24,7 +24,21 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.73.0`
+- **oxfmt**: `>= 0.74.0`
+
+Upgrading from oxfmt 0.73.0 to 0.74.0 accepts BOM-prefixed JSON/JSONC configs
+and uses EditorConfig `indent_size` as a fallback when `tab_width` is absent,
+including when `indent_style` is unspecified or set to `tab`. Out-of-range
+EditorConfig widths are reported as configuration errors. Config merge
+precedence is unchanged; no options were added, renamed, or removed.
+Scoped `indent_size` settings now take effect without repeating `indent_style`,
+so existing EditorConfig sections may change indentation.
+
+Upstream fixes formatting of import comments, JSDoc, TypeScript parentheses,
+JSX, CSS-in-JS, Markdown, YAML, and TOML BOMs, rejects more invalid JSON, and
+corrects parse-error positions for CRLF and BOM-prefixed source. Review affected
+outputs after upgrading. See the upstream
+[0.74.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.74.0).
 
 Upgrading from oxfmt 0.72.0 to 0.73.0 adds language `associations` and opt-in
 Astro formatting. Install `@astrojs/compiler-rs` to use `astro: true` or an Astro

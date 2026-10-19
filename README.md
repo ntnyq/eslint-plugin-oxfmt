@@ -13,7 +13,7 @@ Format code with [oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) through
 
 ## Quick Start
 
-Both packages require Node.js `^22.13.0 || >=24` and oxfmt `>=0.73.0`.
+Both packages require Node.js `^22.13.0 || >=24` and oxfmt `>=0.74.0`.
 
 ### ESLint Plugin
 

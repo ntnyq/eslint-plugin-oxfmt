@@ -735,7 +735,7 @@ it('should keep root oxfmt options above .editorconfig [**] fallbacks', async ()
   expect(summary[0]?.messages).toHaveLength(0)
 })
 
-it('should align section indent_size fallback with oxfmt and keep inherited root indentation', async () => {
+it('should apply section indent_size without repeating the root indent_style', async () => {
   const summary = await runFixture(
     resolve('tests/fixtures/config-loading/editorconfig-sections'),
   )
@@ -743,11 +743,11 @@ it('should align section indent_size fallback with oxfmt and keep inherited root
 
   expect(summaryByFile.get('src/sectioned.js')?.output)
     .toBe(`export function buildUser(
-  name,
+     name,
 ) {
-  return createUserProfile(
-    name,
-    'a very long display name',
-  );
+     return createUserProfile(
+          name,
+          'a very long display name',
+     );
 }`)
 })

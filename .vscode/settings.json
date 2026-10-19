@@ -28,6 +28,7 @@
     "changelogithub",
     "codecov",
     "esbuild",
+    "FEFF",
     "gopkg",
     "lcov",
     "mcmod",

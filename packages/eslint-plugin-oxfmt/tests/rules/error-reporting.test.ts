@@ -15,6 +15,12 @@ it.each([
   { column: 12, endColumn: 13, line: 1, source: 'const 中文 = ;' },
   { column: 25, endColumn: 26, line: 1, source: 'const a="😀"; const b = ;' },
   { column: 15, endColumn: 16, line: 2, source: '// 中文😀\nconst value = ;' },
+  {
+    column: 15,
+    endColumn: 16,
+    line: 2,
+    source: '// 中文😀\r\nconst value = ;',
+  },
   { column: 11, endColumn: 11, line: 1, source: 'const 中文 =' },
 ])(
   'should report UTF-16 diagnostic locations for $source',

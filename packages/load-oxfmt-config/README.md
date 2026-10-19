@@ -33,8 +33,16 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.73.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.74.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
+
+Oxfmt 0.74.0 accepts BOM-prefixed JSON/JSONC configs and uses EditorConfig
+`indent_size` as a fallback when `tab_width` is absent, including for tab or
+unspecified indentation styles. The loader follows these changes and preserves
+out-of-range widths so oxfmt reports configuration errors instead of silently
+wrapping them. Config merge precedence is unchanged, and no options were added,
+renamed, or removed. See the upstream
+[0.74.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.74.0).
 
 Oxfmt 0.73.0 adds `associations` and `astro` options. The loader preserves
 association entries and Astro options in `OxfmtOptions`; it does not select a
@@ -469,7 +477,7 @@ The loader reads the nearest `.editorconfig` file and maps the subset of fields 
 
 - `end_of_line` → `endOfLine`
 - `indent_style` → `useTabs`
-- `indent_size` → `tabWidth` when `indent_style = space`
+- `indent_size` → `tabWidth` when `indent_style = space`, or as a fallback when `tab_width` is absent
 - `tab_width` → `tabWidth`
 - `max_line_length` → `printWidth`
 - `insert_final_newline` → `insertFinalNewline`
@@ -480,7 +488,10 @@ sections also generates an override to preserve source order. Other sections
 such as `[**]` and `[*.ts]` are converted into returned `overrides` entries;
 basename patterns such as `*.ts` are normalized to `**/*.ts` to match descendants.
 The per-file API evaluates matching sections directly, without rebasing them to
-the oxfmt config directory.
+the oxfmt config directory. It combines their raw properties before selecting
+`tabWidth`, so a scoped `indent_size` preserves an inherited `tab_width` unless
+the effective `indent_style` is `space`. Static overrides inherit global
+indentation properties when selecting their widths.
 
 ## Ignore Strategy
 
@@ -532,7 +543,8 @@ Section-specific `.editorconfig` entries are represented as generated `overrides
 
 `loadOxfmtConfig()` returns a static merged `OxfmtOptions` shape. Its generated
 EditorConfig globs cannot represent every relationship between config directories,
-particularly an ancestor EditorConfig with a nested oxfmt config. Use
+particularly an ancestor EditorConfig with a nested oxfmt config, or width
+interactions between overlapping scoped sections. Use
 `loadOxfmtConfigForFile()` to resolve EditorConfig against its original directory
 for a specific target file. Both APIs retain the nearest-file discovery strategy;
 they do not merge multiple EditorConfig files.

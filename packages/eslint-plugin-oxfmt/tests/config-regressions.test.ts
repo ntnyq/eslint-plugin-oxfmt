@@ -68,7 +68,12 @@ const IGNORE_CASES: {
   },
 ]
 
-async function lint(cwd: string, filepath: string, options: RuleOptions = {}) {
+async function lint(
+  cwd: string,
+  filepath: string,
+  options: RuleOptions = {},
+  source = SOURCE,
+) {
   const eslint = new ESLint({
     cwd,
     fix: true,
@@ -80,9 +85,9 @@ async function lint(cwd: string, filepath: string, options: RuleOptions = {}) {
       },
     ],
   })
-  const [result] = await eslint.lintText(SOURCE, { filePath: filepath })
+  const [result] = await eslint.lintText(source, { filePath: filepath })
   expect(result.messages).toEqual([])
-  return result.output ?? SOURCE
+  return result.output ?? source
 }
 
 async function withProject(run: (cwd: string) => Promise<void>) {
@@ -93,6 +98,112 @@ async function withProject(run: (cwd: string) => Promise<void>) {
     await rm(cwd, { force: true, recursive: true })
   }
 }
+
+it.each(['.oxfmtrc.json', '.oxfmtrc.jsonc'])(
+  'matches the CLI for BOM-prefixed %s',
+  async filename => {
+    await withProject(async cwd => {
+      const filepath = join(cwd, 'a.js')
+      await writeFile(filepath, SOURCE)
+      await writeFile(join(cwd, filename), '\u{FEFF}{"singleQuote": true}')
+
+      const output = await lint(cwd, filepath)
+      const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'a.js'], {
+        cwd,
+        encoding: 'utf8',
+      })
+
+      expect(cli.status).toBe(0)
+      expect(await readFile(filepath, 'utf8')).toBe(SINGLE_QUOTED)
+      expect(output).toBe(SINGLE_QUOTED)
+    })
+  },
+)
+
+it.each([
+  { indentation: ' '.repeat(4), properties: 'indent_size = 4' },
+  { indentation: '\t', properties: 'indent_style = tab\nindent_size = 4' },
+  {
+    indentation: ' '.repeat(4),
+    properties: 'indent_style = space\nindent_size = 4\ntab_width = 8',
+  },
+  {
+    indentation: ' '.repeat(8),
+    properties: 'tab_width = 8\n[*.js]\nindent_size = 4',
+  },
+  {
+    indentation: ' '.repeat(4),
+    properties: 'indent_style = space\ntab_width = 8\n[*.js]\nindent_size = 4',
+  },
+  {
+    indentation: ' '.repeat(8),
+    properties:
+      'quote_type = double\n[*.js]\ntab_width = 8\n[a.*]\nindent_size = 4',
+  },
+  {
+    indentation: ' '.repeat(4),
+    properties: 'tab_width = 8\n[*.js]\ntab_width = unset\nindent_size = 4',
+  },
+])('matches the CLI for $properties', async ({ indentation, properties }) => {
+  await withProject(async cwd => {
+    const filepath = join(cwd, 'a.js')
+    const source = 'if (condition) { console.log("hello"); }\n'
+    const expected = `if (condition) {\n${indentation}console.log("hello");\n}\n`
+    await writeFile(filepath, source)
+    await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
+    await writeFile(
+      join(cwd, '.editorconfig'),
+      `root = true\n[*]\n${properties}\n`,
+    )
+
+    const output = await lint(cwd, filepath, {}, source)
+    const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'a.js'], {
+      cwd,
+      encoding: 'utf8',
+    })
+
+    expect(cli.status).toBe(0)
+    expect(await readFile(filepath, 'utf8')).toBe(expected)
+    expect(output).toBe(expected)
+  })
+})
+
+it.each([
+  'indent_size = 260',
+  'tab_width = 260',
+  'max_line_length = 65546',
+  'indent_style = tab\ntab_width = 260\n[*.js]\nindent_size = 4',
+])('rejects out-of-range EditorConfig %s like the CLI', async property => {
+  await withProject(async cwd => {
+    const filepath = join(cwd, 'a.js')
+    await writeFile(filepath, SOURCE)
+    await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
+    await writeFile(
+      join(cwd, '.editorconfig'),
+      `root = true\n[*]\n${property}\n`,
+    )
+    const eslint = new ESLint({
+      cwd,
+      fix: true,
+      overrideConfig: [pluginOxfmt.configs.recommended],
+      overrideConfigFile: true,
+    })
+
+    const [result] = await eslint.lintText(SOURCE, { filePath: filepath })
+    const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'a.js'], {
+      cwd,
+      encoding: 'utf8',
+    })
+
+    expect(cli.status).toBe(1)
+    expect(result.messages).toHaveLength(1)
+    expect(result.messages[0]?.message).toContain(
+      'Failed to parse configuration',
+    )
+    expect(result.output).toBeUndefined()
+    expect(await readFile(filepath, 'utf8')).toBe(SOURCE)
+  })
+})
 
 it.each([
   { file: 'a.js', name: 'basename at root', section: '*.js' },

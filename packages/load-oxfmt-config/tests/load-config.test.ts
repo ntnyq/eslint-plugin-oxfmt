@@ -7,6 +7,27 @@ import { fixturePath, withTempDir } from './helpers'
 
 describe('loadOxfmtConfig', () => {
   describe('basic loading', () => {
+    it.each(['.oxfmtrc.json', '.oxfmtrc.jsonc', 'custom-config'])(
+      'loads a BOM-prefixed %s config',
+      async filename => {
+        await withTempDir('oxfmt-config-bom-', async cwd => {
+          const content = filename.endsWith('.jsonc')
+            ? '// Formatting options\n{"singleQuote": true,}'
+            : '{"singleQuote": true}'
+          await writeFile(join(cwd, filename), `\u{FEFF}${content}`)
+
+          const result = await loadOxfmtConfig({
+            configPath: filename === 'custom-config' ? filename : undefined,
+            cwd,
+            editorconfig: false,
+          })
+
+          expect(result.config).toStrictEqual({ singleQuote: true })
+          expect(result.filepath).toBe(join(cwd, filename))
+        })
+      },
+    )
+
     it('preserves associations and Astro options for formatter consumers', async () => {
       await withTempDir('oxfmt-config-associations-', async cwd => {
         const config = {
@@ -848,7 +869,7 @@ describe('loadOxfmtConfig', () => {
 
       expect(result.config.printWidth).toBe(120)
       expect(result.config.useTabs).toBeFalsy()
-      expect(result.config.tabWidth).toBeUndefined()
+      expect(result.config.tabWidth).toBe(8)
     })
 
     it('keeps .editorconfig override fields as fallbacks to root config', async () => {
@@ -889,8 +910,12 @@ describe('loadOxfmtConfig', () => {
 
       const result = await loadOxfmtConfig({ cwd, useCache: false })
 
-      expect(result.config.tabWidth).toBeUndefined()
+      expect(result.config.tabWidth).toBe(2)
       expect(result.config.overrides).toStrictEqual([
+        {
+          files: ['**/*.ts'],
+          options: { tabWidth: 4 },
+        },
         {
           files: ['**/*.md'],
           options: { printWidth: 72 },
@@ -908,7 +933,7 @@ describe('loadOxfmtConfig', () => {
 
       const result = await loadOxfmtConfig({ cwd: child, useCache: false })
 
-      expect(result.config.tabWidth).toBeUndefined()
+      expect(result.config.tabWidth).toBe(2)
       expect(result.config.useTabs).toBeTruthy()
     })
 
@@ -948,7 +973,7 @@ describe('loadOxfmtConfig', () => {
       const result = await loadOxfmtConfig({ cwd: child, useCache: false })
 
       expect(result.config.semi).toBeFalsy()
-      expect(result.config.tabWidth).toBeUndefined()
+      expect(result.config.tabWidth).toBe(2)
       expect(result.config.overrides).toStrictEqual([
         {
           files: ['packages/app/src/**/*.ts'],
@@ -998,7 +1023,7 @@ describe('loadOxfmtConfig', () => {
         useCache: false,
       })
 
-      expect(withWalk.config.tabWidth).toBeUndefined()
+      expect(withWalk.config.tabWidth).toBe(4)
       expect(withoutWalk.config).toStrictEqual({})
     })
 
@@ -1013,7 +1038,7 @@ describe('loadOxfmtConfig', () => {
       })
 
       expect(result.config.semi).toBeTruthy()
-      expect(result.config.tabWidth).toBeUndefined()
+      expect(result.config.tabWidth).toBe(8)
       expect(result.config.printWidth).toBe(120)
     })
 

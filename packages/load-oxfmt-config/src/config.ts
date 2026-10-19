@@ -119,7 +119,10 @@ export async function readConfigFromFile(
     return readConfigDefaultExport(mod)
   }
 
-  const content = await readFile(resolvedPath, 'utf8')
+  const content = (await readFile(resolvedPath, 'utf8')).replace(
+    /^\u{FEFF}/u,
+    '',
+  )
 
   if (extension === '.jsonc') {
     const parseErrors: ParseError[] = []
