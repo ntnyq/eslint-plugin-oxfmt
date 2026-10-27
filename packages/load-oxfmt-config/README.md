@@ -33,8 +33,15 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.74.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.75.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
+
+Oxfmt 0.75.0 leaves the configuration schema, discovery, ignore resolution,
+and merge precedence unchanged, so this upgrade requires no loader runtime
+changes. Formatting fixes are applied by oxfmt after loading the config.
+Astro formatting now requires `@astrojs/compiler-rs ^0.5.0` when enabled.
+See the upstream [0.75.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.75.0)
+and [Astro dependency update](https://github.com/oxc-project/oxc/pull/28162).
 
 Oxfmt 0.74.0 accepts BOM-prefixed JSON/JSONC configs and uses EditorConfig
 `indent_size` as a fallback when `tab_width` is absent, including for tab or

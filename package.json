@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.29.0",
   "private": true,
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.15.0",
   "license": "MIT",
   "scripts": {
     "build": "pnpm -r run build",
@@ -24,17 +24,17 @@
     "update:rule-options": "pnpm --filter eslint-plugin-oxfmt run update:rule-options"
   },
   "devDependencies": {
-    "@ntnyq/eslint-config": "^7.0.0-beta.27",
+    "@ntnyq/eslint-config": "^7.0.0-beta.28",
     "@types/node": "^26.6.5",
     "@typescript/native-preview": "^7.0.0-dev.20260707.2",
     "bumpp": "^12.3.0",
     "eslint": "^10.13.0",
     "husky": "^9.1.7",
     "nano-staged": "^1.0.2",
-    "npm-run-all2": "^9.0.3",
-    "oxfmt": "^0.74.0",
+    "npm-run-all2": "^9.0.4",
+    "oxfmt": "^0.75.0",
     "tinyglobby": "^0.2.17",
-    "tsdown": "^0.23.1",
+    "tsdown": "^0.23.2",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5"

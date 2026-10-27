@@ -53,9 +53,9 @@
     "update:rule-options": "tsx scripts/updateRuleOptions.ts"
   },
   "peerDependencies": {
-    "@astrojs/compiler-rs": "*",
+    "@astrojs/compiler-rs": "^0.5.0",
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.74.0",
+    "oxfmt": ">=0.75.0",
     "svelte": "*"
   },
   "peerDependenciesMeta": {
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "generate-differences": "^0.1.1",
-    "ignore": "^7.0.13",
+    "ignore": "^7.0.14",
     "load-oxfmt-config": "workspace:^",
     "picomatch": "^4.0.7",
     "synckit": "^0.12.3"
@@ -82,7 +82,7 @@
     "eslint-vitest-rule-tester": "^3.2.0",
     "jsonc-eslint-parser": "^3.3.0",
     "show-invisibles": "^0.0.2",
-    "svelte": "^5.57.2",
+    "svelte": "^5.57.3",
     "tinyglobby": "^0.2.17"
   },
   "engines": {
