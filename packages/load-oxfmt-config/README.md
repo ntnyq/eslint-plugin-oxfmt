@@ -33,8 +33,12 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.75.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.76.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
+
+Existing oxfmt configs, EditorConfig settings, and ignore patterns work as
+written with 0.76.0. The HTML formatting changes apply after config resolution.
+See the [0.76.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.76.0).
 
 Oxfmt 0.75.0 leaves the configuration schema, discovery, ignore resolution,
 and merge precedence unchanged, so this upgrade requires no loader runtime

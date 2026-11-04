@@ -88,6 +88,11 @@ it.each([
     language: 'html',
     source: '<p   class="a">{{value}}</p>',
   },
+  {
+    file: 'card.wxml',
+    language: 'html',
+    source: '<div><pre>  </pre></div>',
+  },
   { file: 'package.json', language: 'json', source: '{"z":1,"a":2}' },
   {
     file: 'example.js',

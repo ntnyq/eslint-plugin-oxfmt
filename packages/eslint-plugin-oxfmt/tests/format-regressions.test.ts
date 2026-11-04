@@ -138,10 +138,78 @@ result = (value as Factory)<T>;
 :::
 `,
   },
+  {
+    expected: '<title>Docs</title>\n</head>\n<p>Hello</p>\n</body>\n</html>\n',
+    filename: 'page.html',
+    name: 'HTML end tags with omitted opening tags',
+    source: '<title>Docs</title></head><p>Hello</p></body></html>',
+  },
+  {
+    expected: '<!DOCTYPE html>\n<script src="app.js" />\n<p>Text</p>\n',
+    filename: 'page.xhtml',
+    name: 'XHTML doctype case and self-closing script elements',
+    source: '<!DOCTYPE html><script src="app.js"/><p>Text</p>',
+  },
+  {
+    filename: 'icon.html',
+    name: 'preserved SVG text whitespace',
+    expected:
+      '<svg><text xml:space="preserve">  a <tspan>b</tspan>  c</text></svg>\n',
+    source:
+      '<svg><text xml:space="preserve">  a <tspan>b</tspan>  c</text></svg>',
+  },
+  {
+    filename: 'template.js',
+    name: 'dynamic closing tags in HTML templates',
+    source: `html\`<\${tag}> <p>one</p> <p>two</p> </\${tag}>\`;`,
+    expected: `html\`<\${tag}>
+  <p>one</p>
+  <p>two</p>
+</\${tag}>\`;
+`,
+  },
+  {
+    filename: 'fence.md',
+    name: 'whitespace-only pre and textarea content in Markdown HTML fences',
+    source: '```html\n<div><pre>  </pre><textarea>  </textarea></div>\n```',
+    expected:
+      '```html\n<div>\n  <pre>  </pre>\n  <textarea>  </textarea>\n</div>\n```\n',
+  },
+  {
+    filename: 'private.js',
+    name: 'optional private field access after nullish coalescing',
+    source: 'class Item { #id; read(a, b) { return (a ?? b)?.#id; } }',
+    expected: `class Item {
+  #id;
+  read(a, b) {
+    return (a ?? b)?.#id;
+  }
+}
+`,
+  },
+  {
+    expected: 'const fn = <(<T>(x: T) => T)>impl;\n',
+    filename: 'generic.ts',
+    name: 'generic function types inside angle-bracket assertions',
+    source: 'const fn = < <T>(x: T) => T>impl;',
+  },
+  {
+    expected: 'const f = () => (function () {}.ready ? on : off);\n',
+    filename: 'conditional.js',
+    name: 'conditional arrow bodies starting with a function expression',
+    source: 'const f = () => (function () {}).ready ? on : off;',
+  },
+  {
+    expected: '(\n  firstLongOperand +\n  secondLongOperand\n)[key];\n',
+    filename: 'computed.js',
+    name: 'wrapping a binary expression before computed member access',
+    options: { printWidth: 30 },
+    source: '(firstLongOperand + secondLongOperand)[key];',
+  },
 ]
 
 it.each(FORMAT_CASES)(
-  'should preserve oxfmt 0.75.0 formatting for $name',
+  'should preserve oxfmt formatting for $name',
   async ({ expected, filename, options, source }) => {
     const cwd = resolve('tests/fixtures/base')
     const eslint = new ESLint({
@@ -151,7 +219,7 @@ it.each(FORMAT_CASES)(
       overrideConfig: [
         {
           ...pluginOxfmt.configs.recommended,
-          files: ['**/*.{js,cjs,ts,jsx,md}'],
+          files: [filename],
           rules: {
             'oxfmt/oxfmt': ['error', { ...options, useConfig: false }],
           },

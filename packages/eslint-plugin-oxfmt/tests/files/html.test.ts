@@ -25,5 +25,22 @@ run({
         `)
       },
     },
+    {
+      code: '<p>中文</p>\r\n<script>',
+      filename: 'invalid.html',
+      options: [{ useConfig: false }],
+      output: null,
+      errors(errors) {
+        expect(errors).toMatchObject([
+          {
+            column: 1,
+            endColumn: 9,
+            endLine: 2,
+            line: 2,
+            message: expect.stringContaining('missing end tag'),
+          },
+        ])
+      },
+    },
   ],
 })

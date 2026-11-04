@@ -24,7 +24,21 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.75.0`
+- **oxfmt**: `>= 0.76.0`
+
+Oxfmt 0.76.0 uses its native formatter for HTML files, HTML tagged templates
+in JavaScript, and HTML code fences in Markdown. It preserves whitespace-only
+content in `<pre>` and `<textarea>` and SVG text marked with
+`xml:space="preserve"`. It accepts end tags for omitted `html`, `head`, and
+`body` opening tags, and formats dynamic closing tags such as `</${tag}>`
+in tagged templates. With filename detection, `.xhtml` and `.xht` use the
+XHTML dialect and `.component.html` selects the Angular formatter.
+
+When upgrading from 0.75.0, review snapshots for HTML and JS/TS expressions.
+Oxfmt now keeps the parentheses in `(a ?? b)?.#id` and around generic function
+types in angle-bracket assertions. Long computed member expressions can also
+wrap differently. Existing formatter options work as written.
+See the [0.76.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.76.0).
 
 Upgrading from oxfmt 0.74.0 to 0.75.0 fixes parentheses around private `in`
 and TypeScript instantiation expressions, required semicolons before class
