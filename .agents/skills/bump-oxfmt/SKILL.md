@@ -149,17 +149,15 @@ Test update guidance:
 
 ### 6. Update Documentation
 
-Update user-facing docs when behavior or options changed:
+Keep user-facing docs accurate for the current API and requirements:
 
-- Root README requirements and both package README option tables and examples.
+- Minimum required oxfmt version in the READMEs.
+- Both package README option tables and examples when options change.
 - Preset behavior notes.
-- Any migration notes for breaking or user-visible changes.
 
-Document explicitly:
-
-- Minimum required oxfmt version.
-- Any option renames/removals.
-- Any changed formatting outputs users should expect.
+Keep upstream release highlights, formatting output changes, and upgrade/migration
+notes in PR descriptions or release notes rather than accumulating them in package
+READMEs.
 
 ### 7. Final Validation And PR Notes
 
