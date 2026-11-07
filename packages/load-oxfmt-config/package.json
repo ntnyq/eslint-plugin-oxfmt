@@ -47,7 +47,7 @@
     "dev": "tsdown --watch"
   },
   "peerDependencies": {
-    "oxfmt": ">=0.76.0"
+    "oxfmt": ">=0.77.0"
   },
   "dependencies": {
     "@ntnyq/utils": "^0.25.0",
@@ -55,7 +55,7 @@
     "ignore": "^7.0.14",
     "jiti": "^2.7.0",
     "jsonc-parser": "^3.3.1",
-    "minimatch": "~11.0.4"
+    "minimatch": "~11.0.5"
   },
   "engines": {
     "node": "^22.13.0 || >=24"

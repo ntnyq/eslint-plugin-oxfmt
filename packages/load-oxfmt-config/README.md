@@ -33,8 +33,13 @@ yarn add oxfmt load-oxfmt-config
 pnpm add oxfmt load-oxfmt-config
 ```
 
-> `oxfmt >=0.76.0` is a peer dependency and is installed alongside this package.
+> `oxfmt >=0.77.0` is a peer dependency and is installed alongside this package.
 > Node.js `^22.13.0 || >=24` is supported.
+
+In 0.77.0, the CLI resolves the Vite+ project root relative to the Vite config
+file. This loader reads standalone oxfmt configs, so existing config paths,
+EditorConfig settings, and ignore patterns continue to work as written.
+See the [upstream Vite+ fix](https://github.com/oxc-project/oxc/pull/28801).
 
 Existing oxfmt configs, EditorConfig settings, and ignore patterns work as
 written with 0.76.0. The HTML formatting changes apply after config resolution.

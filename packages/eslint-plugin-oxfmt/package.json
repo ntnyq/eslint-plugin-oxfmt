@@ -55,7 +55,7 @@
   "peerDependencies": {
     "@astrojs/compiler-rs": "^0.5.0",
     "eslint": "^9.5.0 || ^10.0.0",
-    "oxfmt": ">=0.76.0",
+    "oxfmt": ">=0.77.0",
     "svelte": "*"
   },
   "peerDependenciesMeta": {

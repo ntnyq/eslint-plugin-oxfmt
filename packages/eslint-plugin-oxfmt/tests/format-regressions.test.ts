@@ -206,6 +206,73 @@ result = (value as Factory)<T>;
     options: { printWidth: 30 },
     source: '(firstLongOperand + secondLongOperand)[key];',
   },
+  {
+    filename: 'literal.vue',
+    name: 'literal v-pre content beside a Vue interpolation',
+    expected: `<template>
+  <div v-pre :id="a+b">{{a+b}}</div>
+  <p>{{ a + b }}</p>
+</template>
+`,
+    source:
+      '<template><div v-pre :id="a+b">{{a+b}}</div><p>{{a+b}}</p></template>',
+  },
+  {
+    filename: 'handler.vue',
+    name: 'statement separators in Vue event handlers with semi disabled',
+    options: { semi: false },
+    expected: `<template>
+  <button
+    @click="
+      start();
+      finish()
+    "
+  >
+    {{ count + 1 }}
+  </button>
+</template>
+`,
+    source:
+      '<template><button @click="start();finish()">{{count+1}}</button></template>',
+  },
+  {
+    filename: 'guide.md',
+    name: 'Vue interpolations and v-pre inside Markdown fences',
+    expected:
+      '```vue\n<template>\n  <p>{{ a + b }}</p>\n  <div v-pre>{{a+b}}</div>\n</template>\n```\n',
+    source:
+      '```vue\n<template>\n<p>{{a+b}}</p><div v-pre>{{a+b}}</div>\n</template>\n```',
+  },
+  {
+    filename: 'style.css',
+    name: 'combinators inside scoped CSS selectors',
+    source: '.root:deep(.a>.b), .menu:slotted(.x+.y), :local(.c~.d){color:red}',
+    expected: `.root:deep(.a > .b),
+.menu:slotted(.x + .y),
+:local(.c ~ .d) {
+  color: red;
+}
+`,
+  },
+  {
+    expected: '```html\n<!DOCTYPE html>\n<p>Test</p>\n```\n',
+    filename: 'embedded.md',
+    name: 'doctype case inside Markdown HTML fences',
+    source: '```html\n<!DOCTYPE html><p>Test</p>\n```',
+  },
+  {
+    expected: 'const styles = clsx(helper(`pt-2 flex`), `flex pt-2`);\n',
+    filename: 'classes.js',
+    name: 'Tailwind class order inside unlisted nested functions',
+    options: { sortTailwindcss: { functions: ['clsx'] } },
+    source: 'const styles = clsx(helper(`pt-2 flex`), `pt-2 flex`);',
+  },
+  {
+    expected: 'class Page {\n  load(@inject() ...items: Item[]) {}\n}\n',
+    filename: 'decorated.ts',
+    name: 'decorators on rest parameters',
+    source: 'class Page { load(@inject() ...items: Item[]) {} }',
+  },
 ]
 
 it.each(FORMAT_CASES)(

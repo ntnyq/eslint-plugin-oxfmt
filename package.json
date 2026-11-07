@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.31.0",
   "private": true,
-  "packageManager": "pnpm@12.16.1",
+  "packageManager": "pnpm@12.18.0",
   "license": "MIT",
   "scripts": {
     "build": "pnpm -r run build",
@@ -32,9 +32,9 @@
     "husky": "^9.1.7",
     "nano-staged": "^1.0.2",
     "npm-run-all2": "^9.0.4",
-    "oxfmt": "^0.76.0",
+    "oxfmt": "^0.77.0",
     "tinyglobby": "^0.2.17",
-    "tsdown": "^0.23.5",
+    "tsdown": "^0.23.7",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0"

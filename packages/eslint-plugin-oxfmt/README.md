@@ -24,7 +24,20 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.76.0`
+- **oxfmt**: `>= 0.77.0`
+
+Oxfmt 0.77.0 uses its native Vue formatter for `.vue` files and Vue code fences
+in Markdown. When upgrading from 0.76.0, review Vue formatting snapshots.
+For example, `<div v-pre>{{a+b}}</div>` keeps the literal text that Vue renders.
+With `semi: false`, event handlers such as `@click="start(); finish()"` retain
+the semicolon between statements.
+
+Existing formatter options still work. Other output changes include spacing
+inside scoped CSS selectors such as `:deep(.a > .b)`, preserved doctype case in
+embedded HTML, and decorators retained on TypeScript rest parameters. With
+`sortTailwindcss` enabled, calls nested inside a configured function keep their
+template strings in the original class order when the nested function is unlisted.
+See the [0.77.0 release notes](https://github.com/oxc-project/oxc/releases/tag/oxfmt_v0.77.0).
 
 Oxfmt 0.76.0 uses its native formatter for HTML files, HTML tagged templates
 in JavaScript, and HTML code fences in Markdown. It preserves whitespace-only
