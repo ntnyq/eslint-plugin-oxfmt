@@ -273,6 +273,118 @@ result = (value as Factory)<T>;
     name: 'decorators on rest parameters',
     source: 'class Page { load(@inject() ...items: Item[]) {} }',
   },
+  {
+    expected: '',
+    filename: 'empty.graphql',
+    name: 'empty GraphQL documents',
+    source: '',
+  },
+  {
+    expected: '',
+    filename: 'blank.graphql',
+    name: 'whitespace-only GraphQL documents',
+    source: ' \t\r\n',
+  },
+  {
+    expected: '',
+    filename: 'blank.toml',
+    name: 'whitespace-only TOML documents',
+    source: ' \t\r\n',
+  },
+  {
+    filename: 'generic.astro',
+    name: 'TSX generic arrow commas in Astro frontmatter and scripts',
+    options: { astro: true },
+    expected: `---
+const identity = <T,>(value: T) => value;
+---
+
+<script>
+  const identity = <T,>(value: T) => value;
+</script>
+`,
+    source:
+      '---\nconst identity = <T,>(value: T) => value\n---\n\n<script>const identity = <T,>(value: T) => value</script>',
+  },
+  {
+    filename: 'types.js',
+    name: 'JSDoc multiline types with CR line endings',
+    options: { jsdoc: {} },
+    expected: `/**
+ * @param {{
+ *   value: string;
+ * }} input
+ *   The input.
+ */
+function f(input) {}
+`,
+    source:
+      '/**\r * @param {{\r *   value: string,\r * }} input The input.\r */\rfunction f(input) {}',
+  },
+  {
+    filename: 'defaults.js',
+    name: 'JSDoc multiline parameter defaults and descriptions',
+    options: { jsdoc: {} },
+    expected: `/**
+ * @param {string[]} [list=[
+ *   "a",
+ *   "b",
+ * ]]
+ *   The list.
+ */
+function f(list) {}
+`,
+    source: `/**
+ * @param {string[]} [list=[
+ *   "a",
+ *   "b",
+ * ]] The list.
+ */
+function f(list) {}`,
+  },
+  {
+    expected: '/**\n * ```js\n * const a = 1;\n * ```\n */\nfunction f() {}\n',
+    filename: 'doc.js',
+    name: 'JSDoc embedded code fences with CR line endings',
+    options: { jsdoc: {} },
+    source: '/**\r * ```js\r * const a=1\r * ```\r */\rfunction f() {}',
+  },
+  {
+    expected: 'const classes = clsx(`flex\npt-2`);\n',
+    filename: 'classes.js',
+    name: 'CR normalization in Tailwind templates with preserved whitespace',
+    source: 'const classes = clsx(`pt-2\rflex`);',
+    options: {
+      sortTailwindcss: { functions: ['clsx'], preserveWhitespace: true },
+    },
+  },
+  {
+    filename: 'escapes.less',
+    name: 'Less escaped strings in values, URLs, and comments',
+    source: "a{value:~ 'x';url:url(~ 'x.png');comment:~ /* c */ 'x'}",
+    expected: `a {
+  value: ~"x";
+  url: url(~"x.png");
+  comment: ~/* c */ "x";
+}
+`,
+  },
+  {
+    filename: 'percentage.less',
+    name: 'Less percentage selectors outside keyframes',
+    source: '.a, 50.0%{top:0} @keyframes k{FROM,50%{top:0}}',
+    expected: `.a,
+50.0% {
+  top: 0;
+}
+@keyframes k {
+  from,
+  50% {
+    top: 0;
+  }
+}
+`,
+  },
 ]
 
 it.each(FORMAT_CASES)(

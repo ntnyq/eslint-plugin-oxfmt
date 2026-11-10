@@ -47,10 +47,10 @@
     "dev": "tsdown --watch"
   },
   "peerDependencies": {
-    "oxfmt": ">=0.77.0"
+    "oxfmt": ">=0.78.0"
   },
   "dependencies": {
-    "@ntnyq/utils": "^0.25.0",
+    "@ntnyq/utils": "^0.26.0",
     "editorconfig": "^3.0.2",
     "ignore": "^7.0.14",
     "jiti": "^2.7.0",

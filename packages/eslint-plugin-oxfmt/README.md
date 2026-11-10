@@ -24,7 +24,7 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.77.0`
+- **oxfmt**: `>= 0.78.0`
 
 The monorepo migration aligns the Node.js requirement with `load-oxfmt-config`; Node.js 20 is no longer supported.
 
