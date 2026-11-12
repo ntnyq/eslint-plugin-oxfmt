@@ -51,11 +51,11 @@
   },
   "dependencies": {
     "@ntnyq/utils": "^0.26.0",
-    "editorconfig": "^3.0.2",
+    "editorconfig": "^4.0.0",
     "ignore": "^7.0.14",
     "jiti": "^2.7.0",
     "jsonc-parser": "^3.3.1",
-    "minimatch": "~11.0.5"
+    "minimatch": "~11.0.8"
   },
   "engines": {
     "node": "^22.13.0 || >=24"
