@@ -1,8 +1,8 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { readEditorconfigFromFile } from '../src/editorconfig'
-import { fixturePath, withTempDir } from './helpers'
+import { readEditorconfigFromFile } from '../../src/editorconfig'
+import { fixturePath, withTempDir } from '../helpers'
 
 describe('readEditorconfigFromFile', () => {
   it.each([

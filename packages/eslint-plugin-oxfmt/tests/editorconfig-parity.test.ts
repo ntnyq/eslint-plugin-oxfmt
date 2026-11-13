@@ -1,124 +1,17 @@
 import { spawnSync } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
 import pluginOxfmt from '../src'
-import { resolvePackagePath } from './helpers/paths'
-import type { OxfmtOxfmt } from '../dts/rule-options'
-
-type RuleOptions = NonNullable<OxfmtOxfmt[0]>
+import { lintText } from './helpers/lint'
+import { OXFMT_CLI } from './helpers/paths'
+import { withTempProject } from './helpers/project'
 
 const SOURCE = 'export const value="hello"\n'
 const SINGLE_QUOTED = "export const value = 'hello';\n"
 const DOUBLE_QUOTED = 'export const value = "hello";\n'
-const OXFMT_CLI = resolvePackagePath('node_modules/oxfmt/bin/oxfmt')
-
-const IGNORE_CASES: {
-  expected: string
-  name: string
-  options: RuleOptions
-  prettierignore?: string
-}[] = [
-  { expected: SOURCE, name: 'config patterns by default', options: {} },
-  {
-    expected: SOURCE,
-    name: 'config patterns with defaults disabled',
-    options: { respectOxfmtDefaultIgnores: false },
-  },
-  {
-    expected: DOUBLE_QUOTED,
-    name: 'empty inline patterns',
-    options: { ignorePatterns: [] },
-  },
-  {
-    expected: DOUBLE_QUOTED,
-    name: 'nonmatching inline patterns',
-    options: { ignorePatterns: ['other/**'] },
-  },
-  {
-    expected: SOURCE,
-    name: 'matching inline patterns',
-    options: { ignorePatterns: ['**/*.js'] },
-  },
-  {
-    expected: SOURCE,
-    name: 'global ignores despite empty inline patterns',
-    options: { ignorePatterns: [] },
-    prettierignore: '*.js',
-  },
-  {
-    expected: DOUBLE_QUOTED,
-    name: 'disabled global ignores and empty inline patterns',
-    options: { ignorePatterns: [], respectOxfmtDefaultIgnores: false },
-    prettierignore: '*.js',
-  },
-  {
-    expected: DOUBLE_QUOTED,
-    name: 'disabled config loading',
-    options: { useConfig: false },
-  },
-  {
-    expected: SOURCE,
-    name: 'global ignores with disabled config loading',
-    options: { useConfig: false },
-    prettierignore: '*.js',
-  },
-]
-
-async function lint(
-  cwd: string,
-  filepath: string,
-  options: RuleOptions = {},
-  source = SOURCE,
-) {
-  const eslint = new ESLint({
-    cwd,
-    fix: true,
-    overrideConfigFile: true,
-    overrideConfig: [
-      {
-        ...pluginOxfmt.configs.recommended,
-        rules: { 'oxfmt/oxfmt': ['error', options] },
-      },
-    ],
-  })
-  const [result] = await eslint.lintText(source, { filePath: filepath })
-  expect(result.messages).toEqual([])
-  return result.output ?? source
-}
-
-async function withProject(run: (cwd: string) => Promise<void>) {
-  const cwd = await mkdtemp(join(tmpdir(), 'oxfmt-config-regression-'))
-  try {
-    await run(cwd)
-  } finally {
-    await rm(cwd, { force: true, recursive: true })
-  }
-}
-
-it.each(['.oxfmtrc.json', '.oxfmtrc.jsonc'])(
-  'matches the CLI for BOM-prefixed %s',
-  async filename => {
-    await withProject(async cwd => {
-      const filepath = join(cwd, 'a.js')
-      await writeFile(filepath, SOURCE)
-      await writeFile(join(cwd, filename), '\u{FEFF}{"singleQuote": true}')
-
-      const output = await lint(cwd, filepath)
-      const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'a.js'], {
-        cwd,
-        encoding: 'utf8',
-      })
-
-      expect(cli.status).toBe(0)
-      expect(await readFile(filepath, 'utf8')).toBe(SINGLE_QUOTED)
-      expect(output).toBe(SINGLE_QUOTED)
-    })
-  },
-)
 
 it.each([
   { indentation: ' '.repeat(4), properties: 'indent_size = 4' },
@@ -145,7 +38,7 @@ it.each([
     properties: 'tab_width = 8\n[*.js]\ntab_width = unset\nindent_size = 4',
   },
 ])('matches the CLI for $properties', async ({ indentation, properties }) => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     const filepath = join(cwd, 'a.js')
     const source = 'if (condition) { console.log("hello"); }\n'
     const expected = `if (condition) {\n${indentation}console.log("hello");\n}\n`
@@ -156,7 +49,7 @@ it.each([
       `root = true\n[*]\n${properties}\n`,
     )
 
-    const output = await lint(cwd, filepath, {}, source)
+    const output = await lintText(cwd, filepath, source)
     const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'a.js'], {
       cwd,
       encoding: 'utf8',
@@ -174,7 +67,7 @@ it.each([
   'max_line_length = 65546',
   'indent_style = tab\ntab_width = 260\n[*.js]\nindent_size = 4',
 ])('rejects out-of-range EditorConfig %s like the CLI', async property => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     const filepath = join(cwd, 'a.js')
     await writeFile(filepath, SOURCE)
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
@@ -227,7 +120,7 @@ it.each([
     section: 'packages/a/src/*.js',
   },
 ])('matches the CLI for $name', async ({ configDir = '.', file, section }) => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     const filepath = join(cwd, file)
     await mkdir(dirname(filepath), { recursive: true })
     await writeFile(filepath, SOURCE)
@@ -237,7 +130,7 @@ it.each([
       `[${section}]\nquote_type = single\n`,
     )
 
-    const output = await lint(cwd, filepath)
+    const output = await lintText(cwd, filepath, SOURCE)
     const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', file], {
       cwd,
       encoding: 'utf8',
@@ -249,7 +142,7 @@ it.each([
 })
 
 it('keeps nearest per-file EditorConfig lookup with a root oxfmt config', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     const filepath = join(cwd, 'packages/a/src/a.js')
     await mkdir(dirname(filepath), { recursive: true })
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
@@ -258,7 +151,7 @@ it('keeps nearest per-file EditorConfig lookup with a root oxfmt config', async 
       join(cwd, 'packages/a/.editorconfig'),
       '[*.js]\nquote_type = single\n',
     )
-    expect(await lint(cwd, filepath)).toBe(SINGLE_QUOTED)
+    expect(await lintText(cwd, filepath, SOURCE)).toBe(SINGLE_QUOTED)
   })
 })
 
@@ -290,14 +183,14 @@ it.each([
 ])(
   'preserves precedence with $name',
   async ({ config = {}, expected, sections }) => {
-    await withProject(async cwd => {
+    await withTempProject(async cwd => {
       const filepath = join(cwd, 'src/a.js')
       await mkdir(dirname(filepath))
       await writeFile(filepath, SOURCE)
       await writeFile(join(cwd, '.oxfmtrc.json'), JSON.stringify(config))
       await writeFile(join(cwd, '.editorconfig'), `${sections}\n`)
 
-      const output = await lint(cwd, filepath)
+      const output = await lintText(cwd, filepath, SOURCE)
       const cli = spawnSync(
         process.execPath,
         [OXFMT_CLI, '--write', 'src/a.js'],
@@ -309,78 +202,3 @@ it.each([
     })
   },
 )
-
-it.each(IGNORE_CASES)(
-  'honors $name',
-  async ({ expected, options, prettierignore }) => {
-    await withProject(async cwd => {
-      await writeFile(
-        join(cwd, '.oxfmtrc.json'),
-        JSON.stringify({ ignorePatterns: ['**/*.js'] }),
-      )
-      if (prettierignore) {
-        await writeFile(join(cwd, '.prettierignore'), prettierignore)
-      }
-      expect(await lint(cwd, join(cwd, 'a.js'), options)).toBe(expected)
-    })
-  },
-)
-
-it.each([
-  { expected: SOURCE, pattern: 'vendor/', source: 'config' },
-  { expected: DOUBLE_QUOTED, pattern: 'vendor/*', source: 'config' },
-  { expected: SOURCE, pattern: 'vendor/', source: '.prettierignore' },
-  {
-    expected: DOUBLE_QUOTED,
-    pattern: 'vendor/*',
-    source: '.prettierignore',
-  },
-])(
-  'matches CLI child negation after $pattern in $source',
-  async ({ expected, pattern, source }) => {
-    await withProject(async cwd => {
-      const file = 'vendor/keep.js'
-      const filepath = join(cwd, file)
-      const patterns = [pattern, `!${file}`]
-      await mkdir(dirname(filepath))
-      await writeFile(filepath, SOURCE)
-      await writeFile(
-        join(cwd, '.oxfmtrc.json'),
-        JSON.stringify(source === 'config' ? { ignorePatterns: patterns } : {}),
-      )
-      if (source === '.prettierignore') {
-        await writeFile(join(cwd, '.prettierignore'), patterns.join('\n'))
-      }
-
-      const cli = spawnSync(
-        process.execPath,
-        [OXFMT_CLI, '--stdin-filepath', file],
-        { cwd, encoding: 'utf8', input: SOURCE },
-      )
-      expect(cli.status).toBe(0)
-      expect(cli.stdout).toBe(expected)
-      expect(await lint(cwd, filepath)).toBe(expected)
-    })
-  },
-)
-
-it('matches CLI global ignores before loading an invalid nested config', async () => {
-  await withProject(async cwd => {
-    const file = 'vendor/keep.js'
-    const filepath = join(cwd, file)
-    await mkdir(dirname(filepath))
-    await writeFile(filepath, SOURCE)
-    await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
-    await writeFile(join(cwd, '.prettierignore'), 'vendor/\n')
-    await writeFile(join(cwd, 'vendor/.oxfmtrc.json'), '{ invalid json')
-
-    const cli = spawnSync(
-      process.execPath,
-      [OXFMT_CLI, '--stdin-filepath', file],
-      { cwd, encoding: 'utf8', input: SOURCE },
-    )
-    expect(cli.status).toBe(0)
-    expect(cli.stdout).toBe(SOURCE)
-    expect(await lint(cwd, filepath)).toBe(SOURCE)
-  })
-})

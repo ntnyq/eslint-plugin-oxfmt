@@ -1,8 +1,8 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { loadOxfmtConfig } from '../src'
-import { fixturePath, withTempDir } from './helpers'
+import { loadOxfmtConfig } from '../../src'
+import { fixturePath, withTempDir } from '../helpers'
 
 describe('loadOxfmtConfig', () => {
   describe('editorconfig behavior', () => {

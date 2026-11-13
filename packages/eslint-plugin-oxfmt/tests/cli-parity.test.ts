@@ -1,12 +1,10 @@
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { ESLint } from 'eslint'
-import { createSyncFn } from 'synckit'
 import { expect, it } from 'vitest'
 import pluginOxfmt, { parserPlain } from '../src'
-import { workersDir } from '../src/worker-path'
 import { resolvePackagePath } from './helpers/paths'
-import type { OxfmtWorkerOptions, WorkerFormatResult } from '../src/types'
+import { runWorker } from './helpers/worker'
+import type { OxfmtWorkerOptions } from '../src/types'
 
 const FIXTURE_CWD = resolvePackagePath('tests/fixtures/cli-parity')
 const FIXTURE_NESTED_CWD = resolvePackagePath(
@@ -15,13 +13,6 @@ const FIXTURE_NESTED_CWD = resolvePackagePath(
 const FIXTURE_NESTED_INVALID_CWD = resolvePackagePath(
   'tests/fixtures/cli-parity/nested-invalid',
 )
-const runWorker = createSyncFn<
-  (
-    filename: string,
-    sourceText: string,
-    options?: OxfmtWorkerOptions,
-  ) => WorkerFormatResult
->(join(workersDir, 'oxfmt.mjs'))
 
 const CLI_PARITY_DEFAULTS: OxfmtWorkerOptions = {
   disableNestedConfig: false,

@@ -433,7 +433,7 @@ const oxfmtOverrideOptionsSchemaProperties = {
 }
 delete oxfmtOverrideOptionsSchemaProperties.ignorePatterns
 
-export const pluginOptionsSchema: JSONSchema4 = {
+export const pluginOptionsSchema = {
   additionalProperties: false,
   type: 'object',
   properties: {
@@ -503,7 +503,7 @@ export const pluginOptionsSchema: JSONSchema4 = {
       type: 'boolean',
     },
   },
-}
+} satisfies JSONSchema4
 
 export const oxfmtRuleSchema: JSONSchema4 = {
   additionalProperties: false,

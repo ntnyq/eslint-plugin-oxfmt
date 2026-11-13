@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { expect, it } from 'vitest'
-import { loadOxfmtConfig, loadOxfmtConfigForFile } from '../src'
-import { withTempDir } from './helpers'
+import { loadOxfmtConfig, loadOxfmtConfigForFile } from '../../src'
+import { withTempDir } from '../helpers'
 
 it('reuses raw config for per-file defaults without rereading or poisoning caches', async () => {
   await withTempDir('oxfmt-preloaded-file-config-', async cwd => {

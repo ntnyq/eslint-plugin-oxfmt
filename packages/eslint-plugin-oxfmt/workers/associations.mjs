@@ -1,7 +1,7 @@
 // @ts-check
 
 import { dirname, join } from 'node:path'
-import { getCachedOverrideMatcher } from './matchers.mjs'
+import { getCachedOxfmtGlobMatcher } from './matchers.mjs'
 import { isStringArray } from './options.mjs'
 import { toRelativePosixPath } from './paths.mjs'
 
@@ -92,9 +92,9 @@ export function resolveAssociationFilename(filename, associations, baseDir) {
       )
     }
 
-    const matches = getCachedOverrideMatcher(association.files)(relativePath)
+    const matches = getCachedOxfmtGlobMatcher(association.files)(relativePath)
     const excluded = association.excludeFiles
-      ? getCachedOverrideMatcher(association.excludeFiles)(relativePath)
+      ? getCachedOxfmtGlobMatcher(association.excludeFiles)(relativePath)
       : false
     if (matches && !excluded) {
       // Use a neutral basename to avoid package.json sorting and .component.html

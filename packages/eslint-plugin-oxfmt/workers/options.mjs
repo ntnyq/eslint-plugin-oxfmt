@@ -6,14 +6,14 @@ import { resolve } from 'node:path'
  * @typedef {import('eslint-plugin-oxfmt').OxfmtWorkerOptions} WorkerOptions
  * @typedef {import('eslint-plugin-oxfmt').OxfmtPluginOptions & Pick<WorkerOptions, 'cwd'>} WorkerControlOptions
  * @typedef {import('load-oxfmt-config').OxfmtOptions} OxfmtOptions
- * @typedef {{pluginOptions: WorkerControlOptions, formatOptions: OxfmtOptions}} SplitOptionsResult
+ * @typedef {{controlOptions: WorkerControlOptions, oxfmtOptions: OxfmtOptions}} SplitOptionsResult
  */
 
 /**
  * Option names consumed by worker orchestration.
- * @type {Set<string>}
+ * @type {(keyof WorkerControlOptions)[]}
  */
-const PLUGIN_ONLY_OPTIONS = new Set([
+export const WORKER_CONTROL_KEYS = [
   'configPath',
   'cwd',
   'disableNestedConfig',
@@ -23,7 +23,13 @@ const PLUGIN_ONLY_OPTIONS = new Set([
   'useCache',
   'useConfig',
   'withNodeModules',
-])
+]
+
+/**
+ * String lookup for partitioning external option keys.
+ * @type {Set<string>}
+ */
+const WORKER_CONTROL_OPTIONS = new Set(WORKER_CONTROL_KEYS)
 
 /**
  * Check whether a value is an array of strings.
@@ -74,34 +80,34 @@ export function splitOptions(options = {}) {
    * Options consumed by config loading and ignore orchestration.
    * @type {Record<string, unknown>}
    */
-  const pluginOptions = {}
+  const controlOptions = {}
   /**
    * Remaining oxfmt options, including file-matching configuration.
    * @type {Record<string, unknown>}
    */
-  const formatOptions = {}
+  const oxfmtOptions = {}
 
   for (const [key, value] of Object.entries(options)) {
-    if (PLUGIN_ONLY_OPTIONS.has(key)) {
-      pluginOptions[key] = value
+    if (WORKER_CONTROL_OPTIONS.has(key)) {
+      controlOptions[key] = value
     } else {
-      formatOptions[key] = value
+      oxfmtOptions[key] = value
     }
   }
 
   return {
-    formatOptions: /** @type {OxfmtOptions} */ (formatOptions),
-    pluginOptions: /** @type {WorkerControlOptions} */ (pluginOptions),
+    controlOptions: /** @type {WorkerControlOptions} */ (controlOptions),
+    oxfmtOptions: /** @type {OxfmtOptions} */ (oxfmtOptions),
   }
 }
 
 /**
  * Validate plugin-only options before dispatching to helper libraries.
- * @param {WorkerControlOptions} pluginOptions - Plugin-only options.
+ * @param {WorkerControlOptions} controlOptions - Plugin-only options.
  * @returns {void}
  * @throws {TypeError} If a supported plugin option has an invalid value type.
  */
-export function validateWorkerOptions(pluginOptions) {
+export function validateWorkerOptions(controlOptions) {
   /**
    * Plugin options validated as strings when provided.
    * @type {('cwd' | 'configPath')[]}
@@ -120,7 +126,7 @@ export function validateWorkerOptions(pluginOptions) {
   ]
 
   for (const key of stringKeys) {
-    const value = pluginOptions[key]
+    const value = controlOptions[key]
     if (value != null && typeof value !== 'string') {
       throw new TypeError(
         `oxfmt worker requires "${key}" to be a string when provided.`,
@@ -129,7 +135,7 @@ export function validateWorkerOptions(pluginOptions) {
   }
 
   for (const key of booleanKeys) {
-    const value = pluginOptions[key]
+    const value = controlOptions[key]
     if (value != null && typeof value !== 'boolean') {
       throw new TypeError(
         `oxfmt worker requires "${key}" to be a boolean when provided.`,
@@ -138,9 +144,9 @@ export function validateWorkerOptions(pluginOptions) {
   }
 
   if (
-    pluginOptions.ignorePath != null &&
-    typeof pluginOptions.ignorePath !== 'string' &&
-    !isStringArray(pluginOptions.ignorePath)
+    controlOptions.ignorePath != null &&
+    typeof controlOptions.ignorePath !== 'string' &&
+    !isStringArray(controlOptions.ignorePath)
   ) {
     throw new TypeError(
       'oxfmt worker requires "ignorePath" to be a string or string array when provided.',

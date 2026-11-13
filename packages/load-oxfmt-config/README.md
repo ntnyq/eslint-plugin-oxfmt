@@ -581,6 +581,7 @@ The caching system maintains bounded caches for:
 2. **Config Sources:** Shares parsed oxfmt files and EditorConfig sections between target files
 3. **Config Results:** Stores merged static or per-file configuration objects
 4. **EditorConfig Matchers:** Reuses compiled section patterns
+5. **Git Discovery:** Shares repository boundaries, ignore file chains, and worktree info exclude paths between files
 
 **Cache keys are based on:**
 
@@ -592,7 +593,7 @@ The caching system maintains bounded caches for:
 **Cache invalidation:**
 
 - Failed operations automatically clear their cache entries
-- Use `useCache: false` to bypass cache for specific calls
+- Use `useCache: false` to bypass cache for specific calls, including Git discovery. Cached Git boundaries and worktree pointers remain stable until bypassed or evicted; bypassing does not replace previously cached entries.
 - Each process-level cache retains at most 1,000 least-recently used entries
 - For native ESM config files (`.mjs` or `.js` under `"type": "module"`), `useCache: false` cache-busts the entry config file. Imported ESM helper modules still follow Node.js module cache behavior for the current process.
 - Cache entries persist until least-recently used eviction or process exit

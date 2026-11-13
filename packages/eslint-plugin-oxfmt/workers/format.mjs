@@ -35,20 +35,20 @@ import { toRelativePosixPath } from './paths.mjs'
  * @returns {Promise<WorkerFormatResult>} Format result.
  */
 export async function formatViaOxfmt(filename, sourceText, options = {}) {
-  const { formatOptions: inlineFormatOptions, pluginOptions } =
+  const { controlOptions, oxfmtOptions: inlineOxfmtOptions } =
     splitOptions(options)
-  validateWorkerOptions(pluginOptions)
+  validateWorkerOptions(controlOptions)
 
-  const cwd = pluginOptions.cwd
-  const useConfig = pluginOptions.useConfig !== false
-  const useCache = pluginOptions.useCache
+  const cwd = controlOptions.cwd
+  const useConfig = controlOptions.useConfig !== false
+  const useCache = controlOptions.useCache
 
   /**
    * Inline ignore patterns matched relative to ESLint cwd.
    * @type {string[] | undefined}
    */
-  const ruleIgnorePatterns = isStringArray(inlineFormatOptions.ignorePatterns)
-    ? inlineFormatOptions.ignorePatterns
+  const ruleIgnorePatterns = isStringArray(inlineOxfmtOptions.ignorePatterns)
+    ? inlineOxfmtOptions.ignorePatterns
     : undefined
 
   if (ruleIgnorePatterns?.length && cwd) {
@@ -66,22 +66,22 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
      * Config and ignore resolution settings for the current file.
      * @type {import('load-oxfmt-config').IsOxfmtIgnoredOptions}
      */
-    const ignoredOptions = {
+    const ignoreOptions = {
       cwd,
       filepath: filename,
-      ignorePath: pluginOptions.ignorePath,
-      includeDefaultIgnores: pluginOptions.respectOxfmtDefaultIgnores,
+      ignorePath: controlOptions.ignorePath,
+      includeDefaultIgnores: controlOptions.respectOxfmtDefaultIgnores,
       loadConfigForIgnorePatterns: false,
       useCache,
-      withNodeModules: pluginOptions.withNodeModules,
+      withNodeModules: controlOptions.withNodeModules,
     }
-    const ignored = await isOxfmtIgnored(ignoredOptions)
+    const ignoreResult = await isOxfmtIgnored(ignoreOptions)
 
-    if (ignored.ignored) {
+    if (ignoreResult.ignored) {
       return {
         code: sourceText,
         ignored: true,
-        reason: ignored.reason,
+        reason: ignoreResult.reason,
       }
     }
   }
@@ -103,24 +103,21 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
   const {
     associations: ruleAssociations,
     overrides: ruleOverrides,
-    ...inlineOptionsWithoutOverrides
-  } = inlineFormatOptions
+    ...inlineRootOptions
+  } = inlineOxfmtOptions
   let associations = ruleAssociations
   let associationBaseDir = inlineBaseDir
   /**
    * Effective formatter options with paths resolved against their source.
    * @type {import('oxfmt').FormatConfig}
    */
-  let finalOptions = resolveTailwindPaths(
-    inlineOptionsWithoutOverrides,
-    inlineBaseDir,
-  )
+  let finalOptions = resolveTailwindPaths(inlineRootOptions, inlineBaseDir)
 
   if (useConfig) {
     const configOptions = {
-      configPath: pluginOptions.configPath,
+      configPath: controlOptions.configPath,
       cwd: cwd ?? dirname(filename),
-      disableNestedConfig: pluginOptions.disableNestedConfig,
+      disableNestedConfig: controlOptions.disableNestedConfig,
       filepath: filename,
       useCache,
     }
@@ -129,24 +126,24 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
       editorconfig: false,
     })
     if (ruleIgnorePatterns === undefined) {
-      const ignored = await isOxfmtIgnored({
+      const ignoreResult = await isOxfmtIgnored({
         cwd: inlineBaseDir,
         filepath: filename,
         includeDefaultIgnores: false,
         loadedConfig: sourceConfig,
         useCache,
       })
-      if (ignored.ignored) {
+      if (ignoreResult.ignored) {
         return {
           code: sourceText,
           ignored: true,
-          reason: ignored.reason,
+          reason: ignoreResult.reason,
         }
       }
     }
     const loaded = await loadOxfmtConfigForFile({
       ...configOptions,
-      editorconfig: pluginOptions.editorconfig,
+      editorconfig: controlOptions.editorconfig,
       loadedConfig: sourceConfig,
     })
     const {

@@ -1,18 +1,17 @@
 import { spawnSync } from 'node:child_process'
-import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { mkdir, symlink, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
 import pluginOxfmt from '../src'
-import { resolvePackagePath } from './helpers/paths'
+import { OXFMT_CLI } from './helpers/paths'
+import { withTempProject } from './helpers/project'
 import type { OxfmtConfig } from 'oxfmt'
 import type { OxfmtOxfmt } from '../dts/rule-options'
 
 type RuleOptions = NonNullable<OxfmtOxfmt[0]>
 
-const OXFMT_CLI = resolvePackagePath('node_modules/oxfmt/bin/oxfmt')
 const SOURCE = '{"z":1,"a":2}'
 const CONFIG: OxfmtConfig = {
   overrides: [{ files: ['src/*.conf'], options: { tabWidth: 4 } }],
@@ -48,19 +47,10 @@ async function lint(
   return result
 }
 
-async function withProject(run: (cwd: string) => Promise<void>) {
-  const cwd = await mkdtemp(join(tmpdir(), 'oxfmt-associations-'))
-  try {
-    await run(cwd)
-  } finally {
-    await rm(cwd, { force: true, recursive: true })
-  }
-}
-
 it.each(['app.conf', 'src/app.conf', 'src/keep.conf', 'src/.hidden/app.conf'])(
   'matches CLI association precedence and original-path overrides for %s',
   async file => {
-    await withProject(async cwd => {
+    await withTempProject(async cwd => {
       await mkdir(dirname(join(cwd, file)), { recursive: true })
       await writeFile(join(cwd, '.oxfmtrc.json'), JSON.stringify(CONFIG))
       const cli = spawnSync(
@@ -106,7 +96,7 @@ it.each([
 }[])(
   'matches CLI language selection for $file as $language',
   async ({ file, language, source }) => {
-    await withProject(async cwd => {
+    await withTempProject(async cwd => {
       await writeFile(
         join(cwd, '.oxfmtrc.json'),
         JSON.stringify({
@@ -133,7 +123,7 @@ it.each([
 it.each([false, true])(
   'resolves nested associations with explicit config: %s',
   async explicit => {
-    await withProject(async cwd => {
+    await withTempProject(async cwd => {
       await mkdir(join(cwd, 'packages/a/src'), { recursive: true })
       await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
       const configPath = 'packages/a/.oxfmtrc.json'
@@ -163,7 +153,7 @@ it.each([false, true])(
 )
 
 it('matches inline associations from ESLint cwd and replaces config associations', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await mkdir(join(cwd, 'packages/a'), { recursive: true })
     await writeFile(
       join(cwd, 'packages/a/.oxfmtrc.json'),
@@ -186,7 +176,7 @@ it('matches inline associations from ESLint cwd and replaces config associations
 })
 
 it('uses inline associations with config loading disabled', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await writeFile(join(cwd, '.oxfmtrc.json'), '{invalid')
     const result = await lint(cwd, 'app.conf', SOURCE, {
       associations: [{ files: ['*.conf'], language: 'json' }],
@@ -202,7 +192,7 @@ it.each([
   { useConfig: false },
   { disableNestedConfig: true },
 ])('does not apply nested config associations with %j', async options => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await mkdir(join(cwd, 'nested'))
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
     await writeFile(join(cwd, 'nested/.oxfmtrc.json'), JSON.stringify(CONFIG))
@@ -221,7 +211,7 @@ it.each([
 ])(
   'keeps upstream exclusions for associated %s even with default ignores disabled',
   async file => {
-    await withProject(async cwd => {
+    await withTempProject(async cwd => {
       const result = await lint(cwd, file, SOURCE, {
         associations: [{ files: ['**/*'], language: 'json' }],
         respectOxfmtDefaultIgnores: false,
@@ -234,7 +224,7 @@ it.each([
 )
 
 it('keeps ignore matching on the original path', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await writeFile(
       join(cwd, '.oxfmtrc.json'),
       JSON.stringify({ ...CONFIG, ignorePatterns: ['*.conf'] }),
@@ -249,7 +239,7 @@ it.each([
   [{ files: ['other.conf'], language: 'invalid' }],
   [{ files: ['**/*.{js,ts'], language: 'json' }],
 ])('reports invalid config associations: %j', async associations => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await writeFile(
       join(cwd, '.oxfmtrc.json'),
       JSON.stringify({ associations }),
@@ -261,7 +251,7 @@ it.each([
 })
 
 it('reports the real filename when an associated plugin is disabled', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     const result = await lint(cwd, 'app.conf', '<div />', {
       associations: [{ files: ['*.conf'], language: 'astro' }],
       useConfig: false,
@@ -272,7 +262,7 @@ it('reports the real filename when an associated plugin is disabled', async () =
 })
 
 it('follows symlinked config discovery and keeps patterns relative to the link', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await mkdir(join(cwd, 'shared'))
     await mkdir(join(cwd, 'project/src'), { recursive: true })
     await writeFile(join(cwd, 'shared/config.json'), JSON.stringify(CONFIG))

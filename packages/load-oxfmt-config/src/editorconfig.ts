@@ -1,6 +1,5 @@
 import { readFile, stat } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
-import { isBoolean, isNumber } from '@ntnyq/utils'
 import { parseBuffer } from 'editorconfig'
 import { Minimatch } from 'minimatch'
 import { cachePromise, getCacheValue, setCacheValue } from './cache'
@@ -8,10 +7,13 @@ import {
   EDITORCONFIG_FILE,
   EDITORCONFIG_GLOBAL_SECTION_NAMES,
 } from './constants'
+import { mapEditorconfigSectionToOptions } from './editorconfig-options'
 import { isPathOutsideBase, toPosixPath } from './path'
 import type { ParseStringResult, SectionBody, SectionName } from 'editorconfig'
-import type { FormatConfig } from 'oxfmt'
+import type { EditorconfigFormatOptions } from './editorconfig-options'
 import type { OxfmtConfigOverride, OxfmtOptions } from './types'
+
+export type { EditorconfigFormatOptions } from './editorconfig-options'
 
 /**
  * Shared input caches for static and per-file EditorConfig resolution.
@@ -32,21 +34,6 @@ export interface EditorconfigData {
    */
   rootOptions: EditorconfigFormatOptions
 }
-
-/**
- * Oxfmt-compatible options derived from supported `.editorconfig` properties.
- *
- * @see https://oxc.rs/docs/guide/usage/formatter/config.html#editorconfig
- */
-export type EditorconfigFormatOptions = Pick<
-  FormatConfig,
-  | 'endOfLine'
-  | 'insertFinalNewline'
-  | 'printWidth'
-  | 'singleQuote'
-  | 'tabWidth'
-  | 'useTabs'
->
 
 /**
  * @deprecated Use EditorconfigFormatOptions.
@@ -148,65 +135,18 @@ export async function readEditorconfigFromFile(
     ? await cachePromise(sectionCache, editorconfigPath, readSections)
     : await readSections()
   const editorconfigDir = dirname(editorconfigPath)
-  let rootOptions: EditorconfigFormatOptions = {}
-  const resolvedSection: SectionBody = {}
-  const overrides: OxfmtConfigOverride[] = []
-  const relativeFile = options.filepath
-    ? toPosixPath(relative(editorconfigDir, options.filepath))
-    : undefined
-
-  if (relativeFile !== undefined && isPathOutsideBase(relativeFile)) {
+  if (options.filepath) {
     return {
-      overrides,
-      rootOptions,
+      overrides: [],
+      rootOptions: resolveEditorconfigOptionsForFile(
+        parsedSections,
+        editorconfigDir,
+        options.filepath,
+        useCache,
+      ),
     }
   }
-
-  for (const [sectionName, sectionBody] of parsedSections) {
-    if (!sectionName) {
-      continue
-    }
-
-    if (relativeFile !== undefined) {
-      if (matchesEditorconfigSection(sectionName, relativeFile, useCache)) {
-        Object.assign(resolvedSection, sectionBody)
-      }
-      continue
-    }
-
-    const mappedOptions = mapEditorconfigSectionToOptions(
-      sectionBody,
-      resolvedSection,
-    )
-
-    if (isEditorconfigGlobalSection(sectionName)) {
-      Object.assign(resolvedSection, sectionBody)
-      rootOptions = mapEditorconfigSectionToOptions(resolvedSection)
-      // A later global section must also override earlier scoped sections.
-      if (overrides.length === 0) {
-        continue
-      }
-    }
-
-    if (Object.keys(mappedOptions).length === 0) {
-      continue
-    }
-
-    overrides.push({
-      options: mappedOptions,
-      files: [
-        rebaseEditorconfigPattern(sectionName, editorconfigDir, anchorDir),
-      ],
-    })
-  }
-
-  return {
-    overrides,
-    rootOptions:
-      relativeFile === undefined
-        ? rootOptions
-        : mapEditorconfigSectionToOptions(resolvedSection),
-  }
+  return createEditorconfigOverrides(parsedSections, editorconfigDir, anchorDir)
 }
 
 /**
@@ -255,6 +195,50 @@ export async function resolveEditorconfigPath(
 }
 
 /**
+ * Build static defaults and source-ordered overrides relative to the oxfmt config.
+ */
+function createEditorconfigOverrides(
+  parsedSections: ParseStringResult,
+  editorconfigDir: string,
+  anchorDir: string,
+): EditorconfigData {
+  let rootOptions: EditorconfigFormatOptions = {}
+  const resolvedSection: SectionBody = {}
+  const overrides: OxfmtConfigOverride[] = []
+
+  for (const [sectionName, sectionBody] of parsedSections) {
+    if (!sectionName) {
+      continue
+    }
+    const mappedOptions = mapEditorconfigSectionToOptions(
+      sectionBody,
+      resolvedSection,
+    )
+    if (isEditorconfigGlobalSection(sectionName)) {
+      Object.assign(resolvedSection, sectionBody)
+      rootOptions = mapEditorconfigSectionToOptions(resolvedSection)
+      // Later global sections must also override earlier scoped sections.
+      if (overrides.length === 0) {
+        continue
+      }
+    }
+    if (Object.keys(mappedOptions).length === 0) {
+      continue
+    }
+    overrides.push({
+      options: mappedOptions,
+      files: [
+        rebaseEditorconfigPattern(sectionName, editorconfigDir, anchorDir),
+      ],
+    })
+  }
+  return {
+    overrides,
+    rootOptions,
+  }
+}
+
+/**
  * Checks whether an EditorConfig section should be treated as a global section.
  *
  * @param sectionName - The section name parsed from .editorconfig.
@@ -264,66 +248,6 @@ function isEditorconfigGlobalSection(sectionName: SectionName) {
   return Boolean(
     sectionName && EDITORCONFIG_GLOBAL_SECTION_NAMES.includes(sectionName),
   )
-}
-
-/**
- * Maps a parsed EditorConfig section to the subset of oxfmt formatter options it supports.
- *
- * @param section - The parsed EditorConfig section body.
- * @param inheritedSection - Global properties inherited by a static override.
- * @returns Formatter options derived from the section.
- */
-function mapEditorconfigSectionToOptions(
-  section: SectionBody,
-  inheritedSection: SectionBody = {},
-): EditorconfigFormatOptions {
-  const options: EditorconfigFormatOptions = {}
-
-  const endOfLine = parseEditorconfigEndOfLine(section.end_of_line)
-  if (endOfLine) {
-    options.endOfLine = endOfLine
-  }
-
-  if (section.indent_style === 'tab') {
-    options.useTabs = true
-  } else if (section.indent_style === 'space') {
-    options.useTabs = false
-  }
-
-  const singleQuote = parseEditorconfigQuoteType(section.quote_type)
-  if (isBoolean(singleQuote)) {
-    options.singleQuote = singleQuote
-  }
-
-  if (
-    section.indent_style !== undefined ||
-    section.indent_size !== undefined ||
-    section.tab_width !== undefined
-  ) {
-    // Select the width after inheriting raw properties, before collapsing both
-    // indent_size and tab_width into the single oxfmt tabWidth option.
-    const effectiveSection = { ...inheritedSection, ...section }
-    const tabWidth = parseEditorconfigTabWidth(effectiveSection)
-    if (isNumber(tabWidth)) {
-      options.tabWidth = tabWidth
-    }
-  }
-
-  if (section.max_line_length && section.max_line_length !== 'unset') {
-    const parsedPrintWidth = Number(section.max_line_length)
-    if (Number.isFinite(parsedPrintWidth)) {
-      options.printWidth = parsedPrintWidth
-    }
-  }
-
-  const insertFinalNewline = parseEditorconfigBoolean(
-    section.insert_final_newline,
-  )
-  if (isBoolean(insertFinalNewline)) {
-    options.insertFinalNewline = insertFinalNewline
-  }
-
-  return options
 }
 
 /**
@@ -368,83 +292,6 @@ function normalizeEditorconfigPattern(pattern: string) {
 }
 
 /**
- * Parses an EditorConfig boolean string.
- *
- * @param value - The raw EditorConfig value.
- * @returns The parsed boolean, or undefined when the value is unsupported.
- */
-function parseEditorconfigBoolean(value: string | undefined) {
-  if (value === 'true') {
-    return true
-  }
-  if (value === 'false') {
-    return false
-  }
-  return undefined
-}
-
-/**
- * Parses the end-of-line style supported by oxfmt.
- *
- * @param value - The raw EditorConfig end_of_line value.
- * @returns The normalized line ending value, or undefined when unsupported.
- */
-function parseEditorconfigEndOfLine(value: string | undefined) {
-  switch (value) {
-    case 'cr':
-    case 'crlf':
-    case 'lf':
-      return value
-  }
-
-  return undefined
-}
-
-/**
- * Parses the single quote preference from an EditorConfig section.
- *
- * @param value - The raw EditorConfig value for single quote preference.
- * @returns True if single quotes are preferred, false if double quotes are preferred, or undefined when auto.
- */
-function parseEditorconfigQuoteType(value: string | undefined) {
-  if (value === 'single') {
-    return true
-  }
-  if (value === 'double') {
-    return false
-  }
-
-  // auto or undefined
-  return undefined
-}
-
-/**
- * Resolves the effective tab width from an EditorConfig section.
- *
- * @param section - The parsed EditorConfig section body.
- * @returns The resolved tab width, or undefined when no numeric value is available.
- */
-function parseEditorconfigTabWidth(section: SectionBody) {
-  const values =
-    section.indent_style === 'space'
-      ? [section.indent_size, section.tab_width]
-      : [section.tab_width, section.indent_size]
-
-  for (const value of values) {
-    if (!value || value === 'unset' || value === 'tab') {
-      continue
-    }
-
-    const parsedWidth = Number(value)
-    if (Number.isFinite(parsedWidth)) {
-      return parsedWidth
-    }
-  }
-
-  return undefined
-}
-
-/**
  * Rebases an EditorConfig section pattern from the config directory to the target anchor directory.
  *
  * @param pattern - The original EditorConfig section pattern.
@@ -464,4 +311,29 @@ function rebaseEditorconfigPattern(
   }
 
   return `${relativePrefix}/${normalizedPattern.replace(/^\//u, '')}`
+}
+
+/**
+ * Resolve raw section properties for a target file before mapping indentation widths.
+ */
+function resolveEditorconfigOptionsForFile(
+  parsedSections: ParseStringResult,
+  editorconfigDir: string,
+  filepath: string,
+  useCache: boolean,
+): EditorconfigFormatOptions {
+  const relativeFile = toPosixPath(relative(editorconfigDir, filepath))
+  if (isPathOutsideBase(relativeFile)) {
+    return {}
+  }
+  const resolvedSection: SectionBody = {}
+  for (const [sectionName, sectionBody] of parsedSections) {
+    if (
+      sectionName &&
+      matchesEditorconfigSection(sectionName, relativeFile, useCache)
+    ) {
+      Object.assign(resolvedSection, sectionBody)
+    }
+  }
+  return mapEditorconfigSectionToOptions(resolvedSection)
 }

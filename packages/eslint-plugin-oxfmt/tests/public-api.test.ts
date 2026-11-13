@@ -9,6 +9,7 @@ import type {
   RuleOptions,
 } from '../dts/rule-options'
 import type {
+  OxfmtPluginOptions,
   OxfmtRuleOptions,
   OxfmtWorkerOptions,
   RuleOxfmtOptions,
@@ -34,6 +35,9 @@ it('preserves the published runtime exports and presets', () => {
 })
 
 it('keeps user option keys aligned with generated schema types', () => {
+  expectTypeOf<keyof typeof pluginOptionsSchema.properties>().toEqualTypeOf<
+    keyof OxfmtPluginOptions
+  >()
   expectTypeOf<keyof OxfmtRuleOptions>().toEqualTypeOf<
     keyof NonNullable<OxfmtRuleOptionsTuple[0]>
   >()

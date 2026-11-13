@@ -1,6 +1,6 @@
 // @ts-check
 
-import { getCachedOverrideMatcher } from './matchers.mjs'
+import { getCachedOxfmtGlobMatcher } from './matchers.mjs'
 import { resolveTailwindPaths } from './options.mjs'
 
 /**
@@ -35,11 +35,11 @@ export function applyOverrides(
       continue
     }
 
-    const fileMatcher = getCachedOverrideMatcher(override.files)
+    const fileMatcher = getCachedOxfmtGlobMatcher(override.files)
     const matches = !!fileMatcher && fileMatcher(relativePath)
 
     const excludeMatcher = override.excludeFiles?.length
-      ? getCachedOverrideMatcher(override.excludeFiles)
+      ? getCachedOxfmtGlobMatcher(override.excludeFiles)
       : undefined
     const excluded = excludeMatcher ? excludeMatcher(relativePath) : false
 

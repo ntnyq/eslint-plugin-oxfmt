@@ -1,32 +1,13 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { ESLint } from 'eslint'
-import { createSyncFn } from 'synckit'
 import { expect, it } from 'vitest'
 import pluginOxfmt from '../src'
-import { workersDir } from '../src/worker-path'
-import type { OxfmtWorkerOptions, WorkerFormatResult } from '../src/types'
-
-const runWorker = createSyncFn<
-  (
-    filename: string,
-    sourceText: string,
-    options?: OxfmtWorkerOptions,
-  ) => WorkerFormatResult
->(join(workersDir, 'oxfmt.mjs'))
-
-async function withProject(run: (cwd: string) => Promise<void>) {
-  const cwd = await mkdtemp(join(tmpdir(), 'oxfmt-worker-contract-'))
-  try {
-    await run(cwd)
-  } finally {
-    await rm(cwd, { force: true, recursive: true })
-  }
-}
+import { withTempProject } from './helpers/project'
+import { runWorker } from './helpers/worker'
 
 it('accepts useCache in rule options and reloads changed config when disabled', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     const configPath = join(cwd, '.oxfmtrc.json')
     const eslint = new ESLint({
       cwd,
@@ -58,7 +39,7 @@ it('accepts useCache in rule options and reloads changed config when disabled', 
 it.each([true, false])(
   'loads a CommonJS config once per request with useCache=%s',
   async useCache => {
-    await withProject(async cwd => {
+    await withTempProject(async cwd => {
       const counterPath = join(cwd, 'count.txt')
       const configPath = join(cwd, 'config.cjs')
       await writeFile(counterPath, '0')
@@ -85,7 +66,7 @@ it.each([true, false])(
 )
 
 it('checks global ignores before loading a broken config with caching disabled', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await mkdir(join(cwd, 'vendor'))
     await writeFile(join(cwd, '.prettierignore'), 'vendor/')
     await writeFile(join(cwd, 'vendor/.oxfmtrc.json'), '{invalid')
@@ -99,7 +80,7 @@ it('checks global ignores before loading a broken config with caching disabled',
 })
 
 it('does not resolve EditorConfig for files ignored by config patterns', async () => {
-  await withProject(async cwd => {
+  await withTempProject(async cwd => {
     await writeFile(
       join(cwd, '.oxfmtrc.json'),
       '{"ignorePatterns":["generated/**"]}',
@@ -111,5 +92,18 @@ it('does not resolve EditorConfig for files ignored by config patterns', async (
     })
     expect(result.ignored).toBe(true)
     expect(result.code).toBe('const value=1')
+  })
+})
+
+it('formats files outside cwd without passing parent paths to inline ignore matchers', async () => {
+  await withTempProject(async cwd => {
+    const result = runWorker(join(cwd, '../sibling/a.js'), 'const value=1', {
+      cwd,
+      ignorePatterns: ['dist/**'],
+      respectOxfmtDefaultIgnores: false,
+      useConfig: false,
+    })
+    expect(result.ignored).not.toBe(true)
+    expect(result.code).toBe('const value = 1;\n')
   })
 })

@@ -8,7 +8,7 @@ This pnpm monorepo maintains `eslint-plugin-oxfmt` and `load-oxfmt-config` with 
 - `packages/eslint-plugin-oxfmt/workers/oxfmt.mjs`: worker entry; sibling modules own formatting orchestration, option validation, matching, overrides, and associations.
 - `packages/eslint-plugin-oxfmt/scripts/`: schema validation and rule type generation.
 - `packages/eslint-plugin-oxfmt/dts/rule-options.d.ts`: generated rule options; do not hand-edit.
-- `packages/load-oxfmt-config/src/`: config discovery/loading, EditorConfig merging, caching, and ignore resolution.
+- `packages/load-oxfmt-config/src/`: config discovery/loading, EditorConfig merging, caching, and ignore resolution. `git-ignore.ts` owns Git discovery, `ignore-matchers.ts` owns matching, and `ignore.ts` owns precedence.
 - Each package has its own `tests/`, fixtures, README, and tsdown config.
 - Root configuration owns lint, formatting, typechecking, shared Vitest settings, and release orchestration.
 
@@ -36,7 +36,7 @@ Use TypeScript ESM in source and plain ESM JavaScript in workers. Formatting use
 
 ## Testing Guidelines
 
-Use the nearest package's tests for changed behavior. Plugin rule tests live in `tests/rules/`; config integration, CLI parity, and schema parity have dedicated suites. Loader tests cover config loading, discovery, EditorConfig, and ignore resolution.
+Use the nearest package's tests for changed behavior. Plugin rule tests live in `tests/rules/`; config integration, CLI parity, and schema parity have dedicated suites. Loader tests cover config loading, discovery, EditorConfig, and ignore resolution; EditorConfig suites live in `tests/editorconfig/`. Plugin language suites live in `tests/languages/`, with config, EditorConfig, and ignore CLI comparisons in their respective parity suites.
 
 Use paths relative to the test module or package helper instead of assuming the repository working directory. Temporary config tests must explicitly provide any imported dependencies. Refresh snapshots only after confirming intended formatter output changes. Run targeted tests first, then `pnpm release:check` before finalizing.
 

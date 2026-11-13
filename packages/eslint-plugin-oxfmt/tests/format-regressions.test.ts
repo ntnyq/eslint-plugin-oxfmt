@@ -2,14 +2,14 @@ import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
 import pluginOxfmt from '../src'
 import { resolvePackagePath } from './helpers/paths'
-import type { RuleOxfmtOptions } from '../src/types'
+import type { OxfmtRuleOptions } from '../src/types'
 
 const FORMAT_CASES: {
   expected: string
   filename: string
   name: string
   source: string
-  options?: RuleOxfmtOptions
+  options?: OxfmtRuleOptions
 }[] = [
   {
     filename: 'keywords.js',

@@ -2,6 +2,7 @@
 
 import ignore from 'ignore'
 import picomatch from 'picomatch'
+import { isPathOutsideBase } from './paths.mjs'
 
 /**
  * Maximum number of compiled matchers retained in each worker cache.
@@ -10,10 +11,10 @@ import picomatch from 'picomatch'
 const MAX_CACHE_SIZE = 200
 
 /**
- * Compiled override globs keyed by their ordered pattern list.
+ * Compiled oxfmt globs keyed by their ordered pattern list.
  * @type {Map<string, import('picomatch').Matcher>}
  */
-const overrideMatcherCache = new Map()
+const globMatcherCache = new Map()
 
 /**
  * Compiled gitignore-style rules keyed by their ordered pattern list.
@@ -22,14 +23,14 @@ const overrideMatcherCache = new Map()
 const ignoreMatcherCache = new Map()
 
 /**
- * Get or create a cached picomatch matcher for oxfmt override globs.
+ * Get or create a cached picomatch matcher for oxfmt overrides and associations.
  * @param {string[]} patterns - Glob patterns.
  * @returns {import('picomatch').Matcher} Compiled matcher.
  * @throws {Error} If a pattern contains invalid glob syntax.
  */
-export function getCachedOverrideMatcher(patterns) {
+export function getCachedOxfmtGlobMatcher(patterns) {
   const key = patterns.join('\0')
-  const cached = overrideMatcherCache.get(key)
+  const cached = globMatcherCache.get(key)
   if (cached) {
     return cached
   }
@@ -56,7 +57,7 @@ export function getCachedOverrideMatcher(patterns) {
   }
 
   const matcher = picomatch(patterns, matcherOptions)
-  setCacheEntry(overrideMatcherCache, key, matcher)
+  setCacheEntry(globMatcherCache, key, matcher)
   return matcher
 }
 
@@ -67,7 +68,7 @@ export function getCachedOverrideMatcher(patterns) {
  * @returns {boolean} Whether file is ignored.
  */
 export function shouldIgnoreFile(relativePath, ignorePatterns) {
-  if (!ignorePatterns?.length) {
+  if (!ignorePatterns?.length || isPathOutsideBase(relativePath)) {
     return false
   }
 

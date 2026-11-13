@@ -16,7 +16,7 @@ const require = createRequire(import.meta.url)
 /**
  * Node error codes that mean CommonJS require should fall back to ESM loading.
  */
-const requireFallbackErrorCodes = new Set([
+const REQUIRE_FALLBACK_ERROR_CODES = new Set([
   'ERR_REQUIRE_ASYNC_MODULE',
   'ERR_REQUIRE_ESM',
 ])
@@ -24,7 +24,7 @@ const requireFallbackErrorCodes = new Set([
 /**
  * Syntax errors that indicate module syntax was parsed through CommonJS.
  */
-const syntaxFallbackMessages = [
+const MODULE_SYNTAX_ERROR_PATTERNS = [
   /Cannot use import statement outside a module/u,
   /Unexpected token 'export'/u,
   /Unexpected token 'import'/u,
@@ -246,7 +246,7 @@ function isJavaScriptLoaderFallbackError(
   resolvedPaths: string[],
 ): boolean {
   const code = getErrorCode(error)
-  if (code && requireFallbackErrorCodes.has(code)) {
+  if (code && REQUIRE_FALLBACK_ERROR_CODES.has(code)) {
     return true
   }
 
@@ -255,7 +255,7 @@ function isJavaScriptLoaderFallbackError(
     resolvedPaths.some(
       resolvedPath => error.stack?.startsWith(`${resolvedPath}:`) === true,
     ) &&
-    syntaxFallbackMessages.some(pattern => pattern.test(error.message))
+    MODULE_SYNTAX_ERROR_PATTERNS.some(pattern => pattern.test(error.message))
   )
 }
 

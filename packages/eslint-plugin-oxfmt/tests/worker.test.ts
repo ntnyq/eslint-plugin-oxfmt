@@ -1,18 +1,8 @@
-import { join } from 'node:path'
 import process from 'node:process'
-import { createSyncFn } from 'synckit'
 import { expect, it } from 'vitest'
-import { workersDir } from '../src/worker-path'
 import { resolvePackagePath } from './helpers/paths'
-import type { OxfmtWorkerOptions, WorkerFormatResult } from '../src/types'
-
-const runWorker = createSyncFn<
-  (
-    filename: string,
-    sourceText: string,
-    options?: OxfmtWorkerOptions,
-  ) => WorkerFormatResult
->(join(workersDir, 'oxfmt.mjs'))
+import { runWorker } from './helpers/worker'
+import type { OxfmtWorkerOptions } from '../src/types'
 
 it('should allow invoking the worker without an options object', () => {
   const filename = resolvePackagePath(
