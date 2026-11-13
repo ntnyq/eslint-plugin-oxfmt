@@ -5,6 +5,31 @@ import type {
   OxfmtOptions,
 } from 'load-oxfmt-config'
 import type { format } from 'oxfmt'
+import type { OxfmtRuleOptionsTuple } from '../dts/rule-options'
+
+/**
+ * Plugin controls accepted by the rule schema.
+ */
+export type OxfmtPluginOptions = Pick<
+  LoadOxfmtConfigOptions,
+  'configPath' | 'disableNestedConfig' | 'editorconfig' | 'useCache'
+> & {
+  ignorePath?: string | string[]
+  respectOxfmtDefaultIgnores?: boolean
+  useConfig?: boolean
+  withNodeModules?: boolean
+}
+
+/**
+ * User-facing options accepted by the oxfmt rule.
+ */
+export type OxfmtRuleOptions = NonNullable<OxfmtRuleOptionsTuple[0]>
+
+/**
+ * Rule options plus the working directory supplied by ESLint.
+ */
+export type OxfmtWorkerOptions = OxfmtRuleOptions &
+  Pick<LoadOxfmtConfigOptions, 'cwd'>
 
 export interface PluginOxfmt {
   configs: {
@@ -22,16 +47,13 @@ export interface PluginOxfmt {
 }
 
 /**
- * Options for the oxfmt rule
+ * Legacy option type retained for source compatibility.
+ *
+ * @deprecated Use OxfmtRuleOptions for rule configuration or OxfmtWorkerOptions for worker calls.
  */
 export type RuleOxfmtOptions = LoadOxfmtConfigOptions &
-  OxfmtOptions & {
-    disableNestedConfig?: boolean
-    ignorePath?: string | string[]
-    respectOxfmtDefaultIgnores?: boolean
-    useConfig?: boolean
-    withNodeModules?: boolean
-  }
+  OxfmtOptions &
+  OxfmtPluginOptions
 
 /**
  * Oxfmt format result returned by the worker

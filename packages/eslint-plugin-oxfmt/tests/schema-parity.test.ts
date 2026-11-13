@@ -1,174 +1,108 @@
 import { readFile } from 'node:fs/promises'
 import { expect, it } from 'vitest'
-import { oxfmtRuleSchema } from '../src/schema'
-import type { JSONSchema4, JSONSchema4Type } from 'json-schema'
+import { compareSchemas } from '../scripts/schema-parity'
+import { oxfmtRuleSchema, pluginOptionsSchema } from '../src/schema'
+import type { JSONSchema4 } from 'json-schema'
 
-const UPSTREAM_SCHEMA_PATH = 'node_modules/oxfmt/configuration_schema.json'
+const upstream = JSON.parse(
+  await readFile(
+    new URL('../node_modules/oxfmt/configuration_schema.json', import.meta.url),
+    'utf8',
+  ),
+) as JSONSchema4
 
-const PLUGIN_ONLY_TOP_LEVEL_OPTIONS = new Set([
-  'configPath',
-  'disableNestedConfig',
-  'editorconfig',
-  'ignorePath',
-  'respectOxfmtDefaultIgnores',
-  'useConfig',
-  'withNodeModules',
-])
-
-function resolveEnum(
-  schema: JSONSchema4,
-  root: JSONSchema4,
-): JSONSchema4Type[] | null {
-  if (Array.isArray(schema.enum)) {
-    return schema.enum
-  }
-
-  if (typeof schema.$ref === 'string') {
-    const match = schema.$ref.match(/^#\/definitions\/(.+)$/)
-    if (match) {
-      const resolved = root.definitions?.[match[1]]
-      return resolved ? resolveEnum(resolved, root) : null
-    }
-  }
-
-  if (Array.isArray(schema.allOf)) {
-    for (const sub of schema.allOf) {
-      const resolved = resolveEnum(sub, root)
-      if (resolved) {
-        return resolved
-      }
-    }
-  }
-
-  if (Array.isArray(schema.oneOf)) {
-    for (const sub of schema.oneOf) {
-      const resolved = resolveEnum(sub, root)
-      if (resolved) {
-        return resolved
-      }
-    }
-  }
-
-  if (Array.isArray(schema.anyOf)) {
-    for (const sub of schema.anyOf) {
-      const resolved = resolveEnum(sub, root)
-      if (resolved) {
-        return resolved
-      }
-    }
-  }
-
-  return null
-}
-
-it('should keep top-level schema options aligned with oxfmt + plugin extras', async () => {
-  const upstreamRaw = await readFile(UPSTREAM_SCHEMA_PATH, 'utf8')
-  const upstreamSchema = JSON.parse(upstreamRaw) as JSONSchema4
-
-  const upstreamKeys = Object.keys(upstreamSchema.properties ?? {}).sort()
-  const pluginKeys = Object.keys(oxfmtRuleSchema.properties ?? {}).sort()
-
-  const expectedPluginKeys = [
-    ...upstreamKeys,
-    ...PLUGIN_ONLY_TOP_LEVEL_OPTIONS,
-  ].sort()
-
-  expect(pluginKeys).toEqual(expectedPluginKeys)
-})
-
-it('should keep override option schema aligned with upstream format options', async () => {
-  const upstreamRaw = await readFile(UPSTREAM_SCHEMA_PATH, 'utf8')
-  const upstreamSchema = JSON.parse(upstreamRaw) as JSONSchema4
-  const upstreamFormatConfig = upstreamSchema.definitions
-    ?.FormatConfig as JSONSchema4
-
-  const pluginProperties = (oxfmtRuleSchema.properties ?? {}) as Record<
-    string,
-    JSONSchema4
-  >
-  const overridesSchema = pluginProperties.overrides
-  const overrideItemSchema = overridesSchema?.items as JSONSchema4
-  const overrideOptionsSchema = overrideItemSchema.properties
-    ?.options as JSONSchema4
-
-  const upstreamFormatKeys = Object.keys(
-    upstreamFormatConfig.properties ?? {},
-  ).sort()
-  const pluginOverrideOptionKeys = Object.keys(
-    overrideOptionsSchema.properties ?? {},
-  ).sort()
-
-  expect(pluginOverrideOptionKeys).toEqual(upstreamFormatKeys)
-  expect(pluginOverrideOptionKeys).not.toContain('ignorePatterns')
-})
-
-it('should keep enum options aligned with oxfmt schema', async () => {
-  const upstreamRaw = await readFile(UPSTREAM_SCHEMA_PATH, 'utf8')
-  const upstreamSchema = JSON.parse(upstreamRaw) as JSONSchema4
-
-  const upstreamProperties = upstreamSchema.properties ?? {}
-  const pluginProperties = (oxfmtRuleSchema.properties ?? {}) as Record<
-    string,
-    JSONSchema4
-  >
-
-  for (const key of Object.keys(upstreamProperties)) {
-    const upstreamEnum = resolveEnum(
-      upstreamProperties[key] as JSONSchema4,
-      upstreamSchema,
-    )
-    const pluginEnum = resolveEnum(pluginProperties[key] as JSONSchema4, {
-      definitions: {},
-      properties: pluginProperties,
-    })
-
-    if (!upstreamEnum || !pluginEnum) {
-      continue
-    }
-
-    const normalize = (value: JSONSchema4Type[]) => [...value].sort()
-    expect(normalize(pluginEnum), `${key} enum drift`).toEqual(
-      normalize(upstreamEnum),
-    )
-  }
-
-  // Explicitly guard the historical drift point.
-  const objectWrap = resolveEnum(
-    pluginProperties.objectWrap as JSONSchema4,
-    {
-      definitions: {},
-      properties: pluginProperties,
-    } as JSONSchema4,
-  )
-
-  expect(objectWrap).toEqual(['preserve', 'collapse'])
-})
-
-it('keeps association languages and Astro options aligned with upstream', async () => {
-  const upstream = JSON.parse(
-    await readFile(UPSTREAM_SCHEMA_PATH, 'utf8'),
-  ) as JSONSchema4
-  const association = oxfmtRuleSchema.properties?.associations
-    .items as JSONSchema4
-  const upstreamAssociation = upstream.definitions?.OxfmtAssociationConfig
-  expect(association.required).toEqual(upstreamAssociation?.required)
-  expect(Object.keys(association.properties ?? {}).sort()).toEqual(
-    Object.keys(upstreamAssociation?.properties ?? {}).sort(),
-  )
-  expect(association.properties?.language.enum).toEqual(
-    upstream.definitions?.Language.enum,
-  )
-  const astro = oxfmtRuleSchema.properties?.astro.anyOf?.find(
-    option => option.type === 'object',
-  )
-  expect(Object.keys(astro?.properties ?? {}).sort()).toEqual(
-    Object.keys(upstream.definitions?.AstroConfig.properties ?? {}).sort(),
-  )
+it('keeps the full rule schema aligned with upstream and plugin controls', () => {
   expect(
-    astro?.properties?.compressHTML.oneOf?.flatMap(option => option.enum ?? []),
-  ).toEqual(
-    upstream.definitions?.AstroCompressHtmlConfig.oneOf?.flatMap(
-      option => option.enum ?? [],
-    ),
-  )
+    compareSchemas(upstream, oxfmtRuleSchema, pluginOptionsSchema.properties),
+  ).toEqual([])
 })
+
+it.each([
+  [
+    'missing enum',
+    (schema: JSONSchema4) => {
+      delete schema.properties?.objectWrap.enum
+    },
+  ],
+  [
+    'changed nested type',
+    (schema: JSONSchema4) => {
+      const association = schema.properties?.associations.items as JSONSchema4
+      if (association.properties?.files.items) {
+        ;(association.properties.files.items as JSONSchema4).type = 'number'
+      }
+    },
+  ],
+  [
+    'missing required field',
+    (schema: JSONSchema4) => {
+      const association = schema.properties?.associations.items as JSONSchema4
+      association.required = ['files']
+    },
+  ],
+  [
+    'changed numeric bound',
+    (schema: JSONSchema4) => {
+      if (schema.properties?.printWidth) {
+        schema.properties.printWidth.minimum = 1
+      }
+    },
+  ],
+  [
+    'missing option',
+    (schema: JSONSchema4) => {
+      delete schema.properties?.semi
+    },
+  ],
+  [
+    'extra option',
+    (schema: JSONSchema4) => {
+      if (schema.properties) {
+        schema.properties.unexpected = { type: 'boolean' }
+      }
+    },
+  ],
+] satisfies [string, (schema: JSONSchema4) => void][])(
+  'detects %s',
+  (_name, mutate) => {
+    const schema = structuredClone(oxfmtRuleSchema)
+    mutate(schema)
+    expect(
+      compareSchemas(upstream, schema, pluginOptionsSchema.properties).length,
+    ).toBeGreaterThan(0)
+  },
+)
+
+it('normalizes reference wrappers and branch ordering without ignoring validation', () => {
+  const expected: JSONSchema4 = {
+    allOf: [{ $ref: '#/definitions/Mode' }],
+    definitions: { Mode: { enum: ['a', 'b'], type: 'string' } },
+  }
+  expect(
+    compareSchemas(expected, {
+      description: 'Adapter wording',
+      enum: ['b', 'a'],
+      type: 'string',
+    }),
+  ).toEqual([])
+  const branches: JSONSchema4[] = [
+    { type: 'boolean' },
+    { properties: { enabled: { type: 'boolean' } }, type: 'object' },
+  ]
+  expect(
+    compareSchemas({ anyOf: branches }, { oneOf: [...branches].reverse() }),
+  ).toEqual([])
+  expect(
+    compareSchemas(
+      { anyOf: [{ type: 'number' }, { type: 'integer' }] },
+      { oneOf: [{ type: 'number' }, { type: 'integer' }] },
+    ),
+  ).not.toEqual([])
+})
+
+it.each(['#/definitions/missing', 'https://example.test/schema.json'])(
+  'fails on unresolved or unsupported references: %s',
+  $ref => {
+    expect(() => compareSchemas({ $ref }, {})).toThrow(/reference/)
+  },
+)

@@ -125,13 +125,13 @@ Build the workspace, then run targeted suites first:
 
 ```bash
 pnpm build
-pnpm --filter eslint-plugin-oxfmt test tests/rules/oxfmt.test.ts
-pnpm --filter eslint-plugin-oxfmt test tests/rules/error-reporting.test.ts
-pnpm --filter eslint-plugin-oxfmt test tests/configs.test.ts
-pnpm --filter eslint-plugin-oxfmt test tests/cli-parity.test.ts
-pnpm --filter eslint-plugin-oxfmt test tests/eslint-plugin.test.ts
-pnpm --filter eslint-plugin-oxfmt test tests/schema-parity.test.ts
-pnpm --filter load-oxfmt-config test
+pnpm test packages/eslint-plugin-oxfmt/tests/rules/oxfmt.test.ts
+pnpm test packages/eslint-plugin-oxfmt/tests/rules/error-reporting.test.ts
+pnpm test packages/eslint-plugin-oxfmt/tests/configs.test.ts
+pnpm test packages/eslint-plugin-oxfmt/tests/cli-parity.test.ts
+pnpm test packages/eslint-plugin-oxfmt/tests/eslint-plugin.test.ts
+pnpm test packages/eslint-plugin-oxfmt/tests/schema-parity.test.ts
+pnpm test packages/load-oxfmt-config/tests
 ```
 
 Then run full gate:

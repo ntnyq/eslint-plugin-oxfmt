@@ -15,3 +15,11 @@ export * from './parser'
 export * from './configs'
 
 export default plugin
+
+export type {
+  OxfmtPluginOptions,
+  OxfmtRuleOptions,
+  OxfmtWorkerOptions,
+  RuleOxfmtOptions,
+  WorkerFormatResult,
+} from './types'

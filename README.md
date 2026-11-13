@@ -77,8 +77,8 @@ pnpm test
 Run a single suite after building:
 
 ```shell
-pnpm --filter eslint-plugin-oxfmt test tests/cli-parity.test.ts
-pnpm --filter load-oxfmt-config test tests/load-config.test.ts
+pnpm test packages/eslint-plugin-oxfmt/tests/cli-parity.test.ts
+pnpm test packages/load-oxfmt-config/tests/load-config.test.ts
 ```
 
 Run `pnpm release:check` before submitting changes. This also verifies loader changes against the plugin.

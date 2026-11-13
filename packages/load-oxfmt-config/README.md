@@ -258,9 +258,21 @@ Enable in-memory caching for both path resolution and parsed config contents. Wh
 
 Set to `false` to force reload from disk on every call.
 
+#### `loadedConfig`
+
+- **Type:** `LoadOxfmtConfigResult`
+- **Default:** `undefined`
+
+Reuse config contents and metadata from a previous call made with
+`editorconfig: false`. This skips config discovery and reading while still
+resolving EditorConfig for the new request. Supplied config contents are not
+stored in the merged-config cache. This allows tools to check config ignores
+before loading per-file EditorConfig defaults without evaluating JS/TS configs
+twice.
+
 #### `editorconfig`
 
-- **Type:** `boolean | EditorconfigOption`
+- **Type:** `boolean | EditorconfigLoadOptions`
 - **Default:** `true`
 
 Control how `.editorconfig` files are read and merged:
@@ -269,12 +281,15 @@ Control how `.editorconfig` files are read and merged:
   - `dirname(filepath)` when nested lookup is enabled and `filepath` is provided
   - otherwise `cwd`
 - **`false`** — Disable `.editorconfig` reading entirely.
-- **`EditorconfigOption`** — Enable with additional settings:
+- **`EditorconfigLoadOptions`** — Enable with additional settings:
 
 | Property  | Type      | Default     | Description                                                                                                   |
 | --------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
 | `onlyCwd` | `boolean` | `false`     | When `true`, only look for `.editorconfig` in `cwd` itself — no upward traversal.                             |
 | `cwd`     | `string`  | `undefined` | Override the directory from which `.editorconfig` resolution starts, instead of the default lookup directory. |
+
+The historical `EditorconfigOption` type remains available as a compatibility
+name for `EditorconfigLoadOptions`.
 
 **Returns:** `Promise<LoadOxfmtConfigResult>`
 
@@ -382,6 +397,16 @@ config loading or matching; use the separate config options for that.
 
 Whether to load the resolved config file during ignore checks.
 When `false`, `isOxfmtIgnored()` only applies global ignore and skips config loading.
+
+#### `loadedConfig`
+
+- **Type:** `LoadOxfmtConfigResult`
+- **Default:** `undefined`
+
+Reuse the result of `loadOxfmtConfig()` or `loadOxfmtConfigForFile()` when
+checking config ignore patterns, avoiding a second config read. The supplied
+`dirname` is the matching base. Global ignores still run first; this value is
+unused when `loadConfigForIgnorePatterns` is `false`.
 
 **Returns:** `Promise<IsOxfmtIgnoredResult>`
 

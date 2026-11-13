@@ -5,14 +5,14 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
-import { resolve } from '../scripts/utils'
 import pluginOxfmt from '../src'
+import { resolvePackagePath } from './helpers/paths'
 import type { OxfmtConfig } from 'oxfmt'
 import type { OxfmtOxfmt } from '../dts/rule-options'
 
 type RuleOptions = NonNullable<OxfmtOxfmt[0]>
 
-const OXFMT_CLI = resolve('node_modules/oxfmt/bin/oxfmt')
+const OXFMT_CLI = resolvePackagePath('node_modules/oxfmt/bin/oxfmt')
 const SOURCE = '{"z":1,"a":2}'
 const CONFIG: OxfmtConfig = {
   overrides: [{ files: ['src/*.conf'], options: { tabWidth: 4 } }],

@@ -4,6 +4,34 @@ import { expect, it } from 'vitest'
 import { loadOxfmtConfig, loadOxfmtConfigForFile } from '../src'
 import { withTempDir } from './helpers'
 
+it('reuses raw config for per-file defaults without rereading or poisoning caches', async () => {
+  await withTempDir('oxfmt-preloaded-file-config-', async cwd => {
+    const configPath = join(cwd, '.oxfmtrc.json')
+    await writeFile(configPath, '{"semi":false}')
+    await writeFile(join(cwd, '.editorconfig'), '[*]\nquote_type = single\n')
+    const loadedConfig = await loadOxfmtConfig({
+      cwd,
+      editorconfig: false,
+      useCache: false,
+    })
+    await writeFile(configPath, '{invalid')
+
+    expect(
+      await loadOxfmtConfigForFile({ cwd, filepath: 'src/a.js', loadedConfig }),
+    ).toEqual({
+      config: { semi: false, singleQuote: true },
+      dirname: cwd,
+      filepath: configPath,
+    })
+    expect(loadedConfig.config).toEqual({ semi: false })
+
+    await writeFile(configPath, '{"semi":true}')
+    expect(
+      (await loadOxfmtConfigForFile({ cwd, filepath: 'src/a.js' })).config,
+    ).toEqual({ semi: true, singleQuote: true })
+  })
+})
+
 it('resolves ancestor EditorConfig sections without changing explicit override paths', async () => {
   await withTempDir('oxfmt-file-config-', async cwd => {
     const packageDir = join(cwd, 'packages/app')

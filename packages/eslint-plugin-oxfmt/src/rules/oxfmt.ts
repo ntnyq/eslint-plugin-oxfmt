@@ -1,16 +1,16 @@
 import { Buffer } from 'node:buffer'
 import { join } from 'node:path'
 import { createSyncFn } from 'synckit'
-import { dirWorkers } from '../dir'
 import { messages, reportDifferences } from '../reporter'
 import { oxfmtRuleSchema } from '../schema'
+import { workersDir } from '../worker-path'
 import type { Rule } from 'eslint'
-import type { RuleOxfmtOptions, WorkerFormatResult } from '../types'
+import type { OxfmtWorkerOptions, WorkerFormatResult } from '../types'
 
 let formatViaOxfmt: (
   filename: string,
   sourceText: string,
-  options?: RuleOxfmtOptions,
+  options?: OxfmtWorkerOptions,
 ) => WorkerFormatResult
 
 export const oxfmt: Rule.RuleModule = {
@@ -40,7 +40,7 @@ export const oxfmt: Rule.RuleModule = {
     }
 
     if (!formatViaOxfmt) {
-      formatViaOxfmt = createSyncFn(join(dirWorkers, 'oxfmt.mjs'))
+      formatViaOxfmt = createSyncFn(join(workersDir, 'oxfmt.mjs'))
     }
 
     const sourceText = context.sourceCode.text

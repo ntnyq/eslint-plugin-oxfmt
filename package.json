@@ -20,7 +20,7 @@
     "release:prepare": "pnpm install --lockfile-only && pnpm release:check",
     "release:version": "bumpp",
     "test": "vitest",
-    "typecheck": "tsgo --noEmit",
+    "typecheck": "tsgo --noEmit && tsgo --noEmit -p packages/eslint-plugin-oxfmt/tsconfig.workers.json",
     "update:rule-options": "pnpm --filter eslint-plugin-oxfmt run update:rule-options"
   },
   "devDependencies": {

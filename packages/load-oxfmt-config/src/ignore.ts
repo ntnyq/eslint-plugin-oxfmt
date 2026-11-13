@@ -1,24 +1,15 @@
 import { readFile, stat } from 'node:fs/promises'
-import {
-  basename,
-  dirname,
-  isAbsolute,
-  join,
-  relative,
-  resolve,
-} from 'node:path'
+import { basename, dirname, isAbsolute, join, resolve } from 'node:path'
 import process from 'node:process'
 import ignore from 'ignore'
+import { cachePromise, getCacheValue, setCacheValue } from './cache'
 import { DEFAULT_IGNORED_DIRS, DEFAULT_IGNORED_LOCKFILES } from './constants'
-import { loadOxfmtConfig } from './core'
+import { loadOxfmtConfig } from './load-config'
 import {
-  cachePromise,
-  getCacheValue,
   isPathOutsideBase,
-  setCacheValue,
   splitPathSegments,
-  toPosixPath,
-} from './utils'
+  toRelativePosixPath,
+} from './path'
 import type { Ignore } from 'ignore'
 import type { IsOxfmtIgnoredOptions, IsOxfmtIgnoredResult } from './types'
 
@@ -121,16 +112,18 @@ export async function isOxfmtIgnored(
     }
   }
 
-  const configResult = await loadOxfmtConfig({
-    cwd,
-    filepath,
-    ...(options.disableNestedConfig === true
-      ? { disableNestedConfig: true }
-      : {}),
-    ...(options.configPath ? { configPath: options.configPath } : {}),
-    editorconfig: false,
-    useCache,
-  })
+  const configResult =
+    options.loadedConfig ??
+    (await loadOxfmtConfig({
+      cwd,
+      filepath,
+      ...(options.disableNestedConfig === true
+        ? { disableNestedConfig: true }
+        : {}),
+      ...(options.configPath ? { configPath: options.configPath } : {}),
+      editorconfig: false,
+      useCache,
+    }))
 
   if (
     includeConfigIgnorePatterns &&
@@ -314,7 +307,7 @@ function matchConfigIgnorePatterns(
 ) {
   validateConfigIgnorePatterns(patterns)
 
-  const relativeFile = relativeSafe(configDir, filepath)
+  const relativeFile = toRelativePosixPath(configDir, filepath)
   if (isPathOutsideBase(relativeFile)) {
     return false
   }
@@ -354,7 +347,7 @@ async function matchIgnoreFile(
     return false
   }
 
-  const relativeToIgnore = relativeSafe(
+  const relativeToIgnore = toRelativePosixPath(
     baseDir ?? dirname(ignoreFilePath),
     filepath,
   )
@@ -417,7 +410,7 @@ function matchLoadedIgnoreMatchers(
   let matched = false
 
   for (const entry of matcherEntries) {
-    let relativeToIgnore = relativeSafe(entry.baseDir, filepath)
+    let relativeToIgnore = toRelativePosixPath(entry.baseDir, filepath)
     if (isPathOutsideBase(relativeToIgnore)) {
       continue
     }
@@ -440,17 +433,6 @@ function matchLoadedIgnoreMatchers(
     ignored,
     matched,
   }
-}
-
-/**
- * Build a POSIX relative path.
- *
- * @param from - Base directory.
- * @param to - Target path.
- * @returns POSIX relative path.
- */
-function relativeSafe(from: string, to: string) {
-  return toPosixPath(relative(from, to))
 }
 
 /**

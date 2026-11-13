@@ -1,6 +1,6 @@
 import { ESLint } from 'eslint'
 import { afterEach, expect, it, vi } from 'vitest'
-import { resolve } from '../../scripts/utils'
+import { resolvePackagePath } from '../helpers/paths'
 
 afterEach(() => {
   vi.resetModules()
@@ -26,7 +26,7 @@ it.each([
   'should report UTF-16 diagnostic locations for $source',
   async ({ column, endColumn, line, source }) => {
     const { default: pluginOxfmt } = await import('../../src')
-    const cwd = resolve('tests/fixtures/base')
+    const cwd = resolvePackagePath('tests/fixtures/base')
     const eslint = new ESLint({
       cwd,
       overrideConfigFile: true,
@@ -40,7 +40,7 @@ it.each([
       ],
     })
     const [result] = await eslint.lintText(source, {
-      filePath: resolve(cwd, 'diagnostic.js'),
+      filePath: resolvePackagePath(cwd, 'diagnostic.js'),
     })
 
     expect(result.messages).toEqual([

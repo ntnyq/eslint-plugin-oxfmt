@@ -3,17 +3,12 @@ import { dirname, isAbsolute, join, relative } from 'node:path'
 import { isBoolean, isNumber } from '@ntnyq/utils'
 import { parseBuffer } from 'editorconfig'
 import { Minimatch } from 'minimatch'
+import { cachePromise, getCacheValue, setCacheValue } from './cache'
 import {
   EDITORCONFIG_FILE,
   EDITORCONFIG_GLOBAL_SECTION_NAMES,
 } from './constants'
-import {
-  cachePromise,
-  getCacheValue,
-  isPathOutsideBase,
-  setCacheValue,
-  toPosixPath,
-} from './utils'
+import { isPathOutsideBase, toPosixPath } from './path'
 import type { ParseStringResult, SectionBody, SectionName } from 'editorconfig'
 import type { FormatConfig } from 'oxfmt'
 import type { OxfmtConfigOverride, OxfmtOptions } from './types'
@@ -35,7 +30,7 @@ export interface EditorconfigData {
   /**
    * Root options generated from global `.editorconfig` sections.
    */
-  rootOptions: EditorconfigOptions
+  rootOptions: EditorconfigFormatOptions
 }
 
 /**
@@ -43,7 +38,7 @@ export interface EditorconfigData {
  *
  * @see https://oxc.rs/docs/guide/usage/formatter/config.html#editorconfig
  */
-export type EditorconfigOptions = Pick<
+export type EditorconfigFormatOptions = Pick<
   FormatConfig,
   | 'endOfLine'
   | 'insertFinalNewline'
@@ -52,6 +47,11 @@ export type EditorconfigOptions = Pick<
   | 'tabWidth'
   | 'useTabs'
 >
+
+/**
+ * @deprecated Use EditorconfigFormatOptions.
+ */
+export type EditorconfigOptions = EditorconfigFormatOptions
 
 /**
  * Builds the cache key used for resolved EditorConfig lookups.
@@ -119,7 +119,7 @@ export function mergeOverrides(
  */
 export function mergeRootOptions(
   oxfmtConfig: OxfmtOptions,
-  editorconfigRootOptions: EditorconfigOptions,
+  editorconfigRootOptions: EditorconfigFormatOptions,
 ) {
   return {
     ...editorconfigRootOptions,
@@ -148,7 +148,7 @@ export async function readEditorconfigFromFile(
     ? await cachePromise(sectionCache, editorconfigPath, readSections)
     : await readSections()
   const editorconfigDir = dirname(editorconfigPath)
-  let rootOptions: EditorconfigOptions = {}
+  let rootOptions: EditorconfigFormatOptions = {}
   const resolvedSection: SectionBody = {}
   const overrides: OxfmtConfigOverride[] = []
   const relativeFile = options.filepath
@@ -276,8 +276,8 @@ function isEditorconfigGlobalSection(sectionName: SectionName) {
 function mapEditorconfigSectionToOptions(
   section: SectionBody,
   inheritedSection: SectionBody = {},
-): EditorconfigOptions {
-  const options: EditorconfigOptions = {}
+): EditorconfigFormatOptions {
+  const options: EditorconfigFormatOptions = {}
 
   const endOfLine = parseEditorconfigEndOfLine(section.end_of_line)
   if (endOfLine) {

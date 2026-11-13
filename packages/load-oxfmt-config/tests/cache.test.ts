@@ -1,13 +1,26 @@
 import { describe, expect, it } from 'vitest'
-import { CACHE_MAX_ENTRIES } from '../src/constants'
 import {
   cachePromise,
   getCacheValue,
-  isPathOutsideBase,
+  getConfigCacheKey,
+  getResolveCacheKey,
   setCacheValue,
-} from '../src/utils'
+} from '../src/cache'
+import { CACHE_MAX_ENTRIES } from '../src/constants'
 
 describe('cache helpers', () => {
+  it('creates collision-safe resolve cache keys', () => {
+    expect(getResolveCacheKey('/a::b', 'c')).not.toBe(
+      getResolveCacheKey('/a', 'b::c'),
+    )
+  })
+
+  it('creates collision-safe config cache keys', () => {
+    expect(getConfigCacheKey('/a::b', 'c', 'resolve')).not.toBe(
+      getConfigCacheKey('/a', 'b::c', 'resolve'),
+    )
+  })
+
   it('evicts the least-recently used entry at the cache limit', () => {
     const cache = new Map<number, number>()
 
@@ -35,24 +48,4 @@ describe('cache helpers', () => {
     expect(cache.has('0')).toBeFalsy()
     expect(cache.has(String(CACHE_MAX_ENTRIES))).toBeTruthy()
   })
-})
-
-describe('isPathOutsideBase', () => {
-  it.each([
-    '..',
-    '../file.ts',
-    '/absolute/file.ts',
-    'D:/absolute/file.ts',
-    String.raw`D:\absolute\file.ts`,
-    String.raw`\\server\share\file.ts`,
-  ])('recognizes outside path %s', path => {
-    expect(isPathOutsideBase(path)).toBeTruthy()
-  })
-
-  it.each(['file.ts', 'src/file.ts', '..file.ts', 'src/../file.ts'])(
-    'keeps path %s within the base',
-    path => {
-      expect(isPathOutsideBase(path)).toBeFalsy()
-    },
-  )
 })

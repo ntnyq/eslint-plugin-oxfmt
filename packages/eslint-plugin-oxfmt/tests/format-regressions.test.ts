@@ -1,7 +1,7 @@
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
-import { resolve } from '../scripts/utils'
 import pluginOxfmt from '../src'
+import { resolvePackagePath } from './helpers/paths'
 import type { RuleOxfmtOptions } from '../src/types'
 
 const FORMAT_CASES: {
@@ -390,7 +390,7 @@ function f(list) {}`,
 it.each(FORMAT_CASES)(
   'should preserve oxfmt formatting for $name',
   async ({ expected, filename, options, source }) => {
-    const cwd = resolve('tests/fixtures/base')
+    const cwd = resolvePackagePath('tests/fixtures/base')
     const eslint = new ESLint({
       cwd,
       fix: true,
@@ -405,7 +405,7 @@ it.each(FORMAT_CASES)(
         },
       ],
     })
-    const filePath = resolve(cwd, filename)
+    const filePath = resolvePackagePath(cwd, filename)
     const [result] = await eslint.lintText(source, { filePath })
 
     expect(result.messages).toEqual([])

@@ -166,6 +166,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
     },
     printWidth: {
       description: `The line length that the printer will wrap on. (Default: 100)`,
+      minimum: 0,
       type: 'integer',
     },
     proseWrap: {
@@ -223,11 +224,33 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
                     type: 'array',
                     items: {
                       type: 'string',
+                      enum: [
+                        'default',
+                        'named',
+                        'side_effect',
+                        'type',
+                        'value',
+                        'wildcard',
+                      ],
                     },
                   },
                   selector: {
                     description: `Selector to match the import kind.\n\nPossible values: "type", "side_effect_style", "side_effect", "style", "index", "sibling", "parent", "subpath", "internal", "builtin", "external", "import"`,
                     type: 'string',
+                    enum: [
+                      'builtin',
+                      'external',
+                      'import',
+                      'index',
+                      'internal',
+                      'parent',
+                      'sibling',
+                      'side_effect',
+                      'side_effect_style',
+                      'style',
+                      'subpath',
+                      'type',
+                    ],
                   },
                 },
               },
@@ -386,6 +409,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
     },
     tabWidth: {
       description: `Number of spaces per indentation level. (Default: 2)`,
+      minimum: 0,
       type: 'integer',
     },
     trailingComma: {
@@ -409,7 +433,7 @@ const oxfmtOverrideOptionsSchemaProperties = {
 }
 delete oxfmtOverrideOptionsSchemaProperties.ignorePatterns
 
-export const oxfmtConfigSchema: JSONSchema4 = {
+export const pluginOptionsSchema: JSONSchema4 = {
   additionalProperties: false,
   type: 'object',
   properties: {
@@ -463,6 +487,11 @@ export const oxfmtConfigSchema: JSONSchema4 = {
       description: `Whether to respect oxfmt default ignores (.gitignore, .prettierignore, lockfiles, default directories). (Default: true)`,
       type: 'boolean',
     },
+    useCache: {
+      type: 'boolean',
+      description:
+        'Reuse configuration and ignore caches. Disable to reload configuration on every formatting request. (Default: true)',
+    },
     useConfig: {
       default: true,
       description: `Whether to load Oxfmt configuration file. (Default: true)`,
@@ -481,7 +510,7 @@ export const oxfmtRuleSchema: JSONSchema4 = {
   type: 'object',
   properties: {
     ...oxfmtOptionsSchema.properties,
-    ...oxfmtConfigSchema.properties,
+    ...pluginOptionsSchema.properties,
     associations: {
       type: 'array',
       description:
@@ -573,3 +602,10 @@ export const oxfmtRuleSchema: JSONSchema4 = {
     },
   },
 }
+
+/**
+ * Compatibility name for the plugin-only option schema.
+ *
+ * @deprecated Use pluginOptionsSchema.
+ */
+export const oxfmtConfigSchema = pluginOptionsSchema

@@ -1,26 +1,10 @@
 import { join, relative, resolve } from 'node:path'
 import process from 'node:process'
 import { describe, expect, it } from 'vitest'
-import {
-  getConfigCacheKey,
-  getResolveCacheKey,
-  resolveOxfmtrcPath,
-} from '../src'
+import { resolveOxfmtrcPath } from '../src'
 import { fixturePath } from './helpers'
 
 describe('resolveOxfmtrcPath', () => {
-  it('creates collision-safe resolve cache keys', () => {
-    expect(getResolveCacheKey('/a::b', 'c')).not.toBe(
-      getResolveCacheKey('/a', 'b::c'),
-    )
-  })
-
-  it('creates collision-safe config cache keys', () => {
-    expect(getConfigCacheKey('/a::b', 'c', 'resolve')).not.toBe(
-      getConfigCacheKey('/a', 'b::c', 'resolve'),
-    )
-  })
-
   it('uses explicit configPath relative to cwd', async () => {
     const cwd = fixturePath('resolve', 'explicit-relative')
     const configPath = '.oxfmtrc.json'

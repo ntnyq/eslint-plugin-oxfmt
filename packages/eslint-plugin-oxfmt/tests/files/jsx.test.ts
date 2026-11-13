@@ -1,6 +1,6 @@
 import { expect } from 'vitest'
 import { oxfmt as rule } from '../../src/rules/oxfmt'
-import { run } from '../internal'
+import { run } from '../rule-tester'
 
 run({
   rule,

@@ -181,6 +181,7 @@ All options are optional and default to sensible values.
 
 | Option                       | Type                                             | Default | Description                                                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `useCache`                   | `boolean`                                        | `true`  | Reuse loaded configuration and ignore caches. Set to `false` to reload them for each formatting request.                                                                                                     |
 | `useConfig`                  | `boolean`                                        | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.{ts,mts,cts,js,mjs,cjs}` via `load-oxfmt-config`. Set to `false` to rely only on inline options.                                                    |
 | `configPath`                 | `string`                                         | —       | Custom path to an oxfmt config file. Relative paths resolve from ESLint `cwd`; absolute paths are used as-is. Explicit `configPath` accepts `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`. |
 | `editorconfig`               | `boolean \| { onlyCwd?: boolean; cwd?: string }` | `true`  | Control `.editorconfig` loading. Use `false` to disable, or object form for advanced resolution strategy.                                                                                                    |
@@ -193,6 +194,18 @@ All options are optional and default to sensible values.
 > `.editorconfig` merge behavior follows oxfmt's documented strategy: https://oxc.rs/docs/guide/usage/formatter/config#editorconfig
 
 ### Config Discovery & Precedence
+
+`OxfmtRuleOptions` is exported for typed rule configuration. `cwd` comes from
+ESLint and the target filename comes from the linted file; neither is a rule
+option. `OxfmtWorkerOptions` adds the internal working-directory context.
+The historical `RuleOxfmtOptions` type remains available for compatibility.
+The existing `./rule-options` exports also preserve string-based custom group
+inputs; the new root `OxfmtRuleOptions` type follows the rule schema strictly.
+
+Configuration caches persist for the worker's lifetime. Set `useCache: false`
+when configuration or ignore files may change during a long-running process.
+Native ESM helper imports still follow Node.js module caching, as described in
+the [loader documentation](../load-oxfmt-config/README.md#caching-behavior).
 
 When `useConfig` is `true`, the plugin loads config using
 `loadOxfmtConfigForFile()` from `load-oxfmt-config`. EditorConfig sections are

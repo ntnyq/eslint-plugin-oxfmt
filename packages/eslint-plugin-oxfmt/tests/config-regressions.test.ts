@@ -5,8 +5,8 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
-import { resolve } from '../scripts/utils'
 import pluginOxfmt from '../src'
+import { resolvePackagePath } from './helpers/paths'
 import type { OxfmtOxfmt } from '../dts/rule-options'
 
 type RuleOptions = NonNullable<OxfmtOxfmt[0]>
@@ -14,7 +14,7 @@ type RuleOptions = NonNullable<OxfmtOxfmt[0]>
 const SOURCE = 'export const value="hello"\n'
 const SINGLE_QUOTED = "export const value = 'hello';\n"
 const DOUBLE_QUOTED = 'export const value = "hello";\n'
-const OXFMT_CLI = resolve('node_modules/oxfmt/bin/oxfmt')
+const OXFMT_CLI = resolvePackagePath('node_modules/oxfmt/bin/oxfmt')
 
 const IGNORE_CASES: {
   expected: string

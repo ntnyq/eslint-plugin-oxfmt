@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
-import { resolve } from '../../scripts/utils'
 import { oxfmt as rule } from '../../src/rules/oxfmt'
-import { $, run } from '../internal'
+import { resolvePackagePath } from '../helpers/paths'
+import { $, run } from '../rule-tester'
 
 run({
   rule,
@@ -1511,7 +1511,7 @@ run({
           insertFinalNewline: false,
           useConfig: false,
           sortTailwindcss: {
-            config: resolve('tests/fixtures/tailwind.config.js'),
+            config: resolvePackagePath('tests/fixtures/tailwind.config.js'),
           },
         },
       ],

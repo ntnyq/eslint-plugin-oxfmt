@@ -26,11 +26,11 @@ export function reportDifferences(
   const differences = generateDifferences(source, formatted)
 
   for (const difference of differences) {
-    _reportDifference(context, difference, offset)
+    reportDifference(context, difference, offset)
   }
 }
 
-function _reportDifference(
+function reportDifference(
   context: Rule.RuleContext,
   difference: Difference,
   rangeOffset = 0,

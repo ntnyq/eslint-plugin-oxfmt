@@ -54,22 +54,38 @@ export function getCacheValue<CacheKey, CacheValue>(
 }
 
 /**
- * Check whether a relative path points outside its intended base directory.
+ * Build a cache key for config content; prefixes missing entries.
  *
- * This also recognizes Windows drive-qualified paths when running on another
- * platform so the behavior can be tested consistently.
+ * @deprecated Internal cache key format; retained for compatibility.
  *
- * @param path - Relative path candidate.
- * @returns True when the path escapes or is absolute.
+ * @param resolvedPath - Resolved oxfmt config path.
+ * @param editorconfigPath - Resolved editorconfig path.
+ * @param resolveKey - Resolution cache key.
+ * @returns Cache key for config content cache.
  */
-export function isPathOutsideBase(path: string): boolean {
-  const normalizedPath = toPosixPath(path)
-  return (
-    normalizedPath === '..' ||
-    normalizedPath.startsWith('../') ||
-    normalizedPath.startsWith('/') ||
-    /^[A-Za-z]:\//u.test(normalizedPath)
-  )
+export function getConfigCacheKey(
+  resolvedPath: string | undefined,
+  editorconfigPath: string | undefined,
+  resolveKey: string,
+): string {
+  return JSON.stringify([
+    resolvedPath ?? null,
+    editorconfigPath ?? null,
+    resolveKey,
+  ])
+}
+
+/**
+ * Build a cache key for path resolution (cwd + configPath).
+ *
+ * @deprecated Internal cache key format; retained for compatibility.
+ *
+ * @param cwd - Current working directory.
+ * @param configPath - Optional config path.
+ * @returns Cache key for resolve cache.
+ */
+export function getResolveCacheKey(cwd: string, configPath?: string): string {
+  return JSON.stringify([cwd, configPath ?? null])
 }
 
 /**
@@ -95,24 +111,4 @@ export function setCacheValue<CacheKey, CacheValue>(
   if (!oldestKey.done) {
     cache.delete(oldestKey.value)
   }
-}
-
-/**
- * Split a path into non-empty segments.
- *
- * @param path - Original path.
- * @returns Path segments.
- */
-export function splitPathSegments(path: string): string[] {
-  return path.split(/[\\/]+/u).filter(Boolean)
-}
-
-/**
- * Normalize a filesystem path to POSIX-style separators.
- *
- * @param path - Original path.
- * @returns Path using `/` as separator.
- */
-export function toPosixPath(path: string): string {
-  return path.replaceAll('\\', '/')
 }

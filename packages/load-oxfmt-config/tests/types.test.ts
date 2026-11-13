@@ -7,7 +7,7 @@ describe('public types', () => {
   })
 
   it('includes git-info-exclude in ignore reason union', () => {
-    expectTypeOf<IsOxfmtIgnoredResult['reason']>().toExtend<
+    expectTypeOf<IsOxfmtIgnoredResult['reason']>().toEqualTypeOf<
       | 'config-ignore-patterns'
       | 'default-dir'
       | 'git-info-exclude'

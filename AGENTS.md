@@ -5,7 +5,7 @@
 This pnpm monorepo maintains `eslint-plugin-oxfmt` and `load-oxfmt-config` with a shared version and release tag.
 
 - `packages/eslint-plugin-oxfmt/src/`: plugin exports, presets, rule, schema, and reporting helpers.
-- `packages/eslint-plugin-oxfmt/workers/oxfmt.mjs`: worker-side formatting using the local loader package.
+- `packages/eslint-plugin-oxfmt/workers/oxfmt.mjs`: worker entry; sibling modules own formatting orchestration, option validation, matching, overrides, and associations.
 - `packages/eslint-plugin-oxfmt/scripts/`: schema validation and rule type generation.
 - `packages/eslint-plugin-oxfmt/dts/rule-options.d.ts`: generated rule options; do not hand-edit.
 - `packages/load-oxfmt-config/src/`: config discovery/loading, EditorConfig merging, caching, and ignore resolution.
@@ -19,10 +19,10 @@ Run commands from the repository root unless using a package filter.
 - `pnpm install --frozen-lockfile`: install pinned workspace dependencies.
 - `pnpm build`: build loader first, then regenerate plugin rule types and build plugin.
 - `pnpm dev`: initial build followed by concurrent watchers.
-- `pnpm test`: run both packages' tests from their package directories; build first.
-- `pnpm --filter eslint-plugin-oxfmt test tests/cli-parity.test.ts`: targeted plugin suite.
-- `pnpm --filter load-oxfmt-config test tests/load-config.test.ts`: targeted loader suite.
-- `pnpm format:check`, `pnpm lint`, `pnpm typecheck`: repository checks.
+- `pnpm test`: run both packages' tests from the root; build first.
+- `pnpm test packages/eslint-plugin-oxfmt/tests/cli-parity.test.ts`: targeted plugin suite.
+- `pnpm test packages/load-oxfmt-config/tests/load-config.test.ts`: targeted loader suite.
+- `pnpm format:check`, `pnpm lint`, `pnpm typecheck`: repository checks, including JavaScript worker typechecking.
 - `pnpm check:schema`: verify plugin schema parity with upstream oxfmt.
 - `pnpm update:rule-options`: regenerate plugin rule option declarations.
 - `pnpm check:package`: inspect both package archives without writing tarballs; build first.
@@ -32,7 +32,7 @@ Formatting commands disable nested config discovery because test fixtures intent
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript ESM in source and plain ESM JavaScript in workers. Formatting uses two spaces, LF, no semicolons, single quotes, and trailing commas. Keep public exports and plugin presets stable (`recommended`, `recommendedWithoutParser`, `cliParity`). Preserve option names matching upstream oxfmt.
+Use TypeScript ESM in source and plain ESM JavaScript in workers. Formatting uses two spaces, LF, no semicolons, single quotes, and trailing commas. Use explicit public exports and retain compatibility names when renaming published symbols. Keep plugin presets stable (`recommended`, `recommendedWithoutParser`, `cliParity`). Preserve option names matching upstream oxfmt.
 
 ## Testing Guidelines
 

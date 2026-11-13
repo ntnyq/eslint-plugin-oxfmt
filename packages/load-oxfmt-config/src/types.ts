@@ -1,7 +1,14 @@
 import type { FormatConfig, OxfmtAssociationConfig } from 'oxfmt'
 
 /**
+ * Controls where EditorConfig is discovered and loaded.
+ */
+export type EditorconfigLoadOptions = EditorconfigOption
+
+/**
  * Object-form `.editorconfig` option for fine-grained lookup control.
+ *
+ * @deprecated Use EditorconfigLoadOptions.
  */
 export interface EditorconfigOption {
   /**
@@ -76,6 +83,11 @@ export interface IsOxfmtIgnoredOptions {
    */
   loadConfigForIgnorePatterns?: boolean
   /**
+   * Reuse an already loaded configuration when checking config ignore patterns.
+   * Global ignores still run first. Ignored when loadConfigForIgnorePatterns is false.
+   */
+  loadedConfig?: LoadOxfmtConfigResult
+  /**
    * Whether to use in-memory cache.
    *
    * @default true
@@ -138,13 +150,19 @@ export interface LoadOxfmtConfigOptions {
    *
    * @default true
    */
-  editorconfig?: boolean | EditorconfigOption
+  editorconfig?: boolean | EditorconfigLoadOptions
   /**
    * File path being formatted. When provided (and `configPath` is not set),
    * config discovery starts from this file's directory to match oxfmt nested
    * config behavior.
    */
   filepath?: string
+  /**
+   * Reuse config contents and metadata previously loaded with editorconfig: false.
+   * EditorConfig is still resolved for this request. Supplied config contents are
+   * not stored in the merged-config cache.
+   */
+  loadedConfig?: LoadOxfmtConfigResult
   /**
    * Whether to use in-memory caches for path resolution and parsed config contents.
    *

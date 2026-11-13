@@ -76,6 +76,7 @@
   "devDependencies": {
     "@astrojs/compiler-rs": "^0.5.3",
     "@types/json-schema": "^7.0.15",
+    "@types/picomatch": "^4.0.3",
     "eslint-parser-plain": "^0.1.1",
     "eslint-plugin-oxfmt": "workspace:*",
     "eslint-typegen": "^2.3.2",

@@ -3,23 +3,27 @@ import { join } from 'node:path'
 import { ESLint } from 'eslint'
 import { createSyncFn } from 'synckit'
 import { expect, it } from 'vitest'
-import { resolve } from '../scripts/utils'
 import pluginOxfmt, { parserPlain } from '../src'
-import { dirWorkers } from '../src/dir'
-import type { RuleOxfmtOptions, WorkerFormatResult } from '../src/types'
+import { workersDir } from '../src/worker-path'
+import { resolvePackagePath } from './helpers/paths'
+import type { OxfmtWorkerOptions, WorkerFormatResult } from '../src/types'
 
-const FIXTURE_CWD = resolve('tests/fixtures/cli-parity')
-const FIXTURE_NESTED_CWD = resolve('tests/fixtures/cli-parity/nested')
-const FIXTURE_NESTED_INVALID_CWD = resolve(
+const FIXTURE_CWD = resolvePackagePath('tests/fixtures/cli-parity')
+const FIXTURE_NESTED_CWD = resolvePackagePath(
+  'tests/fixtures/cli-parity/nested',
+)
+const FIXTURE_NESTED_INVALID_CWD = resolvePackagePath(
   'tests/fixtures/cli-parity/nested-invalid',
 )
-const runWorker = createSyncFn(join(dirWorkers, 'oxfmt.mjs')) as unknown as (
-  filename: string,
-  sourceText: string,
-  options?: RuleOxfmtOptions,
-) => WorkerFormatResult
+const runWorker = createSyncFn<
+  (
+    filename: string,
+    sourceText: string,
+    options?: OxfmtWorkerOptions,
+  ) => WorkerFormatResult
+>(join(workersDir, 'oxfmt.mjs'))
 
-const CLI_PARITY_DEFAULTS: RuleOxfmtOptions = {
+const CLI_PARITY_DEFAULTS: OxfmtWorkerOptions = {
   disableNestedConfig: false,
   respectOxfmtDefaultIgnores: true,
   useConfig: true,
@@ -28,7 +32,7 @@ const CLI_PARITY_DEFAULTS: RuleOxfmtOptions = {
 
 function createEslint(
   cwd: string,
-  ruleOptions?: RuleOxfmtOptions,
+  ruleOptions?: OxfmtWorkerOptions,
   fix = false,
 ) {
   return new ESLint({
@@ -56,11 +60,11 @@ function createEslint(
 async function lintFile(
   cwd: string,
   file: string,
-  options?: RuleOxfmtOptions,
+  options?: OxfmtWorkerOptions,
   fix = false,
 ) {
   const eslint = createEslint(cwd, options, fix)
-  const filePath = resolve(cwd, file)
+  const filePath = resolvePackagePath(cwd, file)
   const sourceText = await readFile(filePath, 'utf8')
   const [result] = await eslint.lintText(sourceText, { filePath })
   return (
@@ -78,7 +82,7 @@ it('should ignore node_modules by default', async () => {
 })
 
 it('should lint files in node_modules when withNodeModules is true', async () => {
-  const filePath = resolve(FIXTURE_CWD, 'node_modules/a.ts')
+  const filePath = resolvePackagePath(FIXTURE_CWD, 'node_modules/a.ts')
   const sourceText = await readFile(filePath, 'utf8')
   const result = runWorker(filePath, sourceText, {
     cwd: FIXTURE_CWD,

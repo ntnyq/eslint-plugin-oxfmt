@@ -1,0 +1,55 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should match config-derived overrides relative to config directory, not ESLint cwd > packages/a/src/example.ts 1`] = `
+[
+  {
+    "column": 27,
+    "endColumn": 39,
+    "endLine": 1,
+    "fix": {
+      "text": "
+  name: string,
+",
+    },
+    "line": 1,
+    "message": "Replace \`name:·string\` with \`⏎··name:·string,⏎\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+  {
+    "column": 1,
+    "endColumn": 62,
+    "endLine": 2,
+    "fix": {
+      "text": "  return createUserProfile(
+    name,
+    'a very long display name',
+  ",
+    },
+    "line": 2,
+    "message": "Replace \`····return·createUserProfile(name,·"a·very·long·display·name"\` with \`··return·createUserProfile(⏎····name,⏎····'a·very·long·display·name',⏎··\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
+
+exports[`should match config-derived overrides relative to config directory, not ESLint cwd > packages/a/src/normal.js 1`] = `
+[
+  {
+    "column": 3,
+    "endColumn": 30,
+    "endLine": 2,
+    "fix": {
+      "text": "console.log('hello world'",
+    },
+    "line": 2,
+    "message": "Replace \`··console.log("hello·world"\` with \`console.log('hello·world'\`",
+    "messageId": "replace",
+    "ruleId": "oxfmt/oxfmt",
+    "severity": 2,
+  },
+]
+`;
