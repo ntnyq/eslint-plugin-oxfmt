@@ -75,6 +75,7 @@ export function matchConfigIgnorePatterns(
   validateConfigIgnorePatterns(patterns)
 
   const relativeFile = toRelativePosixPath(configDir, filepath)
+
   if (isPathOutsideBase(relativeFile)) {
     return false
   }
@@ -85,12 +86,15 @@ export function matchConfigIgnorePatterns(
 
   const cacheKey = `${configDir}::${JSON.stringify(patterns)}`
   const cachedMatcher = getCacheValue(configIgnoreMatcherCache, cacheKey)
+
   if (cachedMatcher) {
     return cachedMatcher.ignores(relativeFile)
   }
 
   const matcher = ignore().add(patterns)
+
   setCacheValue(configIgnoreMatcherCache, cacheKey, matcher)
+
   return matcher.ignores(relativeFile)
 }
 
@@ -110,6 +114,7 @@ export async function matchIgnoreFile(
   baseDir?: string,
 ) {
   const matcher = await loadIgnoreMatcher(ignoreFilePath, useCache)
+
   if (!matcher) {
     return false
   }
@@ -118,6 +123,7 @@ export async function matchIgnoreFile(
     baseDir ?? dirname(ignoreFilePath),
     filepath,
   )
+
   if (isPathOutsideBase(relativeToIgnore)) {
     return false
   }
@@ -144,6 +150,7 @@ export async function matchIgnoreFileChain(
 
   for (const entry of ignoreFileEntries) {
     const baseDir = entry.baseDir ?? dirname(entry.path)
+
     if (
       stopAtIgnoredDirectory &&
       matchLoadedIgnoreMatchers(baseDir, matcherEntries, true).ignored
@@ -152,6 +159,7 @@ export async function matchIgnoreFileChain(
     }
 
     const matcher = await loadIgnoreMatcher(entry.path, useCache)
+
     if (matcher) {
       matcherEntries.push({ baseDir, matcher })
     }
@@ -175,11 +183,14 @@ function loadIgnoreMatcher(
     readFile(ignoreFilePath, 'utf8')
       .then(content => {
         const matcher = ignore()
+
         matcher.add(content)
+
         return matcher
       })
       .catch(error => {
         const code = (error as NodeJS.ErrnoException).code
+
         if (code === 'ENOENT' || code === 'ENOTDIR') {
           return undefined
         }
@@ -212,6 +223,7 @@ function matchLoadedIgnoreMatchers(
 
   for (const entry of matcherEntries) {
     let relativeToIgnore = toRelativePosixPath(entry.baseDir, filepath)
+
     if (isPathOutsideBase(relativeToIgnore)) {
       continue
     }
@@ -221,6 +233,7 @@ function matchLoadedIgnoreMatchers(
     }
 
     const result = entry.matcher.test(relativeToIgnore)
+
     if (result.ignored) {
       ignored = true
       matched = true

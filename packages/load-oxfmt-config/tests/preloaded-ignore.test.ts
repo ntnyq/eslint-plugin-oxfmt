@@ -17,6 +17,7 @@ it('reuses preloaded config and its matching base without rereading disk', async
       loadedConfig,
       useCache: false,
     }
+
     expect(
       await isOxfmtIgnored({ ...options, filepath: 'package/generated/a.js' }),
     ).toEqual({ ignored: true, reason: 'config-ignore-patterns' })

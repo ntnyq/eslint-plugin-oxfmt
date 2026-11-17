@@ -24,6 +24,8 @@ export async function lintText(
     ],
   })
   const [result] = await eslint.lintText(source, { filePath: filepath })
+
   expect(result.messages).toEqual([])
+
   return result.output ?? source
 }

@@ -55,6 +55,7 @@ export function isConfigObject(value: unknown): value is OxfmtOptions {
   }
 
   const prototype = Object.getPrototypeOf(value)
+
   return prototype === Object.prototype || prototype === null
 }
 
@@ -66,17 +67,21 @@ export async function loadConfigModule(
   useCache: boolean,
 ): Promise<OxfmtOptions> {
   const extension = extname(resolvedPath)
+
   if (!useCache && extension === '.cjs') {
     return readCommonJSConfig(resolvedPath)
   }
+
   if (!useCache && extension === '.mjs') {
     return readConfigDefaultExport(await importNativeFreshModule(resolvedPath))
   }
+
   if (!useCache && extension === '.js') {
     return readConfigDefaultExport(
       await importFreshJavaScriptConfigModule(resolvedPath),
     )
   }
+
   return readConfigDefaultExport(
     await importJitiConfigModule(resolvedPath, useCache),
   )
@@ -96,6 +101,7 @@ function deleteRequireCacheTree(requirePath: string, seen = new Set<string>()) {
   seen.add(requirePath)
 
   const cachedModule = require.cache[requirePath]
+
   if (cachedModule) {
     for (const child of cachedModule.children) {
       if (!splitPathSegments(child.id).includes('node_modules')) {
@@ -127,6 +133,7 @@ function getErrorCode(error: unknown): string | undefined {
  */
 async function getFreshImportCacheKey(resolvedPath: string) {
   const content = await readFile(resolvedPath)
+
   return createHash('sha256').update(content).digest('hex')
 }
 
@@ -149,27 +156,33 @@ async function importFreshJavaScriptConfigModule(
       : [resolvedPath, canonicalPath]
   const cacheKey = await getFreshImportCacheKey(resolvedPath)
   const cachedModule = getCacheValue(freshJavaScriptModuleCache, resolvedPath)
+
   if (cachedModule?.cacheKey === cacheKey) {
     return cachedModule.namespace
   }
 
   if (cachedModule) {
     const namespace = await importNativeFreshModule(resolvedPath)
+
     setCacheValue(freshJavaScriptModuleCache, resolvedPath, {
       cacheKey,
       namespace,
     })
+
     return namespace
   }
 
   try {
     const configModule = requireFreshModule(resolvedPath)
+
     if (Object.prototype.toString.call(configModule) === '[object Module]') {
       const namespace = configModule as Record<string, unknown>
+
       setCacheValue(freshJavaScriptModuleCache, resolvedPath, {
         cacheKey,
         namespace,
       })
+
       return namespace
     }
 
@@ -183,10 +196,12 @@ async function importFreshJavaScriptConfigModule(
 
     try {
       const namespace = await importNativeFreshModule(resolvedPath)
+
       setCacheValue(freshJavaScriptModuleCache, resolvedPath, {
         cacheKey,
         namespace,
       })
+
       return namespace
     } catch (importError) {
       if (!isJavaScriptLoaderFallbackError(importError, loaderPaths)) {
@@ -214,6 +229,7 @@ async function importJitiConfigModule(
     import.meta.url,
     useCache ? undefined : { fsCache: false, moduleCache: false },
   )
+
   return jiti.import<Record<string, unknown>>(resolvedPath)
 }
 
@@ -227,10 +243,12 @@ async function importNativeFreshModule(
   resolvedPath: string,
 ): Promise<Record<string, unknown>> {
   const url = pathToFileURL(resolvedPath)
+
   url.searchParams.set(
     'oxfmtConfigCacheBust',
     await getFreshImportCacheKey(resolvedPath),
   )
+
   return import(url.href) as Promise<Record<string, unknown>>
 }
 
@@ -246,6 +264,7 @@ function isJavaScriptLoaderFallbackError(
   resolvedPaths: string[],
 ): boolean {
   const code = getErrorCode(error)
+
   if (code && REQUIRE_FALLBACK_ERROR_CODES.has(code)) {
     return true
   }
@@ -267,6 +286,7 @@ function isJavaScriptLoaderFallbackError(
  */
 function readCommonJSConfig(resolvedPath: string): OxfmtOptions {
   const configModule = requireFreshModule(resolvedPath)
+
   if (Object.prototype.toString.call(configModule) === '[object Module]') {
     return readConfigDefaultExport(configModule as Record<string, unknown>)
   }
@@ -320,6 +340,8 @@ function readConfigModuleExports(config: unknown): OxfmtOptions {
  */
 function requireFreshModule(resolvedPath: string): unknown {
   const requirePath = require.resolve(resolvedPath)
+
   deleteRequireCacheTree(requirePath)
+
   return require(requirePath)
 }

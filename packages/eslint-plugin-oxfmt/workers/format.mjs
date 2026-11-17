@@ -37,6 +37,7 @@ import { toRelativePosixPath } from './paths.mjs'
 export async function formatViaOxfmt(filename, sourceText, options = {}) {
   const { controlOptions, oxfmtOptions: inlineOxfmtOptions } =
     splitOptions(options)
+
   validateWorkerOptions(controlOptions)
 
   const cwd = controlOptions.cwd
@@ -53,6 +54,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
 
   if (ruleIgnorePatterns?.length && cwd) {
     const ruleRelativePath = toRelativePosixPath(cwd, filename)
+
     if (shouldIgnoreFile(ruleRelativePath, ruleIgnorePatterns)) {
       return {
         code: sourceText,
@@ -125,6 +127,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
       ...configOptions,
       editorconfig: false,
     })
+
     if (ruleIgnorePatterns === undefined) {
       const ignoreResult = await isOxfmtIgnored({
         cwd: inlineBaseDir,
@@ -133,6 +136,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
         loadedConfig: sourceConfig,
         useCache,
       })
+
       if (ignoreResult.ignored) {
         return {
           code: sourceText,
@@ -141,6 +145,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
         }
       }
     }
+
     const loaded = await loadOxfmtConfigForFile({
       ...configOptions,
       editorconfig: controlOptions.editorconfig,
@@ -151,7 +156,9 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
       overrides: configOverrides,
       ...loadedConfig
     } = loaded.config
+
     overrideBaseDir = loaded.dirname ?? overrideBaseDir
+
     if (ruleAssociations === undefined) {
       associations = configAssociations
       associationBaseDir = overrideBaseDir
@@ -170,6 +177,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
   }
 
   const overrideRelativePath = toRelativePosixPath(overrideBaseDir, filename)
+
   finalOptions = applyOverrides(
     overrideRelativePath,
     finalOptions,
@@ -182,6 +190,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
     associations,
     associationBaseDir,
   )
+
   if (
     formatFilename !== filename &&
     ASSOCIATION_EXCLUDED_FILENAMES.has(basename(filename))
@@ -191,11 +200,14 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
       ignored: true,
     }
   }
+
   const result = await format(formatFilename, sourceText, finalOptions)
+
   if (formatFilename !== filename) {
     for (const error of result.errors) {
       error.message = error.message.replaceAll(formatFilename, () => filename)
     }
   }
+
   return result
 }

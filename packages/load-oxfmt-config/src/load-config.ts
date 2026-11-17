@@ -204,6 +204,7 @@ async function loadConfigSource(
       options: loadedConfig.config,
     }
   }
+
   const readSource = async (): Promise<OxfmtOptions> =>
     resolvedPath
       ? readConfigFromFile(resolvedPath, { useCache }).catch(error => {
@@ -217,6 +218,7 @@ async function loadConfigSource(
     useCache && resolvedPath
       ? await cachePromise(sourceCache, resolvedPath, readSource)
       : await readSource()
+
   return {
     options,
   }

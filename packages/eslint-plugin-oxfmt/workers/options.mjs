@@ -48,6 +48,7 @@ export function isStringArray(value) {
  */
 export function resolveTailwindPaths(options, baseDir) {
   const { sortTailwindcss } = options
+
   if (!sortTailwindcss || typeof sortTailwindcss !== 'object') {
     return options
   }
@@ -57,9 +58,11 @@ export function resolveTailwindPaths(options, baseDir) {
    * @type {import('oxfmt').SortTailwindcssConfig}
    */
   const resolved = { ...sortTailwindcss }
+
   if (resolved.config) {
     resolved.config = resolve(baseDir, resolved.config)
   }
+
   if (resolved.stylesheet) {
     resolved.stylesheet = resolve(baseDir, resolved.stylesheet)
   }
@@ -127,6 +130,7 @@ export function validateWorkerOptions(controlOptions) {
 
   for (const key of stringKeys) {
     const value = controlOptions[key]
+
     if (value != null && typeof value !== 'string') {
       throw new TypeError(
         `oxfmt worker requires "${key}" to be a string when provided.`,
@@ -136,6 +140,7 @@ export function validateWorkerOptions(controlOptions) {
 
   for (const key of booleanKeys) {
     const value = controlOptions[key]
+
     if (value != null && typeof value !== 'boolean') {
       throw new TypeError(
         `oxfmt worker requires "${key}" to be a boolean when provided.`,

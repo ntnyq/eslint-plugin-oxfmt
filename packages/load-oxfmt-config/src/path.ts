@@ -11,6 +11,7 @@ import { relative } from 'node:path'
  */
 export function isPathOutsideBase(path: string): boolean {
   const normalizedPath = toPosixPath(path)
+
   return (
     normalizedPath === '..' ||
     normalizedPath.startsWith('../') ||

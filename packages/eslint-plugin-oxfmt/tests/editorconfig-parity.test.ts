@@ -42,6 +42,7 @@ it.each([
     const filepath = join(cwd, 'a.js')
     const source = 'if (condition) { console.log("hello"); }\n'
     const expected = `if (condition) {\n${indentation}console.log("hello");\n}\n`
+
     await writeFile(filepath, source)
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
     await writeFile(
@@ -69,6 +70,7 @@ it.each([
 ])('rejects out-of-range EditorConfig %s like the CLI', async property => {
   await withTempProject(async cwd => {
     const filepath = join(cwd, 'a.js')
+
     await writeFile(filepath, SOURCE)
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
     await writeFile(
@@ -122,6 +124,7 @@ it.each([
 ])('matches the CLI for $name', async ({ configDir = '.', file, section }) => {
   await withTempProject(async cwd => {
     const filepath = join(cwd, file)
+
     await mkdir(dirname(filepath), { recursive: true })
     await writeFile(filepath, SOURCE)
     await writeFile(join(cwd, configDir, '.oxfmtrc.json'), '{}')
@@ -135,6 +138,7 @@ it.each([
       cwd,
       encoding: 'utf8',
     })
+
     expect(cli.status).toBe(0)
     expect(await readFile(filepath, 'utf8')).toBe(SINGLE_QUOTED)
     expect(output).toBe(SINGLE_QUOTED)
@@ -144,6 +148,7 @@ it.each([
 it('keeps nearest per-file EditorConfig lookup with a root oxfmt config', async () => {
   await withTempProject(async cwd => {
     const filepath = join(cwd, 'packages/a/src/a.js')
+
     await mkdir(dirname(filepath), { recursive: true })
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
     await writeFile(join(cwd, '.editorconfig'), '[*]\nquote_type = double\n')
@@ -185,6 +190,7 @@ it.each([
   async ({ config = {}, expected, sections }) => {
     await withTempProject(async cwd => {
       const filepath = join(cwd, 'src/a.js')
+
       await mkdir(dirname(filepath))
       await writeFile(filepath, SOURCE)
       await writeFile(join(cwd, '.oxfmtrc.json'), JSON.stringify(config))
@@ -196,6 +202,7 @@ it.each([
         [OXFMT_CLI, '--write', 'src/a.js'],
         { cwd, encoding: 'utf8' },
       )
+
       expect(cli.status).toBe(0)
       expect(await readFile(filepath, 'utf8')).toBe(expected)
       expect(output).toBe(expected)

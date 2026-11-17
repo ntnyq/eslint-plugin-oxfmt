@@ -30,6 +30,7 @@ export function createRuleOptionsDeclarations(declarations: string): string {
     'type OxfmtOxfmt =',
     'export type OxfmtRuleOptionsTuple =',
   )
+
   return `${strictDeclarations}\n${COMPATIBILITY_DECLARATIONS}`.replaceAll(
     /[\t ]+$/gmu,
     '',
@@ -45,10 +46,12 @@ function replaceDeclarationOnce(
   replacement: string,
 ): string {
   const count = source.split(expected).length - 1
+
   if (count !== 1) {
     throw new Error(
       `Expected exactly one declaration anchor ${JSON.stringify(expected)}, found ${count}.`,
     )
   }
+
   return source.replace(expected, () => replacement)
 }

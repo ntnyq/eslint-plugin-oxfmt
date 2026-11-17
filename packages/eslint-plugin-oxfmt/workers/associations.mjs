@@ -73,12 +73,14 @@ export function resolveAssociationFilename(filename, associations, baseDir) {
   if (associations === undefined) {
     return filename
   }
+
   if (!Array.isArray(associations)) {
     throw new TypeError('oxfmt associations must be an array.')
   }
 
   const relativePath = toRelativePosixPath(baseDir, filename)
   let formatFilename = filename
+
   for (const association of associations) {
     if (
       !association ||
@@ -96,6 +98,7 @@ export function resolveAssociationFilename(filename, associations, baseDir) {
     const excluded = association.excludeFiles
       ? getCachedOxfmtGlobMatcher(association.excludeFiles)(relativePath)
       : false
+
     if (matches && !excluded) {
       // Use a neutral basename to avoid package.json sorting and .component.html
       // detection overriding the explicitly selected language.
@@ -105,5 +108,6 @@ export function resolveAssociationFilename(filename, associations, baseDir) {
       )
     }
   }
+
   return formatFilename
 }

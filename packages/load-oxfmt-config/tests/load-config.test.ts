@@ -13,6 +13,7 @@ describe('loadOxfmtConfig', () => {
           const content = filename.endsWith('.jsonc')
             ? '// Formatting options\n{"singleQuote": true,}'
             : '{"singleQuote": true}'
+
           await writeFile(join(cwd, filename), `\u{FEFF}${content}`)
 
           const result = await loadOxfmtConfig({
@@ -33,8 +34,10 @@ describe('loadOxfmtConfig', () => {
           associations: [{ files: ['src/*.conf'], language: 'json' }],
           astro: { skipFrontmatter: true },
         }
+
         await writeFile(join(cwd, '.oxfmtrc.json'), JSON.stringify(config))
         const result = await loadOxfmtConfig({ cwd, editorconfig: false })
+
         expect(result.config).toStrictEqual(config)
         expect(result.dirname).toBe(cwd)
       })
@@ -83,6 +86,7 @@ describe('loadOxfmtConfig', () => {
       async (_format, filename, content) => {
         await withTempDir('oxfmt-config-non-object-', async cwd => {
           const configPath = join(cwd, filename)
+
           await writeFile(configPath, content, 'utf8')
 
           await expect(
@@ -131,6 +135,7 @@ describe('loadOxfmtConfig', () => {
     it('loads explicit .mts config path', async () => {
       await withTempDir('oxfmt-config-explicit-mts-', async cwd => {
         const configPath = join(cwd, 'custom.config.mts')
+
         await writeFile(
           configPath,
           'export default { printWidth: 88 }\n',
@@ -151,6 +156,7 @@ describe('loadOxfmtConfig', () => {
     it('loads explicit .cjs config path', async () => {
       await withTempDir('oxfmt-config-explicit-cjs-', async cwd => {
         const configPath = join(cwd, 'custom.config.cjs')
+
         await writeFile(
           configPath,
           'module.exports = { printWidth: 89 }\n',
@@ -179,6 +185,7 @@ describe('loadOxfmtConfig', () => {
     it('auto-discovers oxfmt.config.mts', async () => {
       await withTempDir('oxfmt-config-auto-discover-mts-', async cwd => {
         const configPath = join(cwd, 'oxfmt.config.mts')
+
         await writeFile(
           configPath,
           'export default { printWidth: 92 }\n',
@@ -199,6 +206,7 @@ describe('loadOxfmtConfig', () => {
     it('resolves nested config from filepath directory by default', async () => {
       await withTempDir('oxfmt-config-by-filepath-', async cwd => {
         const nestedDir = join(cwd, 'packages', 'app', 'src')
+
         await mkdir(nestedDir, { recursive: true })
         await writeFile(
           join(cwd, '.oxfmtrc.json'),
@@ -225,6 +233,7 @@ describe('loadOxfmtConfig', () => {
     it('uses cwd-based config when disableNestedConfig is true', async () => {
       await withTempDir('oxfmt-config-disable-nested-', async cwd => {
         const nestedDir = join(cwd, 'packages', 'app', 'src')
+
         await mkdir(nestedDir, { recursive: true })
         await writeFile(
           join(cwd, '.oxfmtrc.json'),

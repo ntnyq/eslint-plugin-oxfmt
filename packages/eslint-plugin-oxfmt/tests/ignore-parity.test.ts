@@ -6,7 +6,6 @@ import { expect, it } from 'vitest'
 import { lintText } from './helpers/lint'
 import { OXFMT_CLI } from './helpers/paths'
 import { withTempProject } from './helpers/project'
-
 import type { OxfmtRuleOptions } from '../src/types'
 
 const SOURCE = 'export const value="hello"\n'
@@ -72,9 +71,11 @@ it.each(IGNORE_CASES)(
         join(cwd, '.oxfmtrc.json'),
         JSON.stringify({ ignorePatterns: ['**/*.js'] }),
       )
+
       if (prettierignore) {
         await writeFile(join(cwd, '.prettierignore'), prettierignore)
       }
+
       expect(await lintText(cwd, join(cwd, 'a.js'), SOURCE, options)).toBe(
         expected,
       )
@@ -98,12 +99,14 @@ it.each([
       const file = 'vendor/keep.js'
       const filepath = join(cwd, file)
       const patterns = [pattern, `!${file}`]
+
       await mkdir(dirname(filepath))
       await writeFile(filepath, SOURCE)
       await writeFile(
         join(cwd, '.oxfmtrc.json'),
         JSON.stringify(source === 'config' ? { ignorePatterns: patterns } : {}),
       )
+
       if (source === '.prettierignore') {
         await writeFile(join(cwd, '.prettierignore'), patterns.join('\n'))
       }
@@ -113,6 +116,7 @@ it.each([
         [OXFMT_CLI, '--stdin-filepath', file],
         { cwd, encoding: 'utf8', input: SOURCE },
       )
+
       expect(cli.status).toBe(0)
       expect(cli.stdout).toBe(expected)
       expect(await lintText(cwd, filepath, SOURCE)).toBe(expected)
@@ -124,6 +128,7 @@ it('matches CLI global ignores before loading an invalid nested config', async (
   await withTempProject(async cwd => {
     const file = 'vendor/keep.js'
     const filepath = join(cwd, file)
+
     await mkdir(dirname(filepath))
     await writeFile(filepath, SOURCE)
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
@@ -135,6 +140,7 @@ it('matches CLI global ignores before loading an invalid nested config', async (
       [OXFMT_CLI, '--stdin-filepath', file],
       { cwd, encoding: 'utf8', input: SOURCE },
     )
+
     expect(cli.status).toBe(0)
     expect(cli.stdout).toBe(SOURCE)
     expect(await lintText(cwd, filepath, SOURCE)).toBe(SOURCE)

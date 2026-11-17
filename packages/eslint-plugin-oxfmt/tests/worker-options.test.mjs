@@ -12,6 +12,7 @@ it('keeps worker controls aligned with the plugin schema, adding only ESLint cwd
     WORKER_CONTROL_KEYS.map(key => [key, undefined]),
   )
   const split = splitOptions({ ...options, ignorePatterns: [], semi: false })
+
   expect(Object.keys(split.controlOptions).sort()).toEqual(
     [...WORKER_CONTROL_KEYS].sort(),
   )

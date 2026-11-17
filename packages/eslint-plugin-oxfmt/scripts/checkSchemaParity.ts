@@ -24,6 +24,7 @@ for (const difference of differences) {
     `${LOG_PREFIX} ${styleText(['bold', 'red'], 'ERROR')} ${difference.path}: expected ${JSON.stringify(difference.expected) ?? '(missing)'}, received ${JSON.stringify(difference.actual) ?? '(missing)'}`,
   )
 }
+
 if (differences.length > 0) {
   process.exitCode = 1
 } else {

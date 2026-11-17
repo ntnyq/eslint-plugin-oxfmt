@@ -30,12 +30,14 @@ it.each(TAILWIND_PATH_CASES)(
 
     try {
       const configDir = resolvePackagePath(cwd, 'packages/app')
+
       await mkdir(resolvePackagePath(configDir, 'src'), { recursive: true })
 
       const isInline = origin.startsWith('inline')
       const assetDir = isInline ? cwd : configDir
       const assetName = pathOption === 'config' ? 'theme.cjs' : 'theme.css'
       const assetPath = resolvePackagePath(assetDir, assetName)
+
       await writeFile(
         assetPath,
         pathOption === 'config'
@@ -59,6 +61,7 @@ it.each(TAILWIND_PATH_CASES)(
       if (isInline) {
         // A conflicting config value must not change the inline path's base.
         config.sortTailwindcss = { [pathOption]: './missing' }
+
         if (origin === 'inline override') {
           ruleOptions.overrides = overrides
         } else {
@@ -69,6 +72,7 @@ it.each(TAILWIND_PATH_CASES)(
         config.overrides = overrides
       } else {
         config.sortTailwindcss = tailwindOptions
+
         if (origin === 'explicit configPath') {
           ruleOptions.configPath = 'packages/app/.oxfmtrc.json'
         }

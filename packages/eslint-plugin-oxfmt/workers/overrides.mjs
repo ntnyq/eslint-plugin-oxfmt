@@ -30,6 +30,7 @@ export function applyOverrides(
    * @type {import('oxfmt').FormatConfig}
    */
   let merged = baseOptions
+
   for (const override of overrides) {
     if (!override?.files?.length) {
       continue

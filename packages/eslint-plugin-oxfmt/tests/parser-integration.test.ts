@@ -52,6 +52,7 @@ it('should work with jsonc-eslint-parser when using recommendedWithoutParser', a
   const [jsoncLintResult] = await lintEslint.lintText(jsoncSourceText, {
     filePath: jsoncFilePath,
   })
+
   expect(
     jsoncLintResult.messages.some(message => message.ruleId === null),
   ).toBe(false)
@@ -60,6 +61,7 @@ it('should work with jsonc-eslint-parser when using recommendedWithoutParser', a
   const [jsLintResult] = await lintEslint.lintText(jsSourceText, {
     filePath: jsFilePath,
   })
+
   expect(jsLintResult.messages.some(message => message.ruleId === null)).toBe(
     false,
   )
@@ -70,6 +72,7 @@ it('should work with jsonc-eslint-parser when using recommendedWithoutParser', a
   const [fixedJsResult] = await fixedEslint.lintText(jsSourceText, {
     filePath: jsFilePath,
   })
+
   expect(typeof fixedJsResult.output).toBe('string')
   expect(normalizeLineEndings(fixedJsResult.output ?? '')).not.toBe(
     jsSourceText,

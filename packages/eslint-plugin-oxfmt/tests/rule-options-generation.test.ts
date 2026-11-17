@@ -9,6 +9,7 @@ type OxfmtOxfmt = [{ semi?: boolean }?]
 
 it('retains the strict tuple and historical custom-group compatibility adapter', () => {
   const declarations = createRuleOptionsDeclarations(GENERATOR_OUTPUT)
+
   expect(declarations).toContain('export type RuleOptions = {')
   expect(declarations).toContain('export type OxfmtRuleOptionsTuple =')
   expect(declarations).toContain(

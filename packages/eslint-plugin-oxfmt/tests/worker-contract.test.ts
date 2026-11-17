@@ -21,16 +21,19 @@ it('accepts useCache in rule options and reloads changed config when disabled', 
       ],
     })
     const source = 'const value="hello"'
+
     await writeFile(configPath, '{"singleQuote":true}')
     const [first] = await eslint.lintText(source, {
       filePath: join(cwd, 'a.js'),
     })
+
     expect(first.messages).toEqual([])
     expect(first.output).toBe("const value = 'hello';\n")
     await writeFile(configPath, '{"singleQuote":false}')
     const [second] = await eslint.lintText(source, {
       filePath: join(cwd, 'a.js'),
     })
+
     expect(second.messages).toEqual([])
     expect(second.output).toBe('const value = "hello";\n')
   })
@@ -42,6 +45,7 @@ it.each([true, false])(
     await withTempProject(async cwd => {
       const counterPath = join(cwd, 'count.txt')
       const configPath = join(cwd, 'config.cjs')
+
       await writeFile(counterPath, '0')
       await writeFile(
         configPath,
@@ -52,14 +56,17 @@ it.each([true, false])(
           'module.exports = { semi: false }',
         ].join('\n'),
       )
+
       for (const file of ['a.js', 'nested/b.js']) {
         const result = runWorker(join(cwd, file), 'const value=1', {
           configPath,
           cwd,
           useCache,
         })
+
         expect(result.code).toBe('const value = 1\n')
       }
+
       expect(await readFile(counterPath, 'utf8')).toBe(useCache ? '1' : '2')
     })
   },
@@ -74,6 +81,7 @@ it('checks global ignores before loading a broken config with caching disabled',
       cwd,
       useCache: false,
     })
+
     expect(result.ignored).toBe(true)
     expect(result.code).toBe('const value=1')
   })
@@ -90,6 +98,7 @@ it('does not resolve EditorConfig for files ignored by config patterns', async (
       editorconfig: { cwd: 'invalid\0directory' },
       useCache: false,
     })
+
     expect(result.ignored).toBe(true)
     expect(result.code).toBe('const value=1')
   })
@@ -103,6 +112,7 @@ it('formats files outside cwd without passing parent paths to inline ignore matc
       respectOxfmtDefaultIgnores: false,
       useConfig: false,
     })
+
     expect(result.ignored).not.toBe(true)
     expect(result.code).toBe('const value = 1;\n')
   })

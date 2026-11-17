@@ -9,6 +9,7 @@ export async function withTempProject<Output>(
   run: (cwd: string) => Promise<Output>,
 ): Promise<Output> {
   const cwd = await mkdtemp(join(tmpdir(), 'oxfmt-project-'))
+
   try {
     return await run(cwd)
   } finally {

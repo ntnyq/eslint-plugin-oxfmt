@@ -50,6 +50,7 @@ export async function lintFixtureFiles(
       const filePath = resolvePackagePath(cwd, file)
       const sourceText = normalizeLineEndings(await readFile(filePath, 'utf8'))
       const [result] = await eslint.lintText(sourceText, { filePath })
+
       return result
     }),
   )
@@ -84,6 +85,7 @@ export function normalizeLintMessagesForSnapshot(
         ? {
             suggestions: suggestions.map(suggestion => {
               const { fix: suggestionFix, ...suggestionRest } = suggestion
+
               return {
                 ...suggestionRest,
                 ...(suggestionFix

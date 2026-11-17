@@ -13,6 +13,7 @@ for (const pkg of [loader, plugin]) {
 }
 
 const tag = process.argv[2]
+
 if (tag) {
   assert.equal(
     tag,

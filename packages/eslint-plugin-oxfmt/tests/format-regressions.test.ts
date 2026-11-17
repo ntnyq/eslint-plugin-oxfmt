@@ -412,6 +412,7 @@ it.each(FORMAT_CASES)(
     expect(result.output ?? source).toBe(expected)
 
     const [secondResult] = await eslint.lintText(expected, { filePath })
+
     expect(secondResult.messages).toEqual([])
     expect(secondResult.output).toBeUndefined()
   },

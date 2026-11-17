@@ -16,6 +16,7 @@ export function cachePromise<T>(
   factory: () => Promise<T>,
 ): Promise<T> {
   const cached = getCacheValue(cache, key)
+
   if (cached) {
     return cached
   }
@@ -29,6 +30,7 @@ export function cachePromise<T>(
   })
 
   setCacheValue(cache, key, task)
+
   return task
 }
 
@@ -44,12 +46,14 @@ export function getCacheValue<CacheKey, CacheValue>(
   key: CacheKey,
 ): CacheValue | undefined {
   const value = cache.get(key)
+
   if (value === undefined) {
     return undefined
   }
 
   cache.delete(key)
   cache.set(key, value)
+
   return value
 }
 
@@ -108,6 +112,7 @@ export function setCacheValue<CacheKey, CacheValue>(
   }
 
   const oldestKey = cache.keys().next()
+
   if (!oldestKey.done) {
     cache.delete(oldestKey.value)
   }

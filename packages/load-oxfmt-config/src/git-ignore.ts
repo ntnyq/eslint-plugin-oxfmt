@@ -24,6 +24,7 @@ export function collectGitignorePaths(
 ): Promise<GitignorePaths> {
   const fileDir = dirname(filepath)
   const discover = () => readGitignorePaths(fileDir, useCache)
+
   return useCache
     ? cachePromise(gitignorePathsCache, fileDir, discover)
     : discover()
@@ -37,6 +38,7 @@ export function resolveGitInfoExcludePath(
   useCache: boolean,
 ): Promise<string | undefined> {
   const discover = () => readGitInfoExcludePath(repoRoot)
+
   return useCache
     ? cachePromise(infoExcludePathCache, repoRoot, discover)
     : discover()
@@ -56,11 +58,14 @@ function findGitRepoRoot(
     if (await hasGitEntry(fromDir)) {
       return fromDir
     }
+
     const parentDir = dirname(fromDir)
+
     return parentDir === fromDir
       ? undefined
       : findGitRepoRoot(parentDir, useCache)
   }
+
   return useCache ? cachePromise(repoRootCache, fromDir, discover) : discover()
 }
 
@@ -75,9 +80,11 @@ function findGitRepoRoot(
 async function hasGitEntry(dir: string) {
   try {
     await stat(join(dir, '.git'))
+
     return true
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code
+
     if (code === 'ENOENT' || code === 'ENOTDIR') {
       return false
     }
@@ -106,6 +113,7 @@ async function readGitignorePaths(fileDir: string, useCache: boolean) {
     }
 
     const parent = dirname(current)
+
     if (parent === current) {
       break
     }
@@ -132,6 +140,7 @@ async function readGitInfoExcludePath(repoRoot: string) {
 
   try {
     const stats = await stat(gitEntryPath)
+
     if (stats.isDirectory()) {
       return join(gitEntryPath, 'info', 'exclude')
     }
@@ -158,14 +167,17 @@ async function readGitInfoExcludePath(repoRoot: string) {
     try {
       const commonDirContent = await readFile(commonDirPath, 'utf8')
       const commonDir = commonDirContent.trim()
+
       if (commonDir) {
         const resolvedCommonDir = isAbsolute(commonDir)
           ? commonDir
           : resolve(resolvedGitDir, commonDir)
+
         return join(resolvedCommonDir, 'info', 'exclude')
       }
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code
+
       if (code !== 'ENOENT' && code !== 'ENOTDIR') {
         throw error
       }
@@ -174,6 +186,7 @@ async function readGitInfoExcludePath(repoRoot: string) {
     return join(resolvedGitDir, 'info', 'exclude')
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code
+
     if (code === 'ENOENT' || code === 'ENOTDIR') {
       return undefined
     }

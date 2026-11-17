@@ -23,10 +23,12 @@ describe('readEditorconfigFromFile', () => {
   ])('resolves tabWidth from $properties', async ({ properties, tabWidth }) => {
     await withTempDir('oxfmt-editorconfig-width-', async cwd => {
       const filepath = join(cwd, '.editorconfig')
+
       await writeFile(filepath, `root = true\n[*]\n${properties}\n`)
 
       for (const options of [{}, { filepath: join(cwd, 'test.js') }]) {
         const result = await readEditorconfigFromFile(filepath, cwd, options)
+
         expect(result.rootOptions.tabWidth).toBe(tabWidth)
       }
     })
@@ -42,6 +44,7 @@ describe('readEditorconfigFromFile', () => {
     async ({ properties, tabWidth }) => {
       await withTempDir('oxfmt-editorconfig-inherited-width-', async cwd => {
         const filepath = join(cwd, '.editorconfig')
+
         await writeFile(
           filepath,
           `root = true\n[*]\n${properties}\n[*.js]\nindent_size = 4\n`,
@@ -50,9 +53,11 @@ describe('readEditorconfigFromFile', () => {
         const perFile = await readEditorconfigFromFile(filepath, cwd, {
           filepath: join(cwd, 'test.js'),
         })
+
         expect(perFile.rootOptions.tabWidth).toBe(tabWidth)
 
         const result = await readEditorconfigFromFile(filepath, cwd)
+
         expect(result.overrides).toStrictEqual([
           { files: ['**/*.js'], options: { tabWidth } },
         ])
@@ -68,6 +73,7 @@ describe('readEditorconfigFromFile', () => {
     async ({ properties, tabWidth }) => {
       await withTempDir('oxfmt-editorconfig-scoped-width-', async cwd => {
         const filepath = join(cwd, '.editorconfig')
+
         await writeFile(
           filepath,
           `root = true\n[*.js]\ntab_width = 8\n[test.*]\n${properties}\n`,
@@ -76,11 +82,13 @@ describe('readEditorconfigFromFile', () => {
         const result = await readEditorconfigFromFile(filepath, cwd, {
           filepath: join(cwd, 'test.js'),
         })
+
         expect(result.rootOptions.tabWidth).toBe(tabWidth)
 
         const unmatched = await readEditorconfigFromFile(filepath, cwd, {
           filepath: join(cwd, 'test.ts'),
         })
+
         expect(unmatched.rootOptions.tabWidth).toBe(4)
       })
     },
@@ -89,6 +97,7 @@ describe('readEditorconfigFromFile', () => {
   it('normalizes basename patterns and preserves later global overrides in static results', async () => {
     await withTempDir('oxfmt-editorconfig-order-', async cwd => {
       const filepath = join(cwd, '.editorconfig')
+
       await writeFile(
         filepath,
         '[*.js]\nquote_type = single\n[*]\nquote_type = double\n',

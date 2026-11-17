@@ -65,6 +65,7 @@ export function getEditorconfigSearchDir(cwd: string, configPath?: string) {
   const resolvedConfigPath = isAbsolute(configPath)
     ? configPath
     : join(cwd, configPath)
+
   return dirname(resolvedConfigPath)
 }
 
@@ -94,6 +95,7 @@ export function mergeOverrides(
     ...editorconfigFallbackOverrides,
     ...(oxfmtConfig.overrides || []),
   ]
+
   return mergedOverrides.length > 0 ? mergedOverrides : undefined
 }
 
@@ -135,6 +137,7 @@ export async function readEditorconfigFromFile(
     ? await cachePromise(sectionCache, editorconfigPath, readSections)
     : await readSections()
   const editorconfigDir = dirname(editorconfigPath)
+
   if (options.filepath) {
     return {
       overrides: [],
@@ -146,6 +149,7 @@ export async function readEditorconfigFromFile(
       ),
     }
   }
+
   return createEditorconfigOverrides(parsedSections, editorconfigDir, anchorDir)
 }
 
@@ -167,11 +171,13 @@ export async function resolveEditorconfigPath(
 
     try {
       const stats = await stat(editorconfigPath)
+
       if (stats.isFile()) {
         return editorconfigPath
       }
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code
+
       if (code !== 'ENOENT' && code !== 'ENOTDIR') {
         throw error
       }
@@ -184,6 +190,7 @@ export async function resolveEditorconfigPath(
     }
 
     const parentDir = join(currentDir, '..')
+
     if (parentDir === currentDir) {
       break
     }
@@ -210,21 +217,26 @@ function createEditorconfigOverrides(
     if (!sectionName) {
       continue
     }
+
     const mappedOptions = mapEditorconfigSectionToOptions(
       sectionBody,
       resolvedSection,
     )
+
     if (isEditorconfigGlobalSection(sectionName)) {
       Object.assign(resolvedSection, sectionBody)
       rootOptions = mapEditorconfigSectionToOptions(resolvedSection)
+
       // Later global sections must also override earlier scoped sections.
       if (overrides.length === 0) {
         continue
       }
     }
+
     if (Object.keys(mappedOptions).length === 0) {
       continue
     }
+
     overrides.push({
       options: mappedOptions,
       files: [
@@ -232,6 +244,7 @@ function createEditorconfigOverrides(
       ],
     })
   }
+
   return {
     overrides,
     rootOptions,
@@ -264,6 +277,7 @@ function matchesEditorconfigSection(
   useCache: boolean,
 ) {
   let matcher = useCache ? getCacheValue(matcherCache, pattern) : undefined
+
   if (!matcher) {
     matcher = new Minimatch(normalizeEditorconfigPattern(pattern), {
       dot: true,
@@ -271,10 +285,12 @@ function matchesEditorconfigSection(
       noext: true,
       nonegate: true,
     })
+
     if (useCache) {
       setCacheValue(matcherCache, pattern, matcher)
     }
   }
+
   return matcher.match(filepath)
 }
 
@@ -288,6 +304,7 @@ function normalizeEditorconfigPattern(pattern: string) {
   if (pattern === '*' || pattern === '**') {
     return '**'
   }
+
   return pattern.includes('/') ? pattern : `**/${pattern}`
 }
 
@@ -306,6 +323,7 @@ function rebaseEditorconfigPattern(
 ) {
   const normalizedPattern = normalizeEditorconfigPattern(pattern)
   const relativePrefix = toPosixPath(relative(anchorDir, editorconfigDir))
+
   if (!relativePrefix || relativePrefix === '.') {
     return normalizedPattern
   }
@@ -323,10 +341,13 @@ function resolveEditorconfigOptionsForFile(
   useCache: boolean,
 ): EditorconfigFormatOptions {
   const relativeFile = toPosixPath(relative(editorconfigDir, filepath))
+
   if (isPathOutsideBase(relativeFile)) {
     return {}
   }
+
   const resolvedSection: SectionBody = {}
+
   for (const [sectionName, sectionBody] of parsedSections) {
     if (
       sectionName &&
@@ -335,5 +356,6 @@ function resolveEditorconfigOptionsForFile(
       Object.assign(resolvedSection, sectionBody)
     }
   }
+
   return mapEditorconfigSectionToOptions(resolvedSection)
 }

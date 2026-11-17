@@ -13,6 +13,7 @@ it('retains historical exports without exposing new implementation helpers', () 
     'readConfigFromFile',
     'resolveOxfmtrcPath',
   ]
+
   expect(Object.keys(source).sort()).toEqual(names.sort())
   expect(Object.keys(published).sort()).toEqual(names.sort())
   expect(published.getResolveCacheKey('/project', 'config.json')).toBe(

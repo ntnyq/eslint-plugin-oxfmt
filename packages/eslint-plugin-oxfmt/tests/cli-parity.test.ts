@@ -58,6 +58,7 @@ async function lintFile(
   const filePath = resolvePackagePath(cwd, file)
   const sourceText = await readFile(filePath, 'utf8')
   const [result] = await eslint.lintText(sourceText, { filePath })
+
   return (
     result ?? {
       filePath,
@@ -69,6 +70,7 @@ async function lintFile(
 
 it('should ignore node_modules by default', async () => {
   const result = await lintFile(FIXTURE_CWD, 'node_modules/a.ts')
+
   expect(result.messages).toHaveLength(0)
 })
 
@@ -83,11 +85,13 @@ it('should lint files in node_modules when withNodeModules is true', async () =>
   })
 
   expect(result.ignored).not.toBe(true)
+
   if (result.ignored) {
     throw new Error(
       'node_modules file should not be ignored when withNodeModules is true',
     )
   }
+
   expect(result.code).toBe(`export const dep = 'hello';\n`)
 })
 
@@ -101,11 +105,13 @@ it('should ignore default lockfiles', async () => {
 
 it('should ignore files matched by .prettierignore', async () => {
   const result = await lintFile(FIXTURE_CWD, 'src/prettierignored.js')
+
   expect(result.messages).toHaveLength(0)
 })
 
 it('should ignore files matched by .gitignore', async () => {
   const result = await lintFile(FIXTURE_CWD, 'src/gitignored.js')
+
   expect(result.messages).toHaveLength(0)
 })
 
@@ -113,6 +119,7 @@ it('should honor ignorePath when provided', async () => {
   const result = await lintFile(FIXTURE_CWD, 'src/ignored-by-custom.js', {
     ignorePath: 'custom.ignore',
   })
+
   expect(result.messages).toHaveLength(0)
 })
 

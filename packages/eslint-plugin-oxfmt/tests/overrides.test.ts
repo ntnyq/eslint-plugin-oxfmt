@@ -37,6 +37,7 @@ it('should match config-derived overrides relative to config directory, not ESLi
   const tsResult = resultsByPath.get(
     resolvePackagePath(parentCwd, 'packages/a/src/example.ts'),
   )
+
   expect(tsResult).toBeDefined()
   expect(normalizeLintMessagesForSnapshot(tsResult!.messages)).toMatchSnapshot(
     'packages/a/src/example.ts',
@@ -46,6 +47,7 @@ it('should match config-derived overrides relative to config directory, not ESLi
   const jsResult = resultsByPath.get(
     resolvePackagePath(parentCwd, 'packages/a/src/normal.js'),
   )
+
   expect(jsResult).toBeDefined()
   expect(normalizeLintMessagesForSnapshot(jsResult!.messages)).toMatchSnapshot(
     'packages/a/src/normal.js',
@@ -136,6 +138,7 @@ it('should match config-derived ignorePatterns relative to config directory, not
   const ignoredResult = resultsByPath.get(
     resolvePackagePath(parentCwd, 'packages/a/ignored/skipped.ts'),
   )
+
   expect(ignoredResult).toBeDefined()
   expect(ignoredResult!.messages).toHaveLength(0)
 
@@ -143,6 +146,7 @@ it('should match config-derived ignorePatterns relative to config directory, not
   const srcResult = resultsByPath.get(
     resolvePackagePath(parentCwd, 'packages/a/src/example.ts'),
   )
+
   expect(srcResult).toBeDefined()
   expect(srcResult!.messages.length).toBeGreaterThan(0)
 })

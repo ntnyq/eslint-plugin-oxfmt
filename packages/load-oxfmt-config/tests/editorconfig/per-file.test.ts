@@ -7,6 +7,7 @@ import { withTempDir } from '../helpers'
 it('reuses raw config for per-file defaults without rereading or poisoning caches', async () => {
   await withTempDir('oxfmt-preloaded-file-config-', async cwd => {
     const configPath = join(cwd, '.oxfmtrc.json')
+
     await writeFile(configPath, '{"semi":false}')
     await writeFile(join(cwd, '.editorconfig'), '[*]\nquote_type = single\n')
     const loadedConfig = await loadOxfmtConfig({
@@ -14,6 +15,7 @@ it('reuses raw config for per-file defaults without rereading or poisoning cache
       editorconfig: false,
       useCache: false,
     })
+
     await writeFile(configPath, '{invalid')
 
     expect(
@@ -35,8 +37,10 @@ it('reuses raw config for per-file defaults without rereading or poisoning cache
 it('resolves ancestor EditorConfig sections without changing explicit override paths', async () => {
   await withTempDir('oxfmt-file-config-', async cwd => {
     const packageDir = join(cwd, 'packages/app')
+
     await mkdir(packageDir, { recursive: true })
     const overrides = [{ files: ['src/*.js'], options: { semi: false } }]
+
     await writeFile(
       join(packageDir, '.oxfmtrc.json'),
       JSON.stringify({ overrides }),
@@ -101,6 +105,7 @@ it('isolates cached per-file fallbacks from sibling files and static results', a
 it('resolves EditorConfig without an oxfmt config or matching working directory', async () => {
   await withTempDir('oxfmt-editorconfig-only-', async cwd => {
     const child = join(cwd, 'src')
+
     await mkdir(child)
     await writeFile(
       join(cwd, '.editorconfig'),
@@ -111,6 +116,7 @@ it('resolves EditorConfig without an oxfmt config or matching working directory'
       cwd: child,
       filepath: 'a.js',
     })
+
     expect(result).toEqual({ config: { singleQuote: true } })
     expect(
       (
@@ -127,6 +133,7 @@ it('resolves EditorConfig without an oxfmt config or matching working directory'
 it('does not apply scoped or global EditorConfig settings outside their directory', async () => {
   await withTempDir('oxfmt-editorconfig-scope-', async cwd => {
     const editorDir = join(cwd, 'other')
+
     await mkdir(editorDir)
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
     await writeFile(
@@ -139,6 +146,7 @@ it('does not apply scoped or global EditorConfig settings outside their director
       editorconfig: { cwd: editorDir },
       filepath: 'src/a.js',
     })
+
     expect(result.config).toEqual({})
   })
 })

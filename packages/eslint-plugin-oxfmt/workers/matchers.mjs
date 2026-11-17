@@ -31,6 +31,7 @@ const ignoreMatcherCache = new Map()
 export function getCachedOxfmtGlobMatcher(patterns) {
   const key = patterns.join('\0')
   const cached = globMatcherCache.get(key)
+
   if (cached) {
     return cached
   }
@@ -50,6 +51,7 @@ export function getCachedOxfmtGlobMatcher(patterns) {
       picomatch(pattern, matcherOptions)
     } catch (error) {
       const details = error instanceof Error ? `: ${error.message}` : ''
+
       throw new Error(`Invalid glob pattern \`${pattern}\`${details}`, {
         cause: error,
       })
@@ -57,7 +59,9 @@ export function getCachedOxfmtGlobMatcher(patterns) {
   }
 
   const matcher = picomatch(patterns, matcherOptions)
+
   setCacheEntry(globMatcherCache, key, matcher)
+
   return matcher
 }
 
@@ -73,6 +77,7 @@ export function shouldIgnoreFile(relativePath, ignorePatterns) {
   }
 
   const matcher = getCachedIgnoreMatcher(ignorePatterns)
+
   return matcher.ignores(relativePath)
 }
 
@@ -84,12 +89,15 @@ export function shouldIgnoreFile(relativePath, ignorePatterns) {
 function getCachedIgnoreMatcher(patterns) {
   const key = patterns.join('\0')
   const cached = ignoreMatcherCache.get(key)
+
   if (cached) {
     return cached
   }
 
   const matcher = ignore().add(patterns)
+
   setCacheEntry(ignoreMatcherCache, key, matcher)
+
   return matcher
 }
 
@@ -102,8 +110,10 @@ function getCachedIgnoreMatcher(patterns) {
  */
 function setCacheEntry(cache, key, value) {
   cache.set(key, value)
+
   if (cache.size > MAX_CACHE_SIZE) {
     const oldestKey = cache.keys().next().value
+
     if (oldestKey != null) {
       cache.delete(oldestKey)
     }

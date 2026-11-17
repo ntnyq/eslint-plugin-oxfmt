@@ -31,6 +31,7 @@ export function mapEditorconfigSectionToOptions(
   const options: EditorconfigFormatOptions = {}
 
   const endOfLine = parseEditorconfigEndOfLine(section.end_of_line)
+
   if (endOfLine) {
     options.endOfLine = endOfLine
   }
@@ -42,6 +43,7 @@ export function mapEditorconfigSectionToOptions(
   }
 
   const singleQuote = parseEditorconfigQuoteType(section.quote_type)
+
   if (isBoolean(singleQuote)) {
     options.singleQuote = singleQuote
   }
@@ -55,6 +57,7 @@ export function mapEditorconfigSectionToOptions(
     // indent_size and tab_width into the single oxfmt tabWidth option.
     const effectiveSection = { ...inheritedSection, ...section }
     const tabWidth = parseEditorconfigTabWidth(effectiveSection)
+
     if (isNumber(tabWidth)) {
       options.tabWidth = tabWidth
     }
@@ -62,6 +65,7 @@ export function mapEditorconfigSectionToOptions(
 
   if (section.max_line_length && section.max_line_length !== 'unset') {
     const parsedPrintWidth = Number(section.max_line_length)
+
     if (Number.isFinite(parsedPrintWidth)) {
       options.printWidth = parsedPrintWidth
     }
@@ -70,6 +74,7 @@ export function mapEditorconfigSectionToOptions(
   const insertFinalNewline = parseEditorconfigBoolean(
     section.insert_final_newline,
   )
+
   if (isBoolean(insertFinalNewline)) {
     options.insertFinalNewline = insertFinalNewline
   }
@@ -87,9 +92,11 @@ function parseEditorconfigBoolean(value: string | undefined) {
   if (value === 'true') {
     return true
   }
+
   if (value === 'false') {
     return false
   }
+
   return undefined
 }
 
@@ -120,6 +127,7 @@ function parseEditorconfigQuoteType(value: string | undefined) {
   if (value === 'single') {
     return true
   }
+
   if (value === 'double') {
     return false
   }
@@ -146,6 +154,7 @@ function parseEditorconfigTabWidth(section: SectionBody) {
     }
 
     const parsedWidth = Number(value)
+
     if (Number.isFinite(parsedWidth)) {
       return parsedWidth
     }

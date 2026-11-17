@@ -37,15 +37,18 @@ export async function readConfigFromFile(
       allowEmptyContent: true,
       allowTrailingComma: true,
     })
+
     if (parseErrors.length > 0) {
       const firstError = parseErrors[0]
       const errorCode = isUndefined(firstError)
         ? 'Unknown'
         : printParseErrorCode(firstError.error)
+
       throw new Error(`Invalid JSONC syntax: ${errorCode}`)
     }
 
     const config = isUndefined(parsed) && content.trim() === '' ? {} : parsed
+
     return readParsedConfigObject(config)
   }
 

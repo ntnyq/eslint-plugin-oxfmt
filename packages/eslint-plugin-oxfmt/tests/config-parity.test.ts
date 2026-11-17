@@ -15,6 +15,7 @@ it.each(['.oxfmtrc.json', '.oxfmtrc.jsonc'])(
   async filename => {
     await withTempProject(async cwd => {
       const filepath = join(cwd, 'a.js')
+
       await writeFile(filepath, SOURCE)
       await writeFile(join(cwd, filename), '\u{FEFF}{"singleQuote": true}')
 

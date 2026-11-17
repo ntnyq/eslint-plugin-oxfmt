@@ -9,6 +9,7 @@ it('should allow invoking the worker without an options object', () => {
     'tests/fixtures/config-loading/json/src/example.js',
   )
   const result = runWorker(filename, `export const value = "hello"\n`)
+
   expect(result).toBeTypeOf('object')
 })
 

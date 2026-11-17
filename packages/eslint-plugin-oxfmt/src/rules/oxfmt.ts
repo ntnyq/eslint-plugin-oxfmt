@@ -35,6 +35,7 @@ export const oxfmt: Rule.RuleModule = {
     // file, formatting the extracted fragment separately would produce
     // conflicting results (ping-pong).
     const physicalFilename = context.physicalFilename ?? context.filename
+
     if (context.filename !== physicalFilename) {
       return {}
     }
@@ -63,6 +64,7 @@ export const oxfmt: Rule.RuleModule = {
 
             for (const error of formatResult.errors) {
               const label = error.labels?.[0]
+
               if (label) {
                 const start = context.sourceCode.getLocFromIndex(
                   sourceBytes.toString('utf8', 0, label.start).length,
@@ -70,6 +72,7 @@ export const oxfmt: Rule.RuleModule = {
                 const end = context.sourceCode.getLocFromIndex(
                   sourceBytes.toString('utf8', 0, label.end).length,
                 )
+
                 context.report({
                   loc: { end, start },
                   message: `Failed to format code: ${error.message}`,

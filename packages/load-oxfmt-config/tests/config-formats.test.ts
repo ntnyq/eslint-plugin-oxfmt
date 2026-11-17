@@ -42,6 +42,7 @@ describe('loadOxfmtConfig', () => {
       async (extension, content, expectedPrintWidth) => {
         await withTempDir('oxfmt-config-explicit-ext-', async cwd => {
           const configPath = join(cwd, `custom.config${extension}`)
+
           await writeFile(configPath, content, 'utf8')
 
           const result = await loadOxfmtConfig({
@@ -61,6 +62,7 @@ describe('loadOxfmtConfig', () => {
     it('throws when explicit JS config has no default export', async () => {
       await withTempDir('oxfmt-config-explicit-js-no-default-', async cwd => {
         const configPath = join(cwd, 'custom.config.mjs')
+
         await writeFile(configPath, 'export const printWidth = 97\n', 'utf8')
 
         await expect(
@@ -77,6 +79,7 @@ describe('loadOxfmtConfig', () => {
     it('throws when explicit JS config default export is not an object', async () => {
       await withTempDir('oxfmt-config-explicit-js-non-object-', async cwd => {
         const configPath = join(cwd, 'custom.config.mjs')
+
         await writeFile(configPath, 'export default ["printWidth"]\n', 'utf8')
 
         await expect(
@@ -104,6 +107,7 @@ describe('loadOxfmtConfig', () => {
           'oxfmt-config-explicit-js-invalid-object-',
           async cwd => {
             const configPath = join(cwd, 'custom.config.mjs')
+
             await writeFile(configPath, content, 'utf8')
 
             await expect(
@@ -156,6 +160,7 @@ describe('loadOxfmtConfig', () => {
         'oxfmt-config-explicit-jsonc-trailing-comma-',
         async cwd => {
           const configPath = join(cwd, 'custom.config.jsonc')
+
           await writeFile(
             configPath,
             '{\n  // comment\n  "printWidth": 110,\n}\n',
@@ -177,6 +182,7 @@ describe('loadOxfmtConfig', () => {
     it('loads explicit empty JSONC config as empty object', async () => {
       await withTempDir('oxfmt-config-explicit-jsonc-empty-', async cwd => {
         const configPath = join(cwd, 'custom.config.jsonc')
+
         await writeFile(configPath, '', 'utf8')
 
         const result = await loadOxfmtConfig({
@@ -193,6 +199,7 @@ describe('loadOxfmtConfig', () => {
     it('throws for unsupported explicit config extension', async () => {
       await withTempDir('oxfmt-config-explicit-unsupported-', async cwd => {
         const configPath = join(cwd, 'custom.config.yaml')
+
         await writeFile(configPath, 'printWidth: 88\n', 'utf8')
 
         await expect(
@@ -209,6 +216,7 @@ describe('loadOxfmtConfig', () => {
     it('throws for invalid explicit JSONC config', async () => {
       await withTempDir('oxfmt-config-explicit-jsonc-invalid-', async cwd => {
         const configPath = join(cwd, 'custom.config.jsonc')
+
         await writeFile(configPath, '{\n  "printWidth": 100,,\n}\n', 'utf8')
 
         await expect(

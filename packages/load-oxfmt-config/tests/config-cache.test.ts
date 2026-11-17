@@ -61,6 +61,7 @@ describe('loadOxfmtConfig', () => {
     ])('reloads changed $name when useCache is false', async testCase => {
       await withTempDir('oxfmt-config-js-cache-bypass-', async cwd => {
         const configPath = join(cwd, testCase.filename)
+
         await writeFile(configPath, testCase.firstContent, 'utf8')
 
         const first = await loadOxfmtConfig({
@@ -88,6 +89,7 @@ describe('loadOxfmtConfig', () => {
       await withTempDir('oxfmt-config-js-esm-cache-bypass-', async cwd => {
         const configPath = join(cwd, 'oxfmt.config.js')
         const configMtime = new Date('2026-01-01T00:00:00.000Z')
+
         await writeFile(
           join(cwd, 'package.json'),
           '{"type":"module"}\n',
@@ -171,6 +173,7 @@ describe('loadOxfmtConfig', () => {
       await withTempDir('oxfmt-config-esm-bare-import-', async cwd => {
         const configPath = join(cwd, 'oxfmt.config.mjs')
         const require = createRequire(import.meta.url)
+
         await cp(
           dirname(require.resolve('ignore/package.json')),
           join(cwd, 'node_modules/ignore'),
@@ -478,6 +481,7 @@ describe('loadOxfmtConfig', () => {
     it('keeps editorconfig onlyCwd cache isolated from default walking', async () => {
       await withTempDir('oxfmt-config-editor-cache-only-cwd-', async cwd => {
         const child = join(cwd, 'packages', 'app')
+
         await mkdir(child, { recursive: true })
         await writeFile(
           join(cwd, '.editorconfig'),
@@ -502,6 +506,7 @@ describe('loadOxfmtConfig', () => {
         'oxfmt-config-editor-cache-only-cwd-miss-',
         async cwd => {
           const child = join(cwd, 'packages', 'app')
+
           await mkdir(child, { recursive: true })
           await writeFile(
             join(cwd, '.editorconfig'),

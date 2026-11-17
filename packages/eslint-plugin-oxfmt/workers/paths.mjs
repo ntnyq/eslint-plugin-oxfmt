@@ -10,6 +10,7 @@ import { relative } from 'node:path'
  */
 export function isPathOutsideBase(path) {
   const normalizedPath = path.replaceAll('\\', '/')
+
   return (
     normalizedPath === '..' ||
     normalizedPath.startsWith('../') ||

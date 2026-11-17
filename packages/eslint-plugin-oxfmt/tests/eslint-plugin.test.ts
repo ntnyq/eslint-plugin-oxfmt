@@ -39,6 +39,7 @@ it('should lint work', async () => {
   expect(results.length).toBe(files.length)
   files.forEach(file => {
     const result = resultsByPath.get(resolvePackagePath(FIXTURE_BASE_CWD, file))
+
     if (!result) {
       throw new Error(`Missing lint result for fixture file: ${file}`)
     }
@@ -75,6 +76,7 @@ it('should respect ignorePatterns from .oxfmtrc when useConfig is true', async (
     const result = resultsByPath.get(
       resolvePackagePath(FIXTURE_USE_CONFIG_CWD, file),
     )
+
     if (!result) {
       throw new Error(`Missing lint result for fixture file: ${file}`)
     }
@@ -119,6 +121,7 @@ it('should prioritize rule ignorePatterns over .oxfmtrc ignorePatterns', async (
     const result = resultsByPath.get(
       resolvePackagePath(FIXTURE_USE_CONFIG_CWD, file),
     )
+
     if (!result) {
       throw new Error(`Missing lint result for fixture file: ${file}`)
     }

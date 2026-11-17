@@ -27,6 +27,7 @@ it('preserves the published runtime exports and presets', () => {
     'recommendedWithoutParser',
     'rules',
   ]
+
   expect(Object.keys(source).sort()).toEqual(names.sort())
   expect(Object.keys(published).sort()).toEqual(names.sort())
   expect(published.default).toBe(published.plugin)
@@ -54,6 +55,7 @@ it('keeps user option keys aligned with generated schema types', () => {
 it('preserves string-based custom group inputs in the historical type subpath', () => {
   function createOptions(selector: string, modifiers: string[]): OxfmtOxfmt {
     const customGroups = [{ groupName: 'custom', modifiers, selector }]
+
     return [
       {
         sortImports: { customGroups },
@@ -63,8 +65,10 @@ it('preserves string-based custom group inputs in the historical type subpath', 
       },
     ]
   }
+
   const options = createOptions('type', ['type'])
   const config: RuleOptions = { 'oxfmt/oxfmt': ['error', ...options] }
+
   expect(config['oxfmt/oxfmt']).toEqual(['error', ...options])
   expect(options[0]?.sortImports).toEqual({
     customGroups: [

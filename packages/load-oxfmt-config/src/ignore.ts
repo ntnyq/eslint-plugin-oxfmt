@@ -47,6 +47,7 @@ export async function isOxfmtIgnored(
       options,
       useCache,
     )
+
     if (defaultResult.ignored) {
       return defaultResult
     }
@@ -178,6 +179,7 @@ async function resolveDefaultIgnores(
     useCache,
     true,
   )
+
   if (gitignoreResult.ignored) {
     return {
       ignored: true,
@@ -187,6 +189,7 @@ async function resolveDefaultIgnores(
 
   if (repoRoot && !gitignoreResult.matched) {
     const infoExcludePath = await resolveGitInfoExcludePath(repoRoot, useCache)
+
     if (
       infoExcludePath &&
       (await matchIgnoreFile(filepath, infoExcludePath, useCache, repoRoot))
@@ -207,6 +210,7 @@ async function resolveDefaultIgnores(
       explicitIgnoreEntries,
       useCache,
     )
+
     if (explicitIgnoreResult.ignored) {
       return {
         ignored: true,
@@ -215,6 +219,7 @@ async function resolveDefaultIgnores(
     }
   } else {
     const prettierignorePath = resolve(cwd, '.prettierignore')
+
     if (await matchIgnoreFile(filepath, prettierignorePath, useCache)) {
       return {
         ignored: true,

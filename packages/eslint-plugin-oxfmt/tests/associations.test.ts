@@ -44,6 +44,7 @@ async function lint(
     ],
   })
   const [result] = await eslint.lintText(source, { filePath: join(cwd, file) })
+
   return result
 }
 
@@ -58,9 +59,11 @@ it.each(['app.conf', 'src/app.conf', 'src/keep.conf', 'src/.hidden/app.conf'])(
         [OXFMT_CLI, '--stdin-filepath', file],
         { cwd, encoding: 'utf8', input: SOURCE },
       )
+
       expect(cli.status).toBe(0)
       expect(cli.stdout).not.toBe(SOURCE)
       const result = await lint(cwd, file, SOURCE)
+
       expect(result.messages).toEqual([])
       expect(result.output).toBe(cli.stdout)
     })
@@ -112,8 +115,10 @@ it.each([
           input: source,
         },
       )
+
       expect(cli.status).toBe(0)
       const result = await lint(cwd, file, source)
+
       expect(result.messages).toEqual([])
       expect(result.output ?? source).toBe(cli.stdout)
     })
@@ -127,6 +132,7 @@ it.each([false, true])(
       await mkdir(join(cwd, 'packages/a/src'), { recursive: true })
       await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
       const configPath = 'packages/a/.oxfmtrc.json'
+
       await writeFile(join(cwd, configPath), JSON.stringify(CONFIG))
       const file = 'packages/a/src/app.conf'
       const args = explicit ? ['--config', configPath] : []
@@ -139,6 +145,7 @@ it.each([false, true])(
           input: SOURCE,
         },
       )
+
       expect(cli.status).toBe(0)
       const result = await lint(
         cwd,
@@ -146,6 +153,7 @@ it.each([false, true])(
         SOURCE,
         explicit ? { configPath } : {},
       )
+
       expect(result.messages).toEqual([])
       expect(result.output).toBe(cli.stdout)
     })
@@ -170,6 +178,7 @@ it('matches inline associations from ESLint cwd and replaces config associations
         ],
       },
     )
+
     expect(result.messages).toEqual([])
     expect(result.output).toBe('const value: number = 1\n')
   })
@@ -182,6 +191,7 @@ it('uses inline associations with config loading disabled', async () => {
       associations: [{ files: ['*.conf'], language: 'json' }],
       useConfig: false,
     })
+
     expect(result.messages).toEqual([])
     expect(result.output).toBe('{ "z": 1, "a": 2 }\n')
   })
@@ -197,6 +207,7 @@ it.each([
     await writeFile(join(cwd, '.oxfmtrc.json'), '{}')
     await writeFile(join(cwd, 'nested/.oxfmtrc.json'), JSON.stringify(CONFIG))
     const result = await lint(cwd, 'nested/app.conf', SOURCE, options)
+
     expect(result.messages[0]?.message).toContain('Unsupported file type:')
     expect(result.output).toBeUndefined()
   })
@@ -217,6 +228,7 @@ it.each([
         respectOxfmtDefaultIgnores: false,
         useConfig: false,
       })
+
       expect(result.messages).toEqual([])
       expect(result.output).toBeUndefined()
     })
@@ -230,6 +242,7 @@ it('keeps ignore matching on the original path', async () => {
       JSON.stringify({ ...CONFIG, ignorePatterns: ['*.conf'] }),
     )
     const result = await lint(cwd, 'app.conf', SOURCE)
+
     expect(result.messages).toEqual([])
     expect(result.output).toBeUndefined()
   })
@@ -245,6 +258,7 @@ it.each([
       JSON.stringify({ associations }),
     )
     const result = await lint(cwd, 'app.conf', SOURCE)
+
     expect(result.messages[0]?.message).toContain('Failed to format file:')
     expect(result.output).toBeUndefined()
   })
@@ -256,6 +270,7 @@ it('reports the real filename when an associated plugin is disabled', async () =
       associations: [{ files: ['*.conf'], language: 'astro' }],
       useConfig: false,
     })
+
     expect(result.messages[0]?.message).toContain(join(cwd, 'app.conf'))
     expect(result.messages[0]?.message).not.toContain('__oxfmt__')
   })
@@ -277,8 +292,10 @@ it('follows symlinked config discovery and keeps patterns relative to the link',
         input: SOURCE,
       },
     )
+
     expect(cli.status).toBe(0)
     const result = await lint(cwd, file, SOURCE)
+
     expect(result.messages).toEqual([])
     expect(result.output).toBe(cli.stdout)
   })

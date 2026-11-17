@@ -431,6 +431,7 @@ export const oxfmtOptionsSchema: JSONSchema4 = {
 const oxfmtOverrideOptionsSchemaProperties = {
   ...oxfmtOptionsSchema.properties,
 }
+
 delete oxfmtOverrideOptionsSchemaProperties.ignorePatterns
 
 export const pluginOptionsSchema = {

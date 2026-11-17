@@ -20,6 +20,7 @@ it.each([
 
 it('retains matching and ordered negation within the base', () => {
   const patterns = ['generated/*', '!generated/keep.js']
+
   expect(shouldIgnoreFile('generated/a.js', patterns)).toBe(true)
   expect(shouldIgnoreFile('generated/keep.js', patterns)).toBe(false)
   expect(shouldIgnoreFile('..file.js', ['*.js'])).toBe(true)

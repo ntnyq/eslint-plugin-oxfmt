@@ -52,7 +52,9 @@ export function compareSchemas(
   )
   const actual = normalizeSchema(plugin, plugin)
   const differences: SchemaDifference[] = []
+
   collectDifferences(expected, actual, '$', differences)
+
   return differences
 }
 
@@ -67,13 +69,16 @@ function areDisjointBranches(branches: NormalizedValue[]): boolean {
       ) {
         return false
       }
+
       if (left.type !== right.type) {
         return ![left.type, right.type].every(type =>
           ['integer', 'number'].includes(type),
         )
       }
+
       const leftEnum = left.enum
       const rightEnum = right.enum
+
       return (
         Array.isArray(leftEnum) &&
         Array.isArray(rightEnum) &&
@@ -134,18 +139,25 @@ function normalizeSchema(
         `Unsupported or circular schema reference: ${schema.$ref}`,
       )
     }
+
     let target: unknown = root
+
     for (const segment of schema.$ref.slice(2).split('/')) {
       const key = segment.replaceAll('~1', '/').replaceAll('~0', '~')
+
       if (!isRecord(target) || !Object.hasOwn(target, key)) {
         throw new Error(`Unresolved schema reference: ${schema.$ref}`)
       }
+
       target = target[key]
     }
+
     if (!isRecord(target)) {
       throw new Error(`Expected an object schema at ${schema.$ref}`)
     }
+
     const { $ref, ...siblings } = schema
+
     return normalizeSchema(
       { ...target, ...siblings },
       root,
@@ -155,16 +167,19 @@ function normalizeSchema(
 
   if (schema.allOf?.length === 1) {
     const { allOf, ...siblings } = schema
+
     return normalizeSchema({ ...allOf[0], ...siblings }, root, references)
   }
 
   const normalized: Record<string, NormalizedValue> = {}
+
   for (const [key, value] of Object.entries(schema).sort(([left], [right]) =>
     left.localeCompare(right),
   )) {
     if (IGNORED_SCHEMA_KEYS.has(key) || value === undefined) {
       continue
     }
+
     if (key === 'properties' || key === 'patternProperties') {
       normalized[key] = Object.fromEntries(
         Object.entries(value as Record<string, JSONSchema4>)
@@ -185,6 +200,7 @@ function normalizeSchema(
       // Oxfmt uses both spellings for unions with disjoint branches.
       const unionKey =
         key === 'oneOf' && areDisjointBranches(branches) ? 'anyOf' : key
+
       normalized[unionKey] = sortValues(branches)
     } else if (
       key === 'enum' ||
@@ -196,6 +212,7 @@ function normalizeSchema(
       normalized[key] = value as NormalizedValue
     }
   }
+
   return normalized
 }
 

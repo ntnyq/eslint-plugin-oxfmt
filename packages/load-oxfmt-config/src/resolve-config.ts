@@ -38,11 +38,13 @@ export async function resolveOxfmtrcPath(
 
       try {
         const stats = await stat(configFilePath)
+
         if (stats.isFile()) {
           return configFilePath
         }
       } catch (error) {
         const code = (error as NodeJS.ErrnoException).code
+
         if (code !== 'ENOENT' && code !== 'ENOTDIR') {
           throw error
         }
@@ -52,6 +54,7 @@ export async function resolveOxfmtrcPath(
     }
 
     const parentDir = join(currentDir, '..')
+
     if (parentDir === currentDir) {
       break
     }

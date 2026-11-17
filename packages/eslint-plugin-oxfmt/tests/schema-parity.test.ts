@@ -28,6 +28,7 @@ it.each([
     'changed nested type',
     (schema: JSONSchema4) => {
       const association = schema.properties?.associations.items as JSONSchema4
+
       if (association.properties?.files.items) {
         ;(association.properties.files.items as JSONSchema4).type = 'number'
       }
@@ -37,6 +38,7 @@ it.each([
     'missing required field',
     (schema: JSONSchema4) => {
       const association = schema.properties?.associations.items as JSONSchema4
+
       association.required = ['files']
     },
   ],
@@ -66,6 +68,7 @@ it.each([
   'detects %s',
   (_name, mutate) => {
     const schema = structuredClone(oxfmtRuleSchema)
+
     mutate(schema)
     expect(
       compareSchemas(upstream, schema, pluginOptionsSchema.properties).length,
@@ -78,6 +81,7 @@ it('normalizes reference wrappers and branch ordering without ignoring validatio
     allOf: [{ $ref: '#/definitions/Mode' }],
     definitions: { Mode: { enum: ['a', 'b'], type: 'string' } },
   }
+
   expect(
     compareSchemas(expected, {
       description: 'Adapter wording',
@@ -89,6 +93,7 @@ it('normalizes reference wrappers and branch ordering without ignoring validatio
     { type: 'boolean' },
     { properties: { enabled: { type: 'boolean' } }, type: 'object' },
   ]
+
   expect(
     compareSchemas({ anyOf: branches }, { oneOf: [...branches].reverse() }),
   ).toEqual([])
