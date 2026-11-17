@@ -559,6 +559,11 @@ interactions between overlapping scoped sections. Use
 for a specific target file. Both APIs retain the nearest-file discovery strategy;
 they do not merge multiple EditorConfig files.
 
+Per-file EditorConfig matching uses minimatch, which expands numeric and
+alphabetic brace ranges such as `[a{1..3}.js]` and `[a{a..c}.js]`. The oxfmt CLI
+currently treats the range contents literally. Use explicit alternatives such
+as `[a{1,2,3}.js]` when both tools must select the same files.
+
 ## Error Handling
 
 ```ts

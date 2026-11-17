@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { expect, it } from 'vitest'
@@ -10,6 +10,73 @@ import type { OxfmtRuleOptions } from '../src/types'
 
 const SOURCE = 'export const value="hello"\n'
 const DOUBLE_QUOTED = 'export const value = "hello";\n'
+
+it.each(
+  [
+    'config',
+    'inline',
+    '.gitignore',
+    '.git/info/exclude',
+    '.prettierignore',
+    'custom.ignore',
+  ].flatMap(source =>
+    [false, true].flatMap(useCache =>
+      ['DIST/a.js', 'dist/a.js'].map(file => ({
+        file,
+        source,
+        useCache,
+      })),
+    ),
+  ),
+)(
+  'matches CLI case-sensitive $source ignores for $file (cache=$useCache)',
+  async ({ file, source, useCache }) => {
+    await withTempProject(async cwd => {
+      const filepath = join(cwd, file)
+      const options: OxfmtRuleOptions = { useCache }
+
+      await mkdir(dirname(filepath), { recursive: true })
+      const git = spawnSync('git', ['init', '--quiet'], {
+        cwd,
+        encoding: 'utf8',
+      })
+
+      expect(git.status).toBe(0)
+      await writeFile(filepath, SOURCE)
+      await writeFile(
+        join(cwd, '.oxfmtrc.json'),
+        JSON.stringify(
+          source === 'config' || source === 'inline'
+            ? { ignorePatterns: ['dist/'] }
+            : {},
+        ),
+      )
+
+      if (source === 'inline') {
+        options.ignorePatterns = ['dist/']
+      } else if (source !== 'config') {
+        await writeFile(join(cwd, source), 'dist/\n')
+      }
+
+      if (source === 'custom.ignore') {
+        options.ignorePath = source
+      }
+
+      const args = source === 'custom.ignore' ? ['--ignore-path', source] : []
+      // Explicit files bypass Git ignores in the CLI; use directory discovery.
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, ...args, '--write', dirname(file)],
+        { cwd, encoding: 'utf8' },
+      )
+      const expected = file.startsWith('dist/') ? SOURCE : DOUBLE_QUOTED
+
+      expect(cli.status).toBe(expected === SOURCE ? 2 : 0)
+      expect(await readFile(filepath, 'utf8')).toBe(expected)
+      expect(await lintText(cwd, filepath, SOURCE, options)).toBe(expected)
+    })
+  },
+)
 
 const IGNORE_CASES: {
   expected: string

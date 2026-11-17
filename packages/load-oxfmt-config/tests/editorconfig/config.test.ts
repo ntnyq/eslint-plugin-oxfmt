@@ -1,11 +1,55 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { loadOxfmtConfig } from '../../src'
+import { loadOxfmtConfig, loadOxfmtConfigForFile } from '../../src'
 import { fixturePath, withTempDir } from '../helpers'
 
 describe('loadOxfmtConfig', () => {
   describe('editorconfig behavior', () => {
+    it.each(['*', '*.js'])(
+      'keeps [%s] fallbacks for null and undefined root options',
+      async section => {
+        await withTempDir('oxfmt-null-editorconfig-', async cwd => {
+          const config = {
+            singleQuote: null,
+            tabWidth: undefined,
+            useTabs: false,
+          }
+
+          await writeFile(join(cwd, '.oxfmtrc.json'), JSON.stringify(config))
+          await writeFile(
+            join(cwd, '.editorconfig'),
+            `[${section}]\nquote_type = single\nindent_size = 4\nindent_style = tab\n`,
+          )
+          const loadedConfig = await loadOxfmtConfig({
+            cwd,
+            editorconfig: false,
+          })
+
+          loadedConfig.config.tabWidth = undefined
+
+          const staticResult = await loadOxfmtConfig({ cwd, loadedConfig })
+          const perFile = await loadOxfmtConfigForFile({
+            cwd,
+            filepath: 'a.js',
+            loadedConfig,
+          })
+          const fallback = { singleQuote: true, tabWidth: 4 }
+
+          expect(perFile.config).toEqual({ ...fallback, useTabs: false })
+          expect(staticResult.config).toEqual(
+            section === '*'
+              ? { ...fallback, useTabs: false }
+              : {
+                  overrides: [{ files: ['**/*.js'], options: fallback }],
+                  useTabs: false,
+                },
+          )
+          expect(loadedConfig.config).toEqual(config)
+        })
+      },
+    )
+
     it('loads .editorconfig root options with local empty oxfmt config', async () => {
       const cwd = fixturePath('load', 'editor-root')
 

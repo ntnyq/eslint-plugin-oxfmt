@@ -1,5 +1,6 @@
 import { readFile, stat } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
+import { isNullOrUndefined } from '@ntnyq/utils'
 import { parseBuffer } from 'editorconfig'
 import { Minimatch } from 'minimatch'
 import { cachePromise, getCacheValue, setCacheValue } from './cache'
@@ -84,7 +85,9 @@ export function mergeOverrides(
     override => {
       const options = Object.fromEntries(
         Object.entries(override.options || {}).filter(
-          ([name]) => !Object.hasOwn(oxfmtConfig, name),
+          ([name]) =>
+            !Object.hasOwn(oxfmtConfig, name) ||
+            isNullOrUndefined(Reflect.get(oxfmtConfig, name)),
         ),
       )
 
@@ -112,7 +115,11 @@ export function mergeRootOptions(
 ) {
   return {
     ...editorconfigRootOptions,
-    ...oxfmtConfig,
+    ...Object.fromEntries(
+      Object.entries(oxfmtConfig).filter(
+        ([, value]) => !isNullOrUndefined(value),
+      ),
+    ),
   }
 }
 
@@ -132,7 +139,13 @@ export async function readEditorconfigFromFile(
   options: { filepath?: string; useCache?: boolean } = {},
 ): Promise<EditorconfigData> {
   const useCache = options.useCache !== false
-  const readSections = async () => parseBuffer(await readFile(editorconfigPath))
+  const readSections = async (): Promise<ParseStringResult> =>
+    parseBuffer(await readFile(editorconfigPath)).map(([name, body]) => [
+      name,
+      Object.fromEntries(
+        Object.entries(body).map(([key, value]) => [key, value.toLowerCase()]),
+      ),
+    ])
   const parsedSections = useCache
     ? await cachePromise(sectionCache, editorconfigPath, readSections)
     : await readSections()

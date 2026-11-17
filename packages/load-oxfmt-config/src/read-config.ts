@@ -1,6 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { extname } from 'node:path'
-import { isUndefined } from '@ntnyq/utils'
+import {
+  isEmptyString,
+  isNullOrUndefined,
+  isString,
+  isUndefined,
+} from '@ntnyq/utils'
 import { parse as parseJSONC, printParseErrorCode } from 'jsonc-parser'
 import { isConfigObject, loadConfigModule } from './config-module'
 import { OXFMT_EXPLICIT_CONFIG_EXTENSIONS } from './constants'
@@ -23,7 +28,9 @@ export async function readConfigFromFile(
   const useCache = options.useCache !== false
 
   if (['.cjs', '.cts', '.js', '.mjs', '.mts', '.ts'].includes(extension)) {
-    return loadConfigModule(resolvedPath, useCache)
+    return readParsedConfigObject(
+      await loadConfigModule(resolvedPath, useCache),
+    )
   }
 
   const content = (await readFile(resolvedPath, 'utf8')).replace(
@@ -47,7 +54,8 @@ export async function readConfigFromFile(
       throw new Error(`Invalid JSONC syntax: ${errorCode}`)
     }
 
-    const config = isUndefined(parsed) && content.trim() === '' ? {} : parsed
+    const config =
+      isUndefined(parsed) && isEmptyString(content.trim()) ? {} : parsed
 
     return readParsedConfigObject(config)
   }
@@ -81,5 +89,52 @@ function readParsedConfigObject(config: unknown): OxfmtOptions {
     throw new Error('Configuration file must be an object.')
   }
 
+  validateOverrides(config.overrides)
+
   return config
+}
+
+/**
+ * Reject malformed external overrides before consumers iterate or merge them.
+ * Formatter option values remain validated by oxfmt when formatting.
+ */
+function validateOverrides(overrides: unknown) {
+  if (isNullOrUndefined(overrides)) {
+    return
+  }
+
+  if (!Array.isArray(overrides)) {
+    throw new TypeError('Invalid overrides: expected an array.')
+  }
+
+  for (const [index, override] of overrides.entries()) {
+    const location = `overrides[${index}]`
+
+    if (!isConfigObject(override)) {
+      throw new TypeError(`Invalid ${location}: expected an object.`)
+    }
+
+    for (const key of ['files', 'excludeFiles'] as const) {
+      const patterns: unknown = Reflect.get(override, key)
+
+      if (key === 'excludeFiles' && isUndefined(patterns)) {
+        continue
+      }
+
+      if (
+        !Array.isArray(patterns) ||
+        !patterns.every(pattern => isString(pattern))
+      ) {
+        throw new TypeError(
+          `Invalid ${location}.${key}: expected an array of strings.`,
+        )
+      }
+    }
+
+    const overrideOptions: unknown = Reflect.get(override, 'options')
+
+    if (!isUndefined(overrideOptions) && !isConfigObject(overrideOptions)) {
+      throw new TypeError(`Invalid ${location}.options: expected an object.`)
+    }
+  }
 }

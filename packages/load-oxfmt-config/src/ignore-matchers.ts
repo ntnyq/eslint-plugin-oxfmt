@@ -81,7 +81,7 @@ export function matchConfigIgnorePatterns(
   }
 
   if (!useCache) {
-    return ignore().add(patterns).ignores(relativeFile)
+    return ignore({ ignorecase: false }).add(patterns).ignores(relativeFile)
   }
 
   const cacheKey = `${configDir}::${JSON.stringify(patterns)}`
@@ -91,7 +91,7 @@ export function matchConfigIgnorePatterns(
     return cachedMatcher.ignores(relativeFile)
   }
 
-  const matcher = ignore().add(patterns)
+  const matcher = ignore({ ignorecase: false }).add(patterns)
 
   setCacheValue(configIgnoreMatcherCache, cacheKey, matcher)
 
@@ -182,7 +182,7 @@ function loadIgnoreMatcher(
   const loadTask = () =>
     readFile(ignoreFilePath, 'utf8')
       .then(content => {
-        const matcher = ignore()
+        const matcher = ignore({ ignorecase: false })
 
         matcher.add(content)
 

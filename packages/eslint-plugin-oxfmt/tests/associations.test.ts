@@ -25,6 +25,93 @@ const CONFIG: OxfmtConfig = {
   ],
 }
 
+it.each(
+  [
+    { file: 'src/a.js', matches: false, pattern: './**.js' },
+    { file: 'a.js', matches: true, pattern: './**.js' },
+  ].flatMap(testCase =>
+    (['files', 'excludeFiles'] as const).map(field => ({
+      ...testCase,
+      field,
+    })),
+  ),
+)(
+  'matches CLI association $field glob $pattern against $file',
+  async ({ field, file, matches, pattern }) => {
+    await withTempProject(async cwd => {
+      const source = '[1,2,3]'
+      const associations: OxfmtConfig['associations'] = [
+        { files: ['**/*.js'], language: 'typescript' },
+        {
+          files: field === 'files' ? [pattern] : ['**/*.js'],
+          ...(field === 'excludeFiles' ? { excludeFiles: [pattern] } : {}),
+          language: 'json',
+        },
+      ]
+
+      await mkdir(dirname(join(cwd, file)), { recursive: true })
+      await writeFile(
+        join(cwd, '.oxfmtrc.json'),
+        JSON.stringify({ associations }),
+      )
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, '--stdin-filepath', file],
+        { cwd, encoding: 'utf8', input: source },
+      )
+      const result = await lint(cwd, file, source)
+      const isJson = field === 'files' ? matches : !matches
+
+      expect(cli.status).toBe(0)
+      expect(cli.stdout).toBe(isJson ? '[1, 2, 3]\n' : '[1, 2, 3];\n')
+      expect(result.messages).toEqual([])
+      expect(result.output).toBe(cli.stdout)
+    })
+  },
+)
+
+it.each(['files', 'excludeFiles'] as const)(
+  'matches CLI recursive basename patterns in association %s',
+  async field => {
+    await withTempProject(async cwd => {
+      const file = 'src/app.conf'
+      const source = field === 'files' ? SOURCE : 'const value:number=1'
+      const associations: OxfmtConfig['associations'] =
+        field === 'files'
+          ? [{ files: ['*.conf'], language: 'json' }]
+          : [
+              { files: ['**/*.conf'], language: 'typescript' },
+              {
+                excludeFiles: ['*.conf'],
+                files: ['**/*.conf'],
+                language: 'json',
+              },
+            ]
+
+      await mkdir(join(cwd, 'src'))
+      await writeFile(
+        join(cwd, '.oxfmtrc.json'),
+        JSON.stringify({ associations }),
+      )
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, '--stdin-filepath', file],
+        { cwd, encoding: 'utf8', input: source },
+      )
+      const result = await lint(cwd, file, source)
+
+      expect(cli.status).toBe(0)
+      expect(cli.stdout).toBe(
+        field === 'files'
+          ? '{ "z": 1, "a": 2 }\n'
+          : 'const value: number = 1;\n',
+      )
+      expect(result.messages).toEqual([])
+      expect(result.output).toBe(cli.stdout)
+    })
+  },
+)
+
 async function lint(
   cwd: string,
   file: string,

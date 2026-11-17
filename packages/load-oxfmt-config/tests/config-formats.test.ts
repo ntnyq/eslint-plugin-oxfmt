@@ -4,6 +4,29 @@ import { describe, expect, it } from 'vitest'
 import { loadOxfmtConfig } from '../src'
 import { fixturePath, withTempDir } from './helpers'
 
+it.each(['.json', '.jsonc', '.cjs'])(
+  'validates external overrides before merging EditorConfig for %s',
+  async extension => {
+    await withTempDir('oxfmt-invalid-overrides-', async cwd => {
+      const configPath = join(cwd, `config${extension}`)
+      const config = JSON.stringify({ overrides: [{}] })
+
+      await writeFile(
+        configPath,
+        extension === '.cjs' ? `module.exports = ${config}` : config,
+      )
+      await writeFile(join(cwd, '.editorconfig'), '[*]\nindent_size = 4\n')
+
+      await expect(loadOxfmtConfig({ configPath, cwd })).rejects.toThrow(
+        configPath,
+      )
+      await expect(loadOxfmtConfig({ configPath, cwd })).rejects.toThrow(
+        'overrides[0].files',
+      )
+    })
+  },
+)
+
 describe('loadOxfmtConfig', () => {
   describe('metadata', () => {
     it('returns merged config with resolved filepath and dirname', async () => {

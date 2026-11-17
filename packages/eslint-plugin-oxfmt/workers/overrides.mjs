@@ -45,12 +45,47 @@ export function applyOverrides(
     const excluded = excludeMatcher ? excludeMatcher(relativePath) : false
 
     if (matches && !excluded && override.options) {
-      merged = {
-        ...merged,
-        ...resolveTailwindPaths(override.options, optionsBaseDir),
-      }
+      merged = mergeOptionObjects(
+        merged,
+        resolveTailwindPaths(override.options, optionsBaseDir),
+      )
     }
   }
 
   return merged
+}
+
+/**
+ * Keep arrays out of the recursive object merge.
+ * @param {unknown} value - Candidate option value.
+ * @returns {value is object} Whether the value is a non-array object.
+ */
+function isOptionObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+/**
+ * Mirror oxfmt's recursive object merge; arrays and booleans replace values.
+ * Null and undefined option fields are omitted by upstream deserialization.
+ * @param {object} base - Inherited options.
+ * @param {object} overlay - Options supplied by a matching override.
+ * @returns {Record<string, unknown>} Merged options without mutating either input.
+ */
+function mergeOptionObjects(base, overlay) {
+  return Object.fromEntries([
+    ...Object.entries(base),
+    ...Object.entries(overlay)
+      .filter(([, value]) => value != null)
+      .map(([key, value]) => {
+        /** @type {unknown} */
+        const inherited = Reflect.get(base, key)
+
+        return [
+          key,
+          isOptionObject(inherited) && isOptionObject(value)
+            ? mergeOptionObjects(inherited, value)
+            : value,
+        ]
+      }),
+  ])
 }

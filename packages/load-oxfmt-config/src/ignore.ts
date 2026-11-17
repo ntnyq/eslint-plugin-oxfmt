@@ -1,5 +1,6 @@
 import { basename, dirname, isAbsolute, resolve } from 'node:path'
 import process from 'node:process'
+import { isString } from '@ntnyq/utils'
 import { DEFAULT_IGNORED_DIRS, DEFAULT_IGNORED_LOCKFILES } from './constants'
 import { collectGitignorePaths, resolveGitInfoExcludePath } from './git-ignore'
 import {
@@ -158,10 +159,9 @@ async function resolveDefaultIgnores(
     }
   }
 
-  const normalizedIgnorePaths =
-    typeof options.ignorePath === 'string'
-      ? [options.ignorePath]
-      : options.ignorePath
+  const normalizedIgnorePaths = isString(options.ignorePath)
+    ? [options.ignorePath]
+    : options.ignorePath
   const explicitIgnorePaths = normalizedIgnorePaths?.map(path =>
     resolveIgnoreFilePath(path, cwd),
   )

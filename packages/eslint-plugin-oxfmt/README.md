@@ -451,6 +451,12 @@ Prettier; use `astro.skipFrontmatter` to preserve it.
 
 Use `overrides` to apply different oxfmt options per file glob (later entries win on conflicts):
 
+Patterns without `/`, such as `*.ts`, also match files in subdirectories; use
+`./*.ts` to match only the base directory. Leading `!` is literal in override
+and association globs. Matching overrides merge nested option objects;
+arrays and boolean values replace inherited values. Malformed external override
+structures are reported with the configuration file path.
+
 ```js
 // eslint.config.mjs
 import pluginOxfmt from 'eslint-plugin-oxfmt'
@@ -518,6 +524,19 @@ It respects:
 - default ignored lockfiles
 
 Note: ESLint still controls file discovery. Files excluded by ESLint will never reach this rule.
+
+### Limitations
+
+CLI parity covers common configuration and ignore behavior. Some glob dialect
+differences remain:
+
+- Per-file EditorConfig matching expands numeric and alphabetic brace ranges,
+  such as `[a{1..3}.js]`, while the oxfmt CLI currently treats the range contents
+  literally. Use explicit alternatives such as `[a{1,2,3}.js]` for consistent
+  selection. See the [loader limitations](../load-oxfmt-config/README.md#limitations).
+- Override and association globs use picomatch's POSIX named character classes:
+  `a[[:digit:]].js` matches `a1.js`. The current oxfmt CLI does not interpret
+  `[:digit:]` as a named class. Use ranges such as `[0-9]` for consistent matching.
 
 ## Integration
 

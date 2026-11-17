@@ -185,7 +185,10 @@ async function loadConfig(
   return {
     config,
     ...(resolvedPath
-      ? { dirname: dirname(resolvedPath), filepath: resolvedPath }
+      ? {
+          dirname: dirname(resolvedPath),
+          filepath: resolvedPath,
+        }
       : {}),
   }
 }
