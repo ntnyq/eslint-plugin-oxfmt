@@ -91,6 +91,11 @@ interface Methods { "valid"(): void; "not-valid"(): void }`,
   ],
   valid: [
     {
+      code: 'const Value = class extends (namespace.Provider<Hello>) {};',
+      filename: 'parenthesized-instantiation-extends.ts',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
+    {
       filename: 'decorated-class.ts',
       code: `// prettier-ignore
 @Decorator({ values: [1,   2] })

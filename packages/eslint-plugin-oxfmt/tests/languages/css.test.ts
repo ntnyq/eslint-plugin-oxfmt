@@ -25,5 +25,11 @@ run({
         `)
       },
     },
+    {
+      code: '@supports selector(.a,.b) {}',
+      filename: 'supports-selector.css',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: '@supports selector(\n  .a,\n  .b\n) {\n}',
+    },
   ],
 })

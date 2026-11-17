@@ -59,6 +59,19 @@ run({
       options: [{ insertFinalNewline: false, useConfig: false, useTabs: true }],
       output: '- item\n\n  ```js\n  if (true) {\n  \trun();\n  }\n  ```',
     },
+    {
+      code: '中文 English 中文 English 中文 English',
+      filename: 'mixed-cjk-latin-wrap.md',
+      output: '中文 English\n中文 English\n中文 English',
+      options: [
+        {
+          insertFinalNewline: false,
+          printWidth: 12,
+          proseWrap: 'always',
+          useConfig: false,
+        },
+      ],
+    },
   ],
   valid: [
     {

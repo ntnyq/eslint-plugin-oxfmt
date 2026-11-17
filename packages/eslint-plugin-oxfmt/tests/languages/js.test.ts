@@ -120,6 +120,12 @@ run({
       options: [{ insertFinalNewline: false, useConfig: false }],
       output: 'const style = css`\n  font-family: Arial, -apple-system;\n`;',
     },
+    {
+      code: 'const value = {\n// first\n\n// second\n};',
+      filename: 'dangling-comment-blank-line.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: 'const value = {\n  // first\n\n  // second\n};',
+    },
   ],
   valid: [
     {
@@ -149,6 +155,11 @@ run({
       code: 'call(   ) // prettier-ignore\n;[].sort()',
       filename: 'trailing-suppression-without-semi.js',
       options: [{ insertFinalNewline: false, semi: false, useConfig: false }],
+    },
+    {
+      code: 'const value = (a < b) > c;',
+      filename: 'parenthesized-comparison.js',
+      options: [{ insertFinalNewline: false, useConfig: false }],
     },
   ],
 })

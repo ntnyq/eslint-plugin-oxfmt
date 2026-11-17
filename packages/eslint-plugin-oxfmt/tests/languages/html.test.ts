@@ -42,5 +42,18 @@ run({
         ])
       },
     },
+    {
+      code: '<template><button @click="a=!a;"></button></template>',
+      filename: 'event-handler-semicolon.vue',
+      options: [{ insertFinalNewline: false, semi: false, useConfig: false }],
+      output: '<template><button @click="a = !a;"></button></template>',
+    },
+  ],
+  valid: [
+    {
+      code: `<template><div v-for="{ a = 'k'in obj } in items"></div></template>`,
+      filename: 'for-alias-in-operator.vue',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+    },
   ],
 })
