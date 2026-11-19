@@ -10,11 +10,9 @@ export const OXFMT_CONFIG_FILES = [
 ]
 
 /**
- * Supported extensions for explicit config paths.
+ * Extensions for executable configuration modules.
  */
-export const OXFMT_EXPLICIT_CONFIG_EXTENSIONS = [
-  '.json',
-  '.jsonc',
+export const OXFMT_MODULE_CONFIG_EXTENSIONS = [
   '.ts',
   '.mts',
   '.cts',

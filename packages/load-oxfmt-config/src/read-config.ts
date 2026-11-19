@@ -8,7 +8,7 @@ import {
 } from '@ntnyq/utils'
 import { parse as parseJSONC, printParseErrorCode } from 'jsonc-parser'
 import { isConfigObject, loadConfigModule } from './config-module'
-import { OXFMT_EXPLICIT_CONFIG_EXTENSIONS } from './constants'
+import { OXFMT_MODULE_CONFIG_EXTENSIONS } from './constants'
 import type { ParseError } from 'jsonc-parser'
 import type { OxfmtOptions } from './types'
 
@@ -27,9 +27,9 @@ export async function readConfigFromFile(
   const extension = extname(resolvedPath)
   const useCache = options.useCache !== false
 
-  if (['.cjs', '.cts', '.js', '.mjs', '.mts', '.ts'].includes(extension)) {
-    return readParsedConfigObject(
-      await loadConfigModule(resolvedPath, useCache),
+  if (OXFMT_MODULE_CONFIG_EXTENSIONS.includes(extension)) {
+    return loadConfigModule(resolvedPath, useCache, config =>
+      validateOverrides(config.overrides),
     )
   }
 
@@ -60,21 +60,13 @@ export async function readConfigFromFile(
     return readParsedConfigObject(config)
   }
 
-  if (extension === '.json') {
+  if (extension === '.json' || !extension) {
     return readParsedConfigObject(JSON.parse(content))
   }
 
-  if (!extension) {
-    return readParsedConfigObject(JSON.parse(content))
-  }
-
-  if (!OXFMT_EXPLICIT_CONFIG_EXTENSIONS.includes(extension)) {
-    throw new Error(
-      `Unsupported oxfmt config extension "${extension}" at ${resolvedPath}`,
-    )
-  }
-
-  return readParsedConfigObject(JSON.parse(content))
+  throw new Error(
+    `Unsupported oxfmt config extension "${extension}" at ${resolvedPath}`,
+  )
 }
 
 /**

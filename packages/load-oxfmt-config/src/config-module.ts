@@ -3,13 +3,14 @@ import { readFile, realpath } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { extname } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { isModuleNamespaceObject } from 'node:util/types'
 import { hasOwn, interopDefault, isObject, isString } from '@ntnyq/utils'
 import { getCacheValue, setCacheValue } from './cache'
 import { splitPathSegments } from './path'
 import type { OxfmtOptions } from './types'
 
 /**
- * CommonJS require scoped to this ESM module for loading `.cjs` config files.
+ * CommonJS require scoped to this ESM module for loading JavaScript configs.
  */
 const require = createRequire(import.meta.url)
 
@@ -65,26 +66,39 @@ export function isConfigObject(value: unknown): value is OxfmtOptions {
 export async function loadConfigModule(
   resolvedPath: string,
   useCache: boolean,
+  validateConfig: (config: OxfmtOptions) => void,
 ): Promise<OxfmtOptions> {
   const extension = extname(resolvedPath)
 
-  if (!useCache && extension === '.cjs') {
-    return readCommonJSConfig(resolvedPath)
+  if (useCache && (extension === '.cjs' || extension === '.js')) {
+    return loadCachedJavaScriptConfig(resolvedPath, validateConfig)
   }
 
-  if (!useCache && extension === '.mjs') {
-    return readConfigDefaultExport(await importNativeFreshModule(resolvedPath))
-  }
+  let config: OxfmtOptions
 
-  if (!useCache && extension === '.js') {
-    return readConfigDefaultExport(
+  if (extension === '.cjs') {
+    const configModule = requireFreshModule(resolvedPath)
+
+    config = isModuleNamespaceObject(configModule)
+      ? readConfigDefaultExport(configModule as Record<string, unknown>)
+      : readConfigModuleExports(configModule)
+  } else if (!useCache && extension === '.mjs') {
+    config = readConfigDefaultExport(
+      await importNativeFreshModule(resolvedPath),
+    )
+  } else if (extension === '.js') {
+    config = readConfigDefaultExport(
       await importFreshJavaScriptConfigModule(resolvedPath),
+    )
+  } else {
+    config = readConfigDefaultExport(
+      await importJitiConfigModule(resolvedPath, useCache),
     )
   }
 
-  return readConfigDefaultExport(
-    await importJitiConfigModule(resolvedPath, useCache),
-  )
+  validateConfig(config)
+
+  return config
 }
 
 /**
@@ -161,8 +175,14 @@ async function importFreshJavaScriptConfigModule(
     return cachedModule.namespace
   }
 
-  if (cachedModule) {
-    const namespace = await importNativeFreshModule(resolvedPath)
+  if (
+    cachedModule ||
+    loaderPaths.some(path =>
+      isModuleNamespaceObject(require.cache[path]?.exports),
+    )
+  ) {
+    // A cached require can have already evaluated the unversioned ESM URL.
+    const namespace = await importNativeFreshModule(resolvedPath, cacheKey)
 
     setCacheValue(freshJavaScriptModuleCache, resolvedPath, {
       cacheKey,
@@ -175,7 +195,7 @@ async function importFreshJavaScriptConfigModule(
   try {
     const configModule = requireFreshModule(resolvedPath)
 
-    if (Object.prototype.toString.call(configModule) === '[object Module]') {
+    if (isModuleNamespaceObject(configModule)) {
       const namespace = configModule as Record<string, unknown>
 
       setCacheValue(freshJavaScriptModuleCache, resolvedPath, {
@@ -195,7 +215,7 @@ async function importFreshJavaScriptConfigModule(
     }
 
     try {
-      const namespace = await importNativeFreshModule(resolvedPath)
+      const namespace = await importNativeFreshModule(resolvedPath, cacheKey)
 
       setCacheValue(freshJavaScriptModuleCache, resolvedPath, {
         cacheKey,
@@ -237,16 +257,18 @@ async function importJitiConfigModule(
  * Import an ESM config module with entry-file cache busting.
  *
  * @param resolvedPath - Absolute config file path to import.
+ * @param cacheKey - Hash of the config contents, if already computed.
  * @returns Imported module namespace.
  */
 async function importNativeFreshModule(
   resolvedPath: string,
+  cacheKey?: string,
 ): Promise<Record<string, unknown>> {
   const url = pathToFileURL(resolvedPath)
 
   url.searchParams.set(
     'oxfmtConfigCacheBust',
-    await getFreshImportCacheKey(resolvedPath),
+    cacheKey ?? (await getFreshImportCacheKey(resolvedPath)),
   )
 
   return import(url.href) as Promise<Record<string, unknown>>
@@ -279,19 +301,52 @@ function isJavaScriptLoaderFallbackError(
 }
 
 /**
- * Load a CommonJS config file without reusing Node's require cache.
- *
- * @param resolvedPath - Absolute `.cjs` config file path.
- * @returns Oxfmt config object from default or module exports.
+ * Reuse Node's module cache, clearing a CommonJS entry when validation fails.
  */
-function readCommonJSConfig(resolvedPath: string): OxfmtOptions {
-  const configModule = requireFreshModule(resolvedPath)
+async function loadCachedJavaScriptConfig(
+  resolvedPath: string,
+  validateConfig: (config: OxfmtOptions) => void,
+) {
+  const requirePath = require.resolve(resolvedPath)
+  const isCjs = extname(resolvedPath) === '.cjs'
+  let configModule: unknown
 
-  if (Object.prototype.toString.call(configModule) === '[object Module]') {
-    return readConfigDefaultExport(configModule as Record<string, unknown>)
+  try {
+    configModule = require(requirePath)
+  } catch (error) {
+    if (
+      isCjs ||
+      !isJavaScriptLoaderFallbackError(error, [resolvedPath, requirePath])
+    ) {
+      throw error
+    }
+
+    const config = readConfigDefaultExport(
+      await importJitiConfigModule(resolvedPath, true),
+    )
+
+    validateConfig(config)
+
+    return config
   }
 
-  return readConfigModuleExports(configModule)
+  const isEsm = !isCjs && isModuleNamespaceObject(configModule)
+
+  try {
+    const config = isEsm
+      ? readConfigDefaultExport(configModule as Record<string, unknown>)
+      : readConfigModuleExports(configModule)
+
+    validateConfig(config)
+
+    return config
+  } catch (error) {
+    if (!isEsm && require.cache[requirePath]?.exports === configModule) {
+      Reflect.deleteProperty(require.cache, requirePath)
+    }
+
+    throw error
+  }
 }
 
 /**

@@ -1,4 +1,11 @@
-import { cp, mkdir, readFile, utimes, writeFile } from 'node:fs/promises'
+import {
+  cp,
+  mkdir,
+  readFile,
+  realpath,
+  utimes,
+  writeFile,
+} from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -17,6 +24,56 @@ describe('loadOxfmtConfig', () => {
       expect(cached.config).toBe(first.config)
     })
 
+    it.each(['.cjs', '.js'])(
+      'loads a CommonJS %s config already present in the require cache',
+      async extension => {
+        await withTempDir('oxfmt-config-cjs-preloaded-', async tempDir => {
+          const cwd = await realpath(tempDir)
+          const configPath = join(cwd, `oxfmt.config${extension}`)
+          const require = createRequire(import.meta.url)
+
+          await writeFile(join(cwd, 'package.json'), '{"type":"commonjs"}')
+          await writeFile(configPath, 'module.exports = { printWidth: 83 }\n')
+
+          const preloaded = require(configPath)
+
+          await writeFile(configPath, 'module.exports = { printWidth: 84 }\n')
+
+          const options = { configPath, cwd, editorconfig: false } as const
+          const result = await loadOxfmtConfig(options)
+          const fresh = await loadOxfmtConfig({ ...options, useCache: false })
+          const cached = await loadOxfmtConfig(options)
+
+          expect(result.config).toStrictEqual(preloaded)
+          expect(fresh.config.printWidth).toBe(84)
+          expect(cached.config).toBe(result.config)
+        })
+      },
+    )
+
+    it.each(['.cjs', '.js'])(
+      'retries a CommonJS %s config after an evaluation error',
+      async extension => {
+        await withTempDir('oxfmt-config-cjs-retry-', async cwd => {
+          const configPath = join(cwd, `oxfmt.config${extension}`)
+          const options = { configPath, cwd, editorconfig: false } as const
+
+          await writeFile(join(cwd, 'package.json'), '{"type":"commonjs"}')
+          await writeFile(configPath, 'throw new Error("config failed")\n')
+
+          await expect(loadOxfmtConfig(options)).rejects.toThrow(
+            'config failed',
+          )
+
+          await writeFile(configPath, 'module.exports = { printWidth: 85 }\n')
+
+          const result = await loadOxfmtConfig(options)
+
+          expect(result.config.printWidth).toBe(85)
+        })
+      },
+    )
+
     it('bypasses cache when useCache is false', async () => {
       const cwd = fixturePath('load', 'cache-bypass')
       const configPath = '.oxfmtrc.json'
@@ -28,6 +85,32 @@ describe('loadOxfmtConfig', () => {
       expect(fresh.config).toStrictEqual({ tabWidth: 2, useTabs: false })
       expect(fresh.config).not.toBe(cached.config)
     })
+
+    it.each(['.cjs', '.js'])(
+      'retries a CommonJS %s config after export validation fails',
+      async extension => {
+        await withTempDir('oxfmt-config-invalid-export-', async cwd => {
+          const configPath = join(cwd, `oxfmt.config${extension}`)
+          const options = { configPath, cwd, editorconfig: false } as const
+
+          await writeFile(join(cwd, 'package.json'), '{"type":"commonjs"}')
+          await writeFile(configPath, 'module.exports = 1')
+          await expect(loadOxfmtConfig(options)).rejects.toThrow(
+            'Configuration file must export an object',
+          )
+
+          await writeFile(configPath, 'module.exports = { overrides: true }')
+          await expect(loadOxfmtConfig(options)).rejects.toThrow(
+            'Invalid overrides: expected an array',
+          )
+
+          await writeFile(configPath, 'module.exports = { printWidth: 85 }')
+          const { config } = await loadOxfmtConfig(options)
+
+          expect(config.printWidth).toBe(85)
+        })
+      },
+    )
 
     it.each([
       {
@@ -85,48 +168,51 @@ describe('loadOxfmtConfig', () => {
       })
     })
 
-    it('reloads same-size changed ESM .js config when mtime is unchanged', async () => {
-      await withTempDir('oxfmt-config-js-esm-cache-bypass-', async cwd => {
-        const configPath = join(cwd, 'oxfmt.config.js')
-        const configMtime = new Date('2026-01-01T00:00:00.000Z')
+    it.each([false, true])(
+      'reloads same-size changed ESM .js config when mtime is unchanged (initial cache: %s)',
+      async initialUseCache => {
+        await withTempDir('oxfmt-config-js-esm-cache-bypass-', async cwd => {
+          const configPath = join(cwd, 'oxfmt.config.js')
+          const configMtime = new Date('2026-01-01T00:00:00.000Z')
 
-        await writeFile(
-          join(cwd, 'package.json'),
-          '{"type":"module"}\n',
-          'utf8',
-        )
-        await writeFile(
-          configPath,
-          'export default { printWidth: 79 }\n',
-          'utf8',
-        )
-        await utimes(configPath, configMtime, configMtime)
+          await writeFile(
+            join(cwd, 'package.json'),
+            '{"type":"module"}\n',
+            'utf8',
+          )
+          await writeFile(
+            configPath,
+            'export default { printWidth: 79 }\n',
+            'utf8',
+          )
+          await utimes(configPath, configMtime, configMtime)
 
-        const first = await loadOxfmtConfig({
-          configPath,
-          cwd,
-          editorconfig: false,
-          useCache: false,
+          const first = await loadOxfmtConfig({
+            configPath,
+            cwd,
+            editorconfig: false,
+            useCache: initialUseCache,
+          })
+
+          await writeFile(
+            configPath,
+            'export default { printWidth: 80 }\n',
+            'utf8',
+          )
+          await utimes(configPath, configMtime, configMtime)
+
+          const second = await loadOxfmtConfig({
+            configPath,
+            cwd,
+            editorconfig: false,
+            useCache: false,
+          })
+
+          expect(second.config.printWidth).not.toBe(first.config.printWidth)
+          expect(second.config.printWidth).toBe(80)
         })
-
-        await writeFile(
-          configPath,
-          'export default { printWidth: 80 }\n',
-          'utf8',
-        )
-        await utimes(configPath, configMtime, configMtime)
-
-        const second = await loadOxfmtConfig({
-          configPath,
-          cwd,
-          editorconfig: false,
-          useCache: false,
-        })
-
-        expect(second.config.printWidth).not.toBe(first.config.printWidth)
-        expect(second.config.printWidth).toBe(80)
-      })
-    })
+      },
+    )
 
     it('evaluates ESM .js config once when useCache is false', async () => {
       await withTempDir('oxfmt-config-js-esm-single-evaluation-', async cwd => {

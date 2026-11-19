@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises'
+import { realpath, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { loadOxfmtConfig } from '../src'
@@ -7,7 +7,9 @@ import { fixturePath, withTempDir } from './helpers'
 it.each(['.json', '.jsonc', '.cjs'])(
   'validates external overrides before merging EditorConfig for %s',
   async extension => {
-    await withTempDir('oxfmt-invalid-overrides-', async cwd => {
+    await withTempDir('oxfmt-invalid-overrides-', async tempDir => {
+      // Resolve symlinks so jiti's CommonJS cache is exercised on macOS too.
+      const cwd = await realpath(tempDir)
       const configPath = join(cwd, `config${extension}`)
       const config = JSON.stringify({ overrides: [{}] })
 
