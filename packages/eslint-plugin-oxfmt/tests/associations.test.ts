@@ -135,6 +135,43 @@ async function lint(
   return result
 }
 
+it.each(['files', 'excludeFiles'] as const)(
+  'matches CLI association %s patterns outside an explicit config directory',
+  async field => {
+    await withTempProject(async cwd => {
+      const file = 'src/app.conf'
+      const configPath = 'configs/custom.json'
+      const source = '[1,2,3]'
+      const associations: OxfmtConfig['associations'] = [
+        { files: ['*.conf'], language: 'javascript' },
+        {
+          files: ['**/*.conf'],
+          ...(field === 'excludeFiles' ? { excludeFiles: ['*.conf'] } : {}),
+          language: 'json',
+        },
+      ]
+
+      await mkdir(join(cwd, 'configs'))
+      await mkdir(join(cwd, 'src'))
+      await writeFile(join(cwd, configPath), JSON.stringify({ associations }))
+
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, '-c', configPath, '--stdin-filepath', file],
+        { cwd, encoding: 'utf8', input: source },
+      )
+      const result = await lint(cwd, file, source, { configPath })
+
+      expect(cli.status).toBe(0)
+      expect(cli.stdout).toBe(
+        field === 'files' ? '[1, 2, 3]\n' : '[1, 2, 3];\n',
+      )
+      expect(result.messages).toEqual([])
+      expect(result.output).toBe(cli.stdout)
+    })
+  },
+)
+
 it.each(['app.conf', 'src/app.conf', 'src/keep.conf', 'src/.hidden/app.conf'])(
   'matches CLI association precedence and original-path overrides for %s',
   async file => {

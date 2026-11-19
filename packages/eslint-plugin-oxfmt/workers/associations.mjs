@@ -3,7 +3,6 @@
 import { dirname, join } from 'node:path'
 import { getCachedOxfmtGlobMatcher } from './matchers.mjs'
 import { isStringArray } from './options.mjs'
-import { toRelativePosixPath } from './paths.mjs'
 
 /**
  * @typedef {import('load-oxfmt-config').OxfmtOptions} OxfmtOptions
@@ -66,10 +65,10 @@ export const ASSOCIATION_EXCLUDED_FILENAMES = new Set([
  * Resolve the last matching association, validating entries even if unmatched.
  * @param {string} filename - Original file path.
  * @param {OxfmtOptions['associations']} associations - Ordered associations.
- * @param {string} baseDir - Directory that owns the association patterns.
+ * @param {string} matchPath - File path evaluated against include and exclude globs.
  * @returns {string} Filename used only for selecting the formatter.
  */
-export function resolveAssociationFilename(filename, associations, baseDir) {
+export function resolveAssociationFilename(filename, associations, matchPath) {
   if (associations === undefined) {
     return filename
   }
@@ -78,7 +77,6 @@ export function resolveAssociationFilename(filename, associations, baseDir) {
     throw new TypeError('oxfmt associations must be an array.')
   }
 
-  const relativePath = toRelativePosixPath(baseDir, filename)
   let formatFilename = filename
 
   for (const association of associations) {
@@ -94,9 +92,9 @@ export function resolveAssociationFilename(filename, associations, baseDir) {
       )
     }
 
-    const matches = getCachedOxfmtGlobMatcher(association.files)(relativePath)
+    const matches = getCachedOxfmtGlobMatcher(association.files)(matchPath)
     const excluded = association.excludeFiles
-      ? getCachedOxfmtGlobMatcher(association.excludeFiles)(relativePath)
+      ? getCachedOxfmtGlobMatcher(association.excludeFiles)(matchPath)
       : false
 
     if (matches && !excluded) {

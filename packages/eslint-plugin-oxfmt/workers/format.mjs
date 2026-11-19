@@ -1,6 +1,6 @@
 // @ts-check
 
-import { basename, dirname } from 'node:path'
+import { basename, dirname, resolve } from 'node:path'
 import {
   isOxfmtIgnored,
   loadOxfmtConfig,
@@ -19,7 +19,7 @@ import {
   validateWorkerOptions,
 } from './options.mjs'
 import { applyOverrides } from './overrides.mjs'
-import { toRelativePosixPath } from './paths.mjs'
+import { isPathOutsideBase, toRelativePosixPath } from './paths.mjs'
 
 /**
  * @typedef {import('eslint-plugin-oxfmt').OxfmtWorkerOptions} WorkerOptions
@@ -108,7 +108,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
     ...inlineRootOptions
   } = inlineOxfmtOptions
   let associations = ruleAssociations
-  let associationBaseDir = inlineBaseDir
+  let associationMatchPath = toRelativePosixPath(inlineBaseDir, filename)
   /**
    * Effective formatter options with paths resolved against their source.
    * @type {import('oxfmt').FormatConfig}
@@ -159,17 +159,24 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
 
     overrideBaseDir = loaded.dirname ?? overrideBaseDir
 
-    if (ruleAssociations === undefined) {
-      associations = configAssociations
-      associationBaseDir = overrideBaseDir
-    }
-
     finalOptions = {
       ...resolveTailwindPaths(loadedConfig, overrideBaseDir),
       ...finalOptions,
     }
+
+    const relativePath = toRelativePosixPath(overrideBaseDir, filename)
+    // Oxfmt uses the full path when the config directory is not a prefix.
+    const configMatchPath = isPathOutsideBase(relativePath)
+      ? resolve(filename).replaceAll('\\', '/')
+      : relativePath
+
+    if (ruleAssociations === undefined) {
+      associations = configAssociations
+      associationMatchPath = configMatchPath
+    }
+
     finalOptions = applyOverrides(
-      toRelativePosixPath(overrideBaseDir, filename),
+      configMatchPath,
       finalOptions,
       configOverrides,
       overrideBaseDir,
@@ -188,7 +195,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
   const formatFilename = resolveAssociationFilename(
     filename,
     associations,
-    associationBaseDir,
+    associationMatchPath,
   )
 
   if (

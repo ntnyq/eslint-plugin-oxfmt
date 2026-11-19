@@ -9,14 +9,14 @@ import { resolveTailwindPaths } from './options.mjs'
 
 /**
  * Apply override entries to a base options object.
- * @param {string} relativePath - Relative file path used for matching.
+ * @param {string} matchPath - File path evaluated against include and exclude globs.
  * @param {import('oxfmt').FormatConfig} baseOptions - Base format options.
  * @param {OxfmtConfigOverride[] | undefined} overrides - Override entries.
  * @param {string} optionsBaseDir - Base directory for paths inside override options.
  * @returns {import('oxfmt').FormatConfig} Options after override merge.
  */
 export function applyOverrides(
-  relativePath,
+  matchPath,
   baseOptions,
   overrides,
   optionsBaseDir,
@@ -37,12 +37,12 @@ export function applyOverrides(
     }
 
     const fileMatcher = getCachedOxfmtGlobMatcher(override.files)
-    const matches = !!fileMatcher && fileMatcher(relativePath)
+    const matches = !!fileMatcher && fileMatcher(matchPath)
 
     const excludeMatcher = override.excludeFiles?.length
       ? getCachedOxfmtGlobMatcher(override.excludeFiles)
       : undefined
-    const excluded = excludeMatcher ? excludeMatcher(relativePath) : false
+    const excluded = excludeMatcher ? excludeMatcher(matchPath) : false
 
     if (matches && !excluded && override.options) {
       merged = mergeOptionObjects(

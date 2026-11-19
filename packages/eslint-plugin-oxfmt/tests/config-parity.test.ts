@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import process from 'node:process'
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
@@ -93,6 +93,63 @@ it.each([
       expect(cli.status).toBe(0)
       expect(await readFile(filepath, 'utf8')).toBe(expected)
       expect(await lintText(cwd, filepath, SOURCE)).toBe(expected)
+    })
+  },
+)
+
+it.each([
+  { file: 'src/a.js', matches: true, pattern: '*.js' },
+  { file: 'src/a.js', matches: false, pattern: './src/*.js' },
+  { file: 'src/a.js', matches: false, pattern: '../src/*.js' },
+  { file: 'src/a.js', matches: true, pattern: '**/<project>/src/*.js' },
+  {
+    exclude: '**/<project>/src/*.js',
+    file: 'src/a.js',
+    matches: false,
+    pattern: '*.js',
+  },
+  { file: 'config/src/a.js', matches: true, pattern: './src/*.js' },
+  { file: 'config/src/a.js', matches: false, pattern: '**/config/src/*.js' },
+])(
+  'matches CLI override $pattern for $file with an explicit config',
+  async ({ exclude, file, matches, pattern }) => {
+    await withTempProject(async cwd => {
+      const configPath = join('config', 'oxfmt.json')
+      const filepath = join(cwd, file)
+      const project = basename(cwd)
+
+      await mkdir(join(cwd, 'config'))
+      await mkdir(dirname(filepath), { recursive: true })
+      await writeFile(
+        join(cwd, configPath),
+        JSON.stringify({
+          overrides: [
+            {
+              files: [pattern.replace('<project>', () => project)],
+              options: { singleQuote: true },
+              excludeFiles: exclude && [
+                exclude.replace('<project>', () => project),
+              ],
+            },
+          ],
+        }),
+      )
+      await writeFile(filepath, SOURCE)
+
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, '--config', configPath, '--write', file],
+        { cwd, encoding: 'utf8' },
+      )
+      const expected = matches
+        ? SINGLE_QUOTED
+        : 'export const value = "hello";\n'
+
+      expect(cli.status).toBe(0)
+      expect(await readFile(filepath, 'utf8')).toBe(expected)
+      expect(await lintText(cwd, filepath, SOURCE, { configPath })).toBe(
+        expected,
+      )
     })
   },
 )

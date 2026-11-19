@@ -425,6 +425,7 @@ is optional. Later matching entries win. Languages are `javascript`, `jsx`,
 `handlebars`, and `mdx`.
 
 Config associations match paths relative to the resolved config directory.
+For files outside that directory, their absolute paths are matched.
 Inline associations match relative to ESLint `cwd` and replace config
 associations entirely; `associations: []` clears them. `useConfig: false` keeps
 inline associations active. Ignores, EditorConfig, and overrides use the original
@@ -456,6 +457,10 @@ Patterns without `/`, such as `*.ts`, also match files in subdirectories; use
 and association globs. Matching overrides merge nested option objects;
 arrays and boolean values replace inherited values. Malformed external override
 structures are reported with the configuration file path.
+
+Config-file overrides match paths relative to the config directory. For files
+outside the directory of an explicit `configPath`, override globs match the
+absolute file path, as in the oxfmt CLI.
 
 ```js
 // eslint.config.mjs
