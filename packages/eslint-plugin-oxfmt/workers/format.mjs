@@ -122,6 +122,7 @@ export async function formatViaOxfmt(filename, sourceText, options = {}) {
       disableNestedConfig: controlOptions.disableNestedConfig,
       filepath: filename,
       useCache,
+      useCliConfig: controlOptions.useCliConfig,
     }
     const sourceConfig = await loadOxfmtConfig({
       ...configOptions,

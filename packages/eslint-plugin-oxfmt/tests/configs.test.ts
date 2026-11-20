@@ -23,6 +23,7 @@ it('should expose a cli parity preset', () => {
     {
       disableNestedConfig: false,
       respectOxfmtDefaultIgnores: true,
+      useCliConfig: true,
       useConfig: true,
       withNodeModules: false,
     },

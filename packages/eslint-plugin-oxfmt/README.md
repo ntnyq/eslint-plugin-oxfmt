@@ -182,6 +182,7 @@ All options are optional and default to sensible values.
 | Option                       | Type                                             | Default | Description                                                                                                                                                                                                  |
 | ---------------------------- | ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `useCache`                   | `boolean`                                        | `true`  | Reuse loaded configuration and ignore caches. Set to `false` to reload them for each formatting request.                                                                                                     |
+| `useCliConfig`               | `boolean`                                        | `false` | Reject conflicting configs during discovery and start EditorConfig lookup at ESLint `cwd`. Enabled by `cliParity`.                                                                                           |
 | `useConfig`                  | `boolean`                                        | `true`  | Load `.oxfmtrc.json`, `.oxfmtrc.jsonc`, or `oxfmt.config.{ts,mts,cts,js,mjs,cjs}` via `load-oxfmt-config`. Set to `false` to rely only on inline options.                                                    |
 | `configPath`                 | `string`                                         | —       | Custom path to an oxfmt config file. Relative paths resolve from ESLint `cwd`; absolute paths are used as-is. Explicit `configPath` accepts `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`. |
 | `editorconfig`               | `boolean \| { onlyCwd?: boolean; cwd?: string }` | `true`  | Control `.editorconfig` loading. Use `false` to disable, or object form for advanced resolution strategy.                                                                                                    |
@@ -214,9 +215,10 @@ a nested package. Matching sections apply in source order, and basename patterns
 such as `[*.js]` also match files in descendant directories.
 
 - Config discovery order (from the formatted file's directory, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` → `oxfmt.config.mts`
-- `.editorconfig` support follows oxfmt behavior: only the nearest `.editorconfig` is loaded for the current file, and its root and section values provide fallbacks for fields not set by the oxfmt config
+- Only the nearest `.editorconfig` from the lookup directory is loaded. Its root and section values provide fallbacks for fields unset by the oxfmt config.
+- By default, EditorConfig lookup starts at the config lookup directory. With `useCliConfig: true`, it starts at ESLint `cwd`, and automatic oxfmt config discovery rejects multiple configs in the same directory.
 - Set `editorconfig: false` to disable `.editorconfig` merging
-- Set `editorconfig: { onlyCwd: true }` to read only the current `cwd`'s `.editorconfig` (no upward traversal)
+- Set `editorconfig: { onlyCwd: true }` to read only the lookup directory's `.editorconfig`
 - Set `editorconfig: { cwd: '/path/to/base' }` to customize editorconfig resolution base directory
 - `configPath` overrides discovery and directly targets the specified config file
 - `configPath` supports explicit file paths with extensions: `.json`, `.jsonc`, `.ts`, `.mts`, `.cts`, `.js`, `.mjs`, `.cjs`

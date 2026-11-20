@@ -1,4 +1,4 @@
-import { isBoolean, isNumber } from '@ntnyq/utils'
+import { isBoolean } from '@ntnyq/utils'
 import type { SectionBody } from 'editorconfig'
 import type { FormatConfig } from 'oxfmt'
 
@@ -58,17 +58,15 @@ export function mapEditorconfigSectionToOptions(
     const effectiveSection = { ...inheritedSection, ...section }
     const tabWidth = parseEditorconfigTabWidth(effectiveSection)
 
-    if (isNumber(tabWidth)) {
+    if (tabWidth !== undefined) {
       options.tabWidth = tabWidth
     }
   }
 
-  if (section.max_line_length && section.max_line_length !== 'unset') {
-    const parsedPrintWidth = Number(section.max_line_length)
+  const printWidth = parseEditorconfigInteger(section.max_line_length)
 
-    if (Number.isFinite(parsedPrintWidth)) {
-      options.printWidth = parsedPrintWidth
-    }
+  if (printWidth !== undefined) {
+    options.printWidth = printWidth
   }
 
   const insertFinalNewline = parseEditorconfigBoolean(
@@ -118,6 +116,19 @@ function parseEditorconfigEndOfLine(value: string | undefined) {
 }
 
 /**
+ * Parse unsigned decimal EditorConfig values before formatter range validation.
+ */
+function parseEditorconfigInteger(value: string | undefined) {
+  if (!value || !/^\+?\d+$/u.test(value)) {
+    return undefined
+  }
+
+  const integer = Number(value)
+
+  return Number.isFinite(integer) ? integer : undefined
+}
+
+/**
  * Parses the single quote preference from an EditorConfig section.
  *
  * @param value - The raw EditorConfig value for single quote preference.
@@ -149,13 +160,9 @@ function parseEditorconfigTabWidth(section: SectionBody) {
       : [section.tab_width, section.indent_size]
 
   for (const value of values) {
-    if (!value || value === 'unset' || value === 'tab') {
-      continue
-    }
+    const parsedWidth = parseEditorconfigInteger(value)
 
-    const parsedWidth = Number(value)
-
-    if (Number.isFinite(parsedWidth)) {
+    if (parsedWidth !== undefined) {
       return parsedWidth
     }
   }

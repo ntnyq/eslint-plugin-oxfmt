@@ -1,8 +1,12 @@
-import { readFile } from 'node:fs/promises'
+import { spawnSync } from 'node:child_process'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import process from 'node:process'
 import { ESLint } from 'eslint'
 import { expect, it } from 'vitest'
 import pluginOxfmt, { parserPlain } from '../src'
-import { resolvePackagePath } from './helpers/paths'
+import { OXFMT_CLI, resolvePackagePath } from './helpers/paths'
+import { withTempProject } from './helpers/project'
 import { runWorker } from './helpers/worker'
 import type { OxfmtWorkerOptions } from '../src/types'
 
@@ -17,6 +21,7 @@ const FIXTURE_NESTED_INVALID_CWD = resolvePackagePath(
 const CLI_PARITY_DEFAULTS: OxfmtWorkerOptions = {
   disableNestedConfig: false,
   respectOxfmtDefaultIgnores: true,
+  useCliConfig: true,
   useConfig: true,
   withNodeModules: false,
 }
@@ -40,9 +45,16 @@ function createEslint(
         languageOptions: {
           parser: parserPlain,
         },
-        rules: {
-          'oxfmt/oxfmt': ['error', { ...CLI_PARITY_DEFAULTS, ...ruleOptions }],
-        },
+        ...(ruleOptions
+          ? {
+              rules: {
+                'oxfmt/oxfmt': [
+                  'error',
+                  { ...CLI_PARITY_DEFAULTS, ...ruleOptions },
+                ],
+              },
+            }
+          : {}),
       },
     ],
   })
@@ -72,6 +84,97 @@ it('should ignore node_modules by default', async () => {
   const result = await lintFile(FIXTURE_CWD, 'node_modules/a.ts')
 
   expect(result.messages).toHaveLength(0)
+})
+
+it.each([undefined, 'configs/custom.json'])(
+  'uses cwd-based EditorConfig with configPath=%s',
+  async configPath => {
+    await withTempProject(async cwd => {
+      const file = 'src/a.js'
+      const source = 'export const value="hello"\n'
+
+      await mkdir(join(cwd, 'src'))
+      await mkdir(join(cwd, 'configs'))
+      await writeFile(join(cwd, file), source)
+      await writeFile(join(cwd, '.editorconfig'), '[*]\nquote_type = single\n')
+      await writeFile(
+        join(cwd, 'src/.editorconfig'),
+        '[*]\nquote_type = double\n',
+      )
+      await writeFile(
+        join(cwd, 'configs/.editorconfig'),
+        '[*]\nquote_type = double\n',
+      )
+      await writeFile(join(cwd, configPath ?? 'src/.oxfmtrc.json'), '{}')
+
+      const result = await lintFile(
+        cwd,
+        file,
+        configPath ? { configPath } : undefined,
+        true,
+      )
+      const args = configPath ? ['-c', configPath] : []
+      const cli = spawnSync(
+        process.execPath,
+        [OXFMT_CLI, ...args, '--write', file],
+        {
+          cwd,
+          encoding: 'utf8',
+        },
+      )
+
+      expect(cli.status).toBe(0)
+      expect(result.messages).toEqual([])
+      expect(result.output).toBe("export const value = 'hello';\n")
+      expect(result.output).toBe(await readFile(join(cwd, file), 'utf8'))
+
+      await writeFile(join(cwd, file), source)
+      const custom = await lintFile(
+        cwd,
+        file,
+        {
+          ...(configPath ? { configPath } : {}),
+          editorconfig: { cwd: join(cwd, 'src') },
+        },
+        true,
+      )
+
+      expect(custom.messages).toEqual([])
+      expect(custom.output).toBe('export const value = "hello";\n')
+    })
+  },
+)
+
+it('reports conflicting discovered configs but accepts an explicit choice', async () => {
+  await withTempProject(async cwd => {
+    const file = 'a.js'
+    const source = 'export const value="hello"\n'
+
+    await writeFile(join(cwd, file), source)
+    await writeFile(join(cwd, '.oxfmtrc.json'), '{"singleQuote": true}')
+    await writeFile(join(cwd, '.oxfmtrc.jsonc'), '{}')
+
+    const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', file], {
+      cwd,
+      encoding: 'utf8',
+    })
+    const result = await lintFile(cwd, file, undefined, true)
+
+    expect(cli.status).toBe(1)
+    expect(result.messages).toHaveLength(1)
+    expect(result.messages[0]?.message).toContain(
+      'Conflicting oxfmt config files ".oxfmtrc.json" and ".oxfmtrc.jsonc"',
+    )
+    const explicit = await lintFile(
+      cwd,
+      file,
+      { configPath: '.oxfmtrc.json' },
+      true,
+    )
+
+    expect(explicit.messages).toEqual([])
+    expect(explicit.output).toBe("export const value = 'hello';\n")
+  })
 })
 
 it('should lint files in node_modules when withNodeModules is true', async () => {

@@ -78,6 +78,7 @@ async function loadConfig(
   editorconfigMode: 'per-file' | 'static' = 'static',
 ): Promise<LoadOxfmtConfigResult> {
   const useCache = options.useCache !== false
+  const useCliConfig = options.useCliConfig === true
   const cwd = resolve(options.cwd || process.cwd())
   const filepath = options.filepath ? resolve(cwd, options.filepath) : undefined
 
@@ -99,25 +100,28 @@ async function loadConfig(
       ? resolve(editorconfig.cwd)
       : undefined
 
-  const resolveKey = getResolveCacheKey(configLookupCwd, options.configPath)
+  const resolveKey = JSON.stringify([
+    getResolveCacheKey(configLookupCwd, options.configPath),
+    useCliConfig,
+  ])
   const editorconfigSearchDir =
-    editorconfigCwd ||
-    getEditorconfigSearchDir(configLookupCwd, options.configPath)
-  const editorconfigResolveKey = editorconfigCwd
-    ? getEditorconfigResolveCacheKey(
-        `${editorconfigCwd}::${options.configPath || ''}::onlyCwd=${String(onlyCwd)}`,
-      )
-    : getEditorconfigResolveCacheKey(
-        `${resolveKey}::onlyCwd=${String(onlyCwd)}`,
-      )
+    editorconfigCwd ??
+    (useCliConfig
+      ? cwd
+      : getEditorconfigSearchDir(configLookupCwd, options.configPath))
+  const editorconfigResolveKey = getEditorconfigResolveCacheKey(
+    JSON.stringify([editorconfigSearchDir, onlyCwd]),
+  )
 
+  const resolveConfig = () =>
+    resolveOxfmtrcPath(configLookupCwd, options.configPath, {
+      errorOnConflict: useCliConfig,
+    })
   const resolvedPath = options.loadedConfig
     ? options.loadedConfig.filepath
     : useCache
-      ? await cachePromise(resolveCache, resolveKey, () =>
-          resolveOxfmtrcPath(configLookupCwd, options.configPath),
-        )
-      : await resolveOxfmtrcPath(configLookupCwd, options.configPath)
+      ? await cachePromise(resolveCache, resolveKey, resolveConfig)
+      : await resolveConfig()
 
   const editorconfigPath = useEditorconfig
     ? await (useCache

@@ -86,6 +86,23 @@ describe('loadOxfmtConfig', () => {
       expect(fresh.config).not.toBe(cached.config)
     })
 
+    it('checks config conflicts even when ordinary discovery is cached', async () => {
+      await withTempDir('oxfmt-config-discovery-cache-', async cwd => {
+        const options = { cwd, editorconfig: false } as const
+
+        await writeFile(join(cwd, '.oxfmtrc.json'), '{"printWidth": 80}')
+        await writeFile(join(cwd, '.oxfmtrc.jsonc'), '{"printWidth": 90}')
+
+        const ordinary = await loadOxfmtConfig(options)
+
+        expect(ordinary.config.printWidth).toBe(80)
+        await expect(
+          loadOxfmtConfig({ ...options, useCliConfig: true }),
+        ).rejects.toThrow('Conflicting oxfmt config files')
+        await expect(loadOxfmtConfig(options)).resolves.toEqual(ordinary)
+      })
+    })
+
     it.each(['.cjs', '.js'])(
       'retries a CommonJS %s config after export validation fails',
       async extension => {

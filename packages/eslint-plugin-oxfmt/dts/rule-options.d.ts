@@ -169,6 +169,8 @@ export type OxfmtRuleOptionsTuple = []|[{
 
   useCache?: boolean
 
+  useCliConfig?: boolean
+
   useConfig?: boolean
 
   withNodeModules?: boolean

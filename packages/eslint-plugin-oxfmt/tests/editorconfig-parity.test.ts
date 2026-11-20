@@ -155,6 +155,10 @@ it.each([
 
 it.each([
   { indentation: ' '.repeat(4), properties: 'indent_size = 4' },
+  { indentation: ' '.repeat(4), properties: 'indent_size = +4' },
+  { indentation: '  ', properties: 'indent_size = 0x4' },
+  { indentation: '  ', properties: 'indent_size = 4.0' },
+  { indentation: '  ', properties: 'indent_size = -4' },
   { indentation: '\t', properties: 'indent_style = tab\nindent_size = 4' },
   {
     indentation: ' '.repeat(4),

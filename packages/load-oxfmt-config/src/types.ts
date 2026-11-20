@@ -169,6 +169,13 @@ export interface LoadOxfmtConfigOptions {
    * @default true
    */
   useCache?: boolean
+  /**
+   * Reject conflicting config files during discovery and search for EditorConfig from cwd.
+   * An explicit editorconfig.cwd still takes precedence.
+   *
+   * @default false
+   */
+  useCliConfig?: boolean
 }
 
 /**

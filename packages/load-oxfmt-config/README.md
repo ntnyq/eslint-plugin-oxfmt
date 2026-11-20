@@ -258,6 +258,16 @@ Enable in-memory caching for both path resolution and parsed config contents. Wh
 
 Set to `false` to force reload from disk on every call.
 
+#### `useCliConfig`
+
+- **Type:** `boolean`
+- **Default:** `false`
+
+Reject multiple supported configs in the same directory during automatic
+discovery and start EditorConfig lookup at `cwd`. An explicit `configPath`
+still selects a single config directly. An explicit `editorconfig.cwd` still
+sets the starting directory for EditorConfig.
+
 #### `loadedConfig`
 
 - **Type:** `LoadOxfmtConfigResult`

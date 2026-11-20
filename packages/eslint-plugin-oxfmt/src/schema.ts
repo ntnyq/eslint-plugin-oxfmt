@@ -493,6 +493,11 @@ export const pluginOptionsSchema = {
       description:
         'Reuse configuration and ignore caches. Disable to reload configuration on every formatting request. (Default: true)',
     },
+    useCliConfig: {
+      default: false,
+      description: `Reject conflicting config files during discovery and search for .editorconfig from cwd. (Default: false)`,
+      type: 'boolean',
+    },
     useConfig: {
       default: true,
       description: `Whether to load Oxfmt configuration file. (Default: true)`,

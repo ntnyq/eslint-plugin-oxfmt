@@ -34,6 +34,7 @@ export const cliParity: Linter.Config<Linter.RulesRecord> = {
       {
         disableNestedConfig: false,
         respectOxfmtDefaultIgnores: true,
+        useCliConfig: true,
         useConfig: true,
         withNodeModules: false,
       },

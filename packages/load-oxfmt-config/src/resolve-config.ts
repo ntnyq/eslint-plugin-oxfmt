@@ -11,6 +11,8 @@ import { OXFMT_CONFIG_FILES } from './constants'
  *
  * @param cwd - Starting directory for resolution.
  * @param configPath - Optional explicit path.
+ * @param options - Discovery settings.
+ * @param options.errorOnConflict - Reject multiple configs in the same directory.
  * @returns Absolute path to config file, or undefined when not found.
  *
  * @example
@@ -23,6 +25,9 @@ import { OXFMT_CONFIG_FILES } from './constants'
 export async function resolveOxfmtrcPath(
   cwd: string,
   configPath?: string,
+  options: {
+    errorOnConflict?: boolean
+  } = {},
 ): Promise<string | undefined> {
   const resolvedCwd = resolve(cwd)
 
@@ -33,14 +38,16 @@ export async function resolveOxfmtrcPath(
   let currentDir = resolvedCwd
 
   while (true) {
+    let foundFilename: string | undefined
+
     for (const filename of OXFMT_CONFIG_FILES) {
       const configFilePath = join(currentDir, filename)
 
       try {
         const stats = await stat(configFilePath)
 
-        if (stats.isFile()) {
-          return configFilePath
+        if (!stats.isFile()) {
+          continue
         }
       } catch (error) {
         const code = (error as NodeJS.ErrnoException).code
@@ -49,8 +56,24 @@ export async function resolveOxfmtrcPath(
           throw error
         }
 
-        // File does not exist, continue searching.
+        continue
       }
+
+      if (!options.errorOnConflict) {
+        return configFilePath
+      }
+
+      if (foundFilename) {
+        throw new Error(
+          `Conflicting oxfmt config files "${foundFilename}" and "${filename}" in ${currentDir}.`,
+        )
+      }
+
+      foundFilename = filename
+    }
+
+    if (foundFilename) {
+      return join(currentDir, foundFilename)
     }
 
     const parentDir = join(currentDir, '..')

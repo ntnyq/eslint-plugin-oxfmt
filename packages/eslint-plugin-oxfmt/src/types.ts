@@ -12,7 +12,11 @@ import type { OxfmtRuleOptionsTuple } from '../dts/rule-options'
  */
 export type OxfmtPluginOptions = Pick<
   LoadOxfmtConfigOptions,
-  'configPath' | 'disableNestedConfig' | 'editorconfig' | 'useCache'
+  | 'configPath'
+  | 'disableNestedConfig'
+  | 'editorconfig'
+  | 'useCache'
+  | 'useCliConfig'
 > & {
   ignorePath?: string | string[]
   respectOxfmtDefaultIgnores?: boolean

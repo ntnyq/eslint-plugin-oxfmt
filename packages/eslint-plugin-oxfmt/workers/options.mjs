@@ -21,6 +21,7 @@ export const WORKER_CONTROL_KEYS = [
   'ignorePath',
   'respectOxfmtDefaultIgnores',
   'useCache',
+  'useCliConfig',
   'useConfig',
   'withNodeModules',
 ]
@@ -118,12 +119,13 @@ export function validateWorkerOptions(controlOptions) {
   const stringKeys = ['configPath', 'cwd']
   /**
    * Plugin switches validated as booleans when provided.
-   * @type {('disableNestedConfig' | 'respectOxfmtDefaultIgnores' | 'useConfig' | 'useCache' | 'withNodeModules')[]}
+   * @type {('disableNestedConfig' | 'respectOxfmtDefaultIgnores' | 'useCache' | 'useCliConfig' | 'useConfig' | 'withNodeModules')[]}
    */
   const booleanKeys = [
     'disableNestedConfig',
     'respectOxfmtDefaultIgnores',
     'useCache',
+    'useCliConfig',
     'useConfig',
     'withNodeModules',
   ]
