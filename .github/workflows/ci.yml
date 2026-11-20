@@ -21,6 +21,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm run release:check
+      - run: pnpm run check:package-smoke
       - run: git diff --exit-code
 
   test:

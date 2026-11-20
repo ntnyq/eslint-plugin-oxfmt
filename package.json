@@ -8,6 +8,7 @@
   "scripts": {
     "build": "pnpm -r run build",
     "check:package": "pnpm --filter \"./packages/*\" pack --dry-run",
+    "check:package-smoke": "tsx scripts/checkPackageSmoke.ts",
     "check:schema": "pnpm --filter eslint-plugin-oxfmt run check:schema",
     "check:versions": "tsx scripts/checkVersions.ts",
     "dev": "pnpm build && pnpm -r --parallel run dev",
@@ -28,6 +29,7 @@
     "@types/node": "^26.6.6",
     "@typescript/native-preview": "^7.0.0-dev.20260707.2",
     "bumpp": "^12.3.0",
+    "changelogithub": "^15.0.5",
     "eslint": "^10.15.0",
     "husky": "^9.1.7",
     "nano-staged": "^1.0.2",
@@ -37,7 +39,7 @@
     "tsdown": "^0.23.7",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   },
   "engines": {
     "node": "^22.13.0 || >=24"

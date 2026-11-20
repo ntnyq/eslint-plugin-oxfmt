@@ -1,6 +1,12 @@
 packages:
   - packages/*
 
+overrides:
+  editorconfig@3.0.2>minimatch: ~11.0.9
+  # Use a patched tar in the changelog generator's transitive dependency chain.
+  giget@1.2.5>tar: ^7.5.23
+  micromark-extension-math@3.1.0>katex: ^0.18.2
+
 allowBuilds:
   esbuild: true
   unrs-resolver: true

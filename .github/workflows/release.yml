@@ -29,11 +29,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check:versions "$GITHUB_REF_NAME"
       - run: pnpm run release:check
+      - run: pnpm run check:package-smoke
       - run: git diff --exit-code
       - name: Select npm dist-tag
         run: |
           node --input-type=module -e 'import { appendFileSync } from "node:fs"; import pkg from "./package.json" with { type: "json" }; appendFileSync(process.env.GITHUB_ENV, `NPM_DIST_TAG=${pkg.version.includes("-") ? "next" : "latest"}\n`)'
       - run: pnpm --filter './packages/*' -r publish --no-git-checks --provenance --tag "$NPM_DIST_TAG"
-      - run: pnpm dlx changelogithub
+      - run: pnpm exec changelogithub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

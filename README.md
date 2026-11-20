@@ -72,7 +72,11 @@ pnpm test
 | `pnpm format` / `pnpm format:check` | Format or check repository files without loading nested fixture configs     |
 | `pnpm lint` / `pnpm typecheck`      | Run repository lint and TypeScript checks                                   |
 | `pnpm check:package`                | Inspect publishable package contents without creating tarballs; build first |
-| `pnpm release:check`                | Run all checks, including builds, tests, and package validation             |
+| `pnpm check:package-smoke`          | Verify tarballs with the minimum peer versions; build first                 |
+| `pnpm release:check`                | Build, run repository checks and tests, and inspect archives                |
+
+CI and the release workflow run the tarball smoke test separately. It runs
+`eslint --fix` and checks the public types with NodeNext resolution.
 
 Run a single suite after building:
 
