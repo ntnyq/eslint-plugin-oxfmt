@@ -33,6 +33,12 @@ run({
       output: '---\ntitle: Home\n---\n\n# Heading',
     },
     {
+      code: '[^empty]:\n[^filled]: Text.',
+      filename: 'empty-footnote.md',
+      options: [{ insertFinalNewline: false, useConfig: false }],
+      output: '[^empty]:\n\n[^filled]: Text.',
+    },
+    {
       code: '```md\n~~~js\nconst  value = 1\n~~~\n```',
       filename: 'nested-fences.md',
       options: [{ insertFinalNewline: false, useConfig: false }],

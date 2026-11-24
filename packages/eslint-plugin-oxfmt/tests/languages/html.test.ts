@@ -48,6 +48,18 @@ run({
       options: [{ insertFinalNewline: false, semi: false, useConfig: false }],
       output: '<template><button @click="a = !a;"></button></template>',
     },
+    {
+      code: `<template><p utility="p-4 flex" :utility="'p-4 flex'"></p></template>`,
+      filename: 'tailwind-bound-attribute.vue',
+      output: `<template><p utility="flex p-4" :utility="'flex p-4'"></p></template>`,
+      options: [
+        {
+          insertFinalNewline: false,
+          sortTailwindcss: { attributes: [':utility'] },
+          useConfig: false,
+        },
+      ],
+    },
   ],
   valid: [
     {

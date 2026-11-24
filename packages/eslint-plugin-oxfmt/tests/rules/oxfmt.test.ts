@@ -1147,6 +1147,30 @@ run({
         }
       `,
     },
+    {
+      filename: 'imports.ts',
+      name: 'break same-source import ties by subgroup in descending source order',
+      code: $`
+        import { value } from "lib";
+        import type { Type } from "lib";
+        import { other } from "z";
+      `,
+      options: [
+        {
+          insertFinalNewline: false,
+          useConfig: false,
+          sortImports: {
+            groups: [['type-external', 'value-external']],
+            order: 'desc',
+          },
+        },
+      ],
+      output: $`
+        import { other } from "z";
+        import type { Type } from "lib";
+        import { value } from "lib";
+      `,
+    },
   ],
   valid: [
     {

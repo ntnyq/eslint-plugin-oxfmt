@@ -24,7 +24,7 @@ Maintained in the [eslint-plugin-oxfmt monorepo](https://github.com/ntnyq/eslint
 
 - **ESLint**: `^9.5.0 || ^10.0.0` (Only supports ESLint flat config)
 - **Node.js**: `^22.13.0 || >=24`
-- **oxfmt**: `>= 0.79.0`
+- **oxfmt**: `>= 0.80.0`
 
 The monorepo migration aligns the Node.js requirement with `load-oxfmt-config`; Node.js 20 is no longer supported.
 
@@ -332,11 +332,11 @@ Use `sortImports: true` to enable import sorting with defaults, or pass an objec
 Available keys:
 
 - `customGroups`: Ordered custom group definitions `{ elementNamePattern?: string[]; groupName?: string; modifiers?: string[]; selector?: string }[]`
-- `groups`: Ordered group list; supports nested arrays and boundary markers like `{ newlinesBetween: boolean }`
+- `groups`: Ordered group list. Nested arrays sort together, using their listed order to break ties between imports from the same source. Use `{ newlinesBetween: boolean }` to control blank lines at a group boundary.
 - `ignoreCase`: Ignore case when sorting (default `true`)
 - `internalPattern`: Glob patterns for internal imports
 - `newlinesBetween`: Insert blank lines between groups (default `true`)
-- `order`: `'asc' | 'desc'` (default `'asc'`)
+- `order`: Sort import sources in `'asc'` or `'desc'` order (default `'asc'`). Both directions preserve group order and the tie-break order.
 - `partitionByComment`: Split groups by comments (default `false`)
 - `partitionByNewline`: Split groups by blank lines (default `false`)
 - `sortSideEffects`: Sort side-effect imports (default `false`)
