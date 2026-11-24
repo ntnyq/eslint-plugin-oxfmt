@@ -296,9 +296,6 @@ importers:
 
   packages/load-oxfmt-config:
     dependencies:
-      '@ntnyq/utils':
-        specifier: ^0.27.0
-        version: 0.27.0
       editorconfig:
         specifier: ^4.0.1
         version: 4.0.1
@@ -317,6 +314,10 @@ importers:
       oxfmt:
         specifier: '>=0.80.0'
         version: 0.80.0(@astrojs/compiler-rs@0.5.3)(svelte@5.59.1(@typescript-eslint/types@8.73.0))
+    devDependencies:
+      '@ntnyq/utils':
+        specifier: ^0.27.0
+        version: 0.27.0
 
 packages:
 

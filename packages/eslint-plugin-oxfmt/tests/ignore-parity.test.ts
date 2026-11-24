@@ -11,6 +11,38 @@ import type { OxfmtRuleOptions } from '../src/types'
 const SOURCE = 'export const value="hello"\n'
 const DOUBLE_QUOTED = 'export const value = "hello";\n'
 
+it.each([
+  { gitignore: '!dist/a.js\n', ignored: true },
+  { gitignore: '!dist/\n!dist/a.js\n', ignored: false },
+])(
+  'matches Git info exclude with gitignore rules $gitignore',
+  async ({ gitignore, ignored }) => {
+    await withTempProject(async cwd => {
+      const filepath = join(cwd, 'dist', 'a.js')
+      const git = spawnSync('git', ['init', '--quiet'], {
+        cwd,
+        encoding: 'utf8',
+      })
+
+      expect(git.status).toBe(0)
+      await mkdir(dirname(filepath), { recursive: true })
+      await writeFile(filepath, SOURCE)
+      await writeFile(join(cwd, '.git', 'info', 'exclude'), 'dist/\n')
+      await writeFile(join(cwd, '.gitignore'), gitignore)
+
+      const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'dist'], {
+        cwd,
+        encoding: 'utf8',
+      })
+      const expected = ignored ? SOURCE : DOUBLE_QUOTED
+
+      expect(cli.status).toBe(ignored ? 2 : 0)
+      expect(await readFile(filepath, 'utf8')).toBe(expected)
+      expect(await lintText(cwd, filepath, SOURCE)).toBe(expected)
+    })
+  },
+)
+
 it.each(
   [
     'config',

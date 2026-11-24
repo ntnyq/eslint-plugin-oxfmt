@@ -216,7 +216,7 @@ such as `[*.js]` also match files in descendant directories.
 
 - Config discovery order (from the formatted file's directory, walking upward): `.oxfmtrc.json` → `.oxfmtrc.jsonc` → `oxfmt.config.ts` → `oxfmt.config.mts`
 - Only the nearest `.editorconfig` from the lookup directory is loaded. Its root and section values provide fallbacks for fields unset by the oxfmt config.
-- By default, EditorConfig lookup starts at the config lookup directory. With `useCliConfig: true`, it starts at ESLint `cwd`, and automatic oxfmt config discovery rejects multiple configs in the same directory.
+- By default, EditorConfig lookup starts at the config lookup directory. With `useCliConfig: true`, it starts at ESLint `cwd`, automatic discovery rejects multiple configs in the same directory, and both `.json` and `.jsonc` configs accept comments and trailing commas.
 - Set `editorconfig: false` to disable `.editorconfig` merging
 - Set `editorconfig: { onlyCwd: true }` to read only the lookup directory's `.editorconfig`
 - Set `editorconfig: { cwd: '/path/to/base' }` to customize editorconfig resolution base directory
@@ -534,9 +534,6 @@ Note: ESLint still controls file discovery. Files excluded by ESLint will never 
 
 ### Limitations
 
-CLI parity covers common configuration and ignore behavior. Some glob dialect
-differences remain:
-
 - Per-file EditorConfig matching expands numeric and alphabetic brace ranges,
   such as `[a{1..3}.js]`, while the oxfmt CLI currently treats the range contents
   literally. Use explicit alternatives such as `[a{1,2,3}.js]` for consistent
@@ -544,6 +541,11 @@ differences remain:
 - Override and association globs use picomatch's POSIX named character classes:
   `a[[:digit:]].js` matches `a1.js`. The current oxfmt CLI does not interpret
   `[:digit:]` as a named class. Use ranges such as `[0-9]` for consistent matching.
+- The plugin validates formatter option values in external overrides when an
+  override applies to a linted file. The oxfmt CLI can report invalid values in
+  overrides whose globs match none of the target files.
+- Cached ESM or TypeScript config exports can survive a validation error. See
+  [module caching limitations](../load-oxfmt-config/README.md#limitations).
 
 ## Integration
 

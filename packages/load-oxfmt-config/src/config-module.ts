@@ -102,12 +102,17 @@ export async function loadConfigModule(
 }
 
 /**
- * Delete a CommonJS module and all cached children reachable from it.
+ * Delete a CommonJS module and its local dependencies from the cache.
  *
  * @param requirePath - Resolved CommonJS module id.
+ * @param preservedModules - Dependencies already cached before this load.
  * @param seen - Visited module ids used to avoid cycles.
  */
-function deleteRequireCacheTree(requirePath: string, seen = new Set<string>()) {
+function deleteRequireCacheTree(
+  requirePath: string,
+  preservedModules?: ReadonlySet<string>,
+  seen = new Set<string>(),
+) {
   if (seen.has(requirePath)) {
     return
   }
@@ -118,8 +123,11 @@ function deleteRequireCacheTree(requirePath: string, seen = new Set<string>()) {
 
   if (cachedModule) {
     for (const child of cachedModule.children) {
-      if (!splitPathSegments(child.id).includes('node_modules')) {
-        deleteRequireCacheTree(child.id, seen)
+      if (
+        !preservedModules?.has(child.id) &&
+        !splitPathSegments(child.id).includes('node_modules')
+      ) {
+        deleteRequireCacheTree(child.id, preservedModules, seen)
       }
     }
   }
@@ -301,7 +309,8 @@ function isJavaScriptLoaderFallbackError(
 }
 
 /**
- * Reuse Node's module cache, clearing a CommonJS entry when validation fails.
+ * Reuse Node's module cache, rolling back newly loaded CommonJS dependencies
+ * when config validation fails.
  */
 async function loadCachedJavaScriptConfig(
   resolvedPath: string,
@@ -309,6 +318,7 @@ async function loadCachedJavaScriptConfig(
 ) {
   const requirePath = require.resolve(resolvedPath)
   const isCjs = extname(resolvedPath) === '.cjs'
+  const previouslyCached = new Set(Object.keys(require.cache))
   let configModule: unknown
 
   try {
@@ -342,7 +352,7 @@ async function loadCachedJavaScriptConfig(
     return config
   } catch (error) {
     if (!isEsm && require.cache[requirePath]?.exports === configModule) {
-      Reflect.deleteProperty(require.cache, requirePath)
+      deleteRequireCacheTree(requirePath, previouslyCached)
     }
 
     throw error

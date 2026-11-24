@@ -13,6 +13,29 @@ import type { OxfmtConfig } from 'oxfmt'
 const SOURCE = 'export const value="hello"\n'
 const SINGLE_QUOTED = "export const value = 'hello';\n"
 
+it('accepts comments and trailing commas in .oxfmtrc.json in CLI mode', async () => {
+  await withTempProject(async cwd => {
+    const filepath = join(cwd, 'a.js')
+
+    await writeFile(
+      join(cwd, '.oxfmtrc.json'),
+      '{ // quotes\n"singleQuote": true,\n}',
+    )
+    await writeFile(filepath, SOURCE)
+
+    const cli = spawnSync(process.execPath, [OXFMT_CLI, '--write', 'a.js'], {
+      cwd,
+      encoding: 'utf8',
+    })
+
+    expect(cli.status).toBe(0)
+    expect(await readFile(filepath, 'utf8')).toBe(SINGLE_QUOTED)
+    expect(await lintText(cwd, filepath, SOURCE, { useCliConfig: true })).toBe(
+      SINGLE_QUOTED,
+    )
+  })
+})
+
 it.each([
   { cliMatches: false, file: 'a1.js', pluginMatches: true },
   { cliMatches: true, file: 'ad].js', pluginMatches: false },

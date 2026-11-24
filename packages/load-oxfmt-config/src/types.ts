@@ -58,8 +58,8 @@ export interface IsOxfmtIgnoredOptions {
   /**
    * Ignore files to use instead of the default cwd `.prettierignore`.
    *
-   * Explicit ignore paths do not replace `.gitignore` or `.git/info/exclude`
-   * handling. They can be passed multiple times in CLI style.
+   * Explicit ignore files must exist. They can be passed multiple times
+   * and are used alongside `.gitignore` and `.git/info/exclude`.
    */
   ignorePath?: string | string[]
   /**
@@ -170,7 +170,8 @@ export interface LoadOxfmtConfigOptions {
    */
   useCache?: boolean
   /**
-   * Reject conflicting config files during discovery and search for EditorConfig from cwd.
+   * Allow comments and trailing commas in JSON, reject conflicting configs
+   * during discovery, and search for EditorConfig from cwd.
    * An explicit editorconfig.cwd still takes precedence.
    *
    * @default false

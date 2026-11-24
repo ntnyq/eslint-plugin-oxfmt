@@ -1,5 +1,6 @@
-import { chmod, mkdir, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, symlink, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
+import process from 'node:process'
 import { describe, expect, it } from 'vitest'
 import { isOxfmtIgnored } from '../src'
 import { fixturePath, withTempDir } from './helpers'
@@ -188,6 +189,65 @@ describe('isOxfmtIgnored', () => {
       await expect(isOxfmtIgnored({ cwd, filepath })).rejects.toThrow(
         /EISDIR|directory/u,
       )
+    })
+  })
+
+  it.skipIf(process.platform === 'win32')(
+    'follows symlinks before resolving a parent segment in an absolute ignorePath',
+    async () => {
+      await withTempDir('oxfmt-ignore-symlink-', async cwd => {
+        const projectDir = join(cwd, 'project')
+        const externalDir = join(cwd, 'external')
+        const link = join(projectDir, 'link')
+
+        await mkdir(projectDir)
+        await mkdir(join(externalDir, 'nested'), { recursive: true })
+        await symlink(join(externalDir, 'nested'), link, 'dir')
+        await writeFile(join(projectDir, 'rules.ignore'), 'other.js\n')
+        await writeFile(join(externalDir, 'rules.ignore'), 'a.js\n')
+
+        const result = await isOxfmtIgnored({
+          cwd: projectDir,
+          filepath: 'a.js',
+          ignorePath: `${link}/../rules.ignore`,
+        })
+
+        expect(result).toStrictEqual({ ignored: true, reason: 'ignore-path' })
+      })
+    },
+  )
+
+  it('preserves an extra carriage return before a CRLF in .gitignore', async () => {
+    await withTempDir('oxfmt-ignore-crlf-', async cwd => {
+      await mkdir(join(cwd, '.git'))
+      await writeFile(join(cwd, '.gitignore'), 'a.js\r\nb.js\r\r\n')
+
+      await expect(
+        isOxfmtIgnored({ cwd, filepath: 'a.js' }),
+      ).resolves.toStrictEqual({
+        ignored: true,
+        reason: 'gitignore',
+      })
+      await expect(
+        isOxfmtIgnored({ cwd, filepath: 'b.js' }),
+      ).resolves.toStrictEqual({
+        ignored: false,
+      })
+    })
+  })
+
+  it('reports a missing explicit ignore file even when Git ignores the target', async () => {
+    await withTempDir('oxfmt-ignore-missing-explicit-', async cwd => {
+      await writeFile(join(cwd, '.gitignore'), 'a.js\n')
+      await writeFile(join(cwd, 'valid.ignore'), 'a.js\n')
+
+      await expect(
+        isOxfmtIgnored({
+          cwd,
+          filepath: 'a.js',
+          ignorePath: ['valid.ignore', 'missing.ignore'],
+        }),
+      ).rejects.toThrow('missing.ignore')
     })
   })
 
@@ -534,6 +594,22 @@ describe('isOxfmtIgnored', () => {
       })
     })
   })
+
+  it.each(['"*.js"', '42', '["*.js", 42]'])(
+    'rejects malformed config ignorePatterns %s',
+    async ignorePatterns => {
+      await withTempDir('oxfmt-ignore-invalid-patterns-', async cwd => {
+        await writeFile(
+          join(cwd, '.oxfmtrc.json'),
+          `{"ignorePatterns":${ignorePatterns}}`,
+        )
+
+        await expect(isOxfmtIgnored({ cwd, filepath: 'a.js' })).rejects.toThrow(
+          'Invalid ignorePatterns: expected an array of strings',
+        )
+      })
+    },
+  )
 
   it('applies config ignorePatterns with gitignore directory semantics', async () => {
     await withTempDir('oxfmt-ignore-config-gitignore-dir-', async cwd => {

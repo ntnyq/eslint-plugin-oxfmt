@@ -146,6 +146,7 @@ async function loadConfig(
       resolvedPath,
       options.loadedConfig,
       useCache,
+      useCliConfig,
     )
     const oxfmtConfig = source.options
 
@@ -205,6 +206,7 @@ async function loadConfigSource(
   resolvedPath: string | undefined,
   loadedConfig: LoadOxfmtConfigResult | undefined,
   useCache: boolean,
+  useCliConfig: boolean,
 ): Promise<{ options: OxfmtOptions }> {
   if (loadedConfig) {
     return {
@@ -214,16 +216,22 @@ async function loadConfigSource(
 
   const readSource = async (): Promise<OxfmtOptions> =>
     resolvedPath
-      ? readConfigFromFile(resolvedPath, { useCache }).catch(error => {
-          throw new Error(
-            `Failed to parse oxfmt configuration file at ${resolvedPath}: ${error instanceof Error ? error.message : String(error)}`,
-            { cause: error },
-          )
-        })
+      ? readConfigFromFile(resolvedPath, { useCache, useCliConfig }).catch(
+          error => {
+            throw new Error(
+              `Failed to parse oxfmt configuration file at ${resolvedPath}: ${error instanceof Error ? error.message : String(error)}`,
+              { cause: error },
+            )
+          },
+        )
       : {}
   const options =
     useCache && resolvedPath
-      ? await cachePromise(sourceCache, resolvedPath, readSource)
+      ? await cachePromise(
+          sourceCache,
+          JSON.stringify([resolvedPath, useCliConfig]),
+          readSource,
+        )
       : await readSource()
 
   return {

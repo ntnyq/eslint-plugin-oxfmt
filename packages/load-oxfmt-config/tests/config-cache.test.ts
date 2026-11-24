@@ -300,6 +300,51 @@ describe('loadOxfmtConfig', () => {
       })
     })
 
+    it.each([false, true])(
+      'reloads a corrected CommonJS helper after validation fails (cache=%s)',
+      async useCache => {
+        await withTempDir('oxfmt-config-helper-retry-', async cwd => {
+          const configPath = join(cwd, 'oxfmt.config.cjs')
+          const helperPath = join(cwd, 'helper.cjs')
+          const options = { configPath, cwd, editorconfig: false } as const
+
+          await writeFile(
+            configPath,
+            'module.exports = require("./helper.cjs")',
+          )
+          await writeFile(helperPath, 'module.exports = 1')
+          await expect(loadOxfmtConfig(options)).rejects.toThrow(
+            'Configuration file must export an object',
+          )
+
+          await writeFile(helperPath, 'module.exports = { printWidth: 85 }')
+          const result = await loadOxfmtConfig({ ...options, useCache })
+
+          expect(result.config.printWidth).toBe(85)
+        })
+      },
+    )
+
+    it('preserves previously loaded CommonJS dependencies when config validation fails', async () => {
+      await withTempDir('oxfmt-config-shared-helper-', async cwd => {
+        const configPath = join(cwd, 'oxfmt.config.cjs')
+        const requireFromCwd = createRequire(join(cwd, 'consumer.cjs'))
+
+        await writeFile(join(cwd, 'shared.cjs'), 'module.exports = {}')
+        await writeFile(
+          configPath,
+          'require("./shared.cjs")\nmodule.exports = 1',
+        )
+
+        const shared = requireFromCwd('./shared.cjs')
+
+        await expect(
+          loadOxfmtConfig({ configPath, cwd, editorconfig: false }),
+        ).rejects.toThrow('Configuration file must export an object')
+        expect(requireFromCwd('./shared.cjs')).toBe(shared)
+      })
+    })
+
     it('reloads changed CommonJS config helper when useCache is false', async () => {
       await withTempDir('oxfmt-config-cjs-helper-cache-bypass-', async cwd => {
         const configPath = join(cwd, 'oxfmt.config.cjs')

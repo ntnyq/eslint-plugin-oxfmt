@@ -264,7 +264,8 @@ Set to `false` to force reload from disk on every call.
 - **Default:** `false`
 
 Reject multiple supported configs in the same directory during automatic
-discovery and start EditorConfig lookup at `cwd`. An explicit `configPath`
+discovery, accept comments and trailing commas in both `.json` and `.jsonc`
+configs, and start EditorConfig lookup at `cwd`. An explicit `configPath`
 still selects a single config directly. An explicit `editorconfig.cwd` still
 sets the starting directory for EditorConfig.
 
@@ -360,7 +361,7 @@ When provided, nested config lookup is disabled (same as oxfmt CLI `-c`).
 
 Ignore files to use instead of the default cwd `.prettierignore`.
 Can be passed multiple times in CLI style.
-Explicit ignore paths do not replace `.gitignore` or `.git/info/exclude` handling.
+Each explicit path must exist. Git ignore rules still apply.
 
 #### `withNodeModules`
 
@@ -574,6 +575,11 @@ alphabetic brace ranges such as `[a{1..3}.js]` and `[a{a..c}.js]`. The oxfmt CLI
 currently treats the range contents literally. Use explicit alternatives such
 as `[a{1,2,3}.js]` when both tools must select the same files.
 
+With caching enabled, an ESM or TypeScript config module can retain its
+previous exports after a validation error. After fixing the entry file, use
+`useCache: false` or restart the process. Changes to native ESM helper imports
+may require a restart.
+
 ## Error Handling
 
 ```ts
@@ -607,7 +613,7 @@ The caching system maintains bounded caches for:
 
 **Cache invalidation:**
 
-- Failed operations automatically clear their cache entries
+- Failed operations clear loader cache entries. See [Limitations](#limitations) for module caching.
 - Use `useCache: false` to bypass cache for specific calls, including Git discovery. Cached Git boundaries and worktree pointers remain stable until bypassed or evicted; bypassing does not replace previously cached entries.
 - Each process-level cache retains at most 1,000 least-recently used entries
 - For native ESM config files (`.mjs` or `.js` under `"type": "module"`), `useCache: false` cache-busts the entry config file. Imported ESM helper modules still follow Node.js module cache behavior for the current process.

@@ -1,12 +1,11 @@
 import { readFile } from 'node:fs/promises'
-import { dirname } from 'node:path'
 import ignore from 'ignore'
 import { cachePromise, getCacheValue, setCacheValue } from './cache'
 import { isPathOutsideBase, toRelativePosixPath } from './path'
 import type { Ignore } from 'ignore'
 
 /**
- * Cache parsed ignore files, including missing files, by absolute path.
+ * Cache compiled groups of ignore files that share a matching base.
  */
 const ignoreMatcherCache = new Map<string, Promise<Ignore | undefined>>()
 
@@ -15,32 +14,9 @@ const ignoreMatcherCache = new Map<string, Promise<Ignore | undefined>>()
  */
 const configIgnoreMatcherCache = new Map<string, Ignore>()
 
-/**
- * Match state from an ordered ignore file chain.
- */
-interface IgnoreFileChainResult {
-  /**
-   * Final ignore state after applying all matching rules.
-   */
-  ignored: boolean
-  /**
-   * Whether any ignore or negation rule matched the file.
-   */
-  matched: boolean
-}
-
-/**
- * Ignore file descriptor with an optional matching base directory override.
- */
 interface IgnoreFileEntry {
-  /**
-   * Absolute path to the ignore file.
-   */
-  path: string
-  /**
-   * Directory used to compute relative paths before matching.
-   */
-  baseDir?: string
+  baseDir: string
+  paths: string[]
 }
 
 /**
@@ -69,10 +45,18 @@ interface LoadedIgnoreMatcher {
 export function matchConfigIgnorePatterns(
   filepath: string,
   configDir: string,
-  patterns: string[],
+  patterns: unknown,
   useCache: boolean,
 ) {
+  if (patterns == null) {
+    return false
+  }
+
   validateConfigIgnorePatterns(patterns)
+
+  if (patterns.length === 0) {
+    return false
+  }
 
   const relativeFile = toRelativePosixPath(configDir, filepath)
 
@@ -99,66 +83,26 @@ export function matchConfigIgnorePatterns(
 }
 
 /**
- * Match file path against one ignore file.
- *
- * @param filepath - Absolute file path.
- * @param ignoreFilePath - Ignore file path.
- * @param useCache - Whether to use matcher cache.
- * @param baseDir - Base directory for relative path calculation, defaults to ignore file directory.
- * @returns True when ignored by this file.
- */
-export async function matchIgnoreFile(
-  filepath: string,
-  ignoreFilePath: string,
-  useCache: boolean,
-  baseDir?: string,
-) {
-  const matcher = await loadIgnoreMatcher(ignoreFilePath, useCache)
-
-  if (!matcher) {
-    return false
-  }
-
-  const relativeToIgnore = toRelativePosixPath(
-    baseDir ?? dirname(ignoreFilePath),
-    filepath,
-  )
-
-  if (isPathOutsideBase(relativeToIgnore)) {
-    return false
-  }
-
-  return matcher.ignores(relativeToIgnore)
-}
-
-/**
- * Match a file path against ordered ignore files while preserving negation state.
- *
- * @param filepath - Absolute file path.
- * @param ignoreFileEntries - Ignore files in increasing precedence order.
- * @param useCache - Whether to use matcher cache.
- * @param stopAtIgnoredDirectory - Whether ignored directories prevent reading nested ignore files.
- * @returns True when the ordered ignore files mark the file as ignored.
+ * Return the ignore file that excludes the target, if any.
+ * Each entry combines same-base rules in increasing precedence order.
  */
 export async function matchIgnoreFileChain(
   filepath: string,
   ignoreFileEntries: IgnoreFileEntry[],
   useCache: boolean,
-  stopAtIgnoredDirectory = false,
-): Promise<IgnoreFileChainResult> {
+  { required = false, stopAtIgnoredDirectory = false } = {},
+): Promise<string | undefined> {
   const matcherEntries: LoadedIgnoreMatcher[] = []
 
-  for (const entry of ignoreFileEntries) {
-    const baseDir = entry.baseDir ?? dirname(entry.path)
-
+  for (const { baseDir, paths } of ignoreFileEntries) {
     if (
       stopAtIgnoredDirectory &&
-      matchLoadedIgnoreMatchers(baseDir, matcherEntries, true).ignored
+      matchLoadedIgnoreMatchers(baseDir, matcherEntries, true)
     ) {
       break
     }
 
-    const matcher = await loadIgnoreMatcher(entry.path, useCache)
+    const matcher = await loadIgnoreMatcher(paths, useCache, required)
 
     if (matcher) {
       matcherEntries.push({ baseDir, matcher })
@@ -169,40 +113,47 @@ export async function matchIgnoreFileChain(
 }
 
 /**
- * Read and parse an ignore file into an `ignore` matcher.
- *
- * @param ignoreFilePath - Ignore file path.
- * @param useCache - Whether to cache matcher instances.
- * @returns Parsed matcher, or undefined when file does not exist.
+ * Source marks preserve the reason when matching a combined set of rules.
  */
 function loadIgnoreMatcher(
-  ignoreFilePath: string,
+  paths: string[],
   useCache: boolean,
+  required: boolean,
 ): Promise<Ignore | undefined> {
-  const loadTask = () =>
-    readFile(ignoreFilePath, 'utf8')
-      .then(content => {
-        const matcher = ignore({ ignorecase: false })
+  const loadTask = async () => {
+    let matcher: Ignore | undefined
 
-        matcher.add(content)
+    for (const path of paths) {
+      try {
+        const content = await readFile(path, 'utf8')
 
-        return matcher
-      })
-      .catch(error => {
+        matcher ??= ignore({ ignorecase: false })
+        // The matcher strips one trailing CR from each marked pattern.
+        matcher.add(
+          content.split('\n').map(pattern => ({
+            mark: path,
+            pattern,
+          })),
+        )
+      } catch (error) {
         const code = (error as NodeJS.ErrnoException).code
 
-        if (code === 'ENOENT' || code === 'ENOTDIR') {
-          return undefined
+        if (required || (code !== 'ENOENT' && code !== 'ENOTDIR')) {
+          throw error
         }
+      }
+    }
 
-        throw error
-      })
-
-  if (!useCache) {
-    return loadTask()
+    return matcher
   }
 
-  return cachePromise(ignoreMatcherCache, ignoreFilePath, loadTask)
+  return useCache
+    ? cachePromise(
+        ignoreMatcherCache,
+        JSON.stringify([paths, required]),
+        loadTask,
+      )
+    : loadTask()
 }
 
 /**
@@ -211,42 +162,36 @@ function loadIgnoreMatcher(
  * @param filepath - Absolute file or directory path to test.
  * @param matcherEntries - Loaded matchers in increasing precedence order.
  * @param isDirectory - Whether the target path is a directory.
- * @returns Final ignore state after all matching rules.
+ * @returns Source of the winning exclusion.
  */
 function matchLoadedIgnoreMatchers(
   filepath: string,
   matcherEntries: LoadedIgnoreMatcher[],
   isDirectory = false,
-): IgnoreFileChainResult {
-  let ignored = false
-  let matched = false
+): string | undefined {
+  let ignoredBy: string | undefined
 
   for (const entry of matcherEntries) {
     let relativeToIgnore = toRelativePosixPath(entry.baseDir, filepath)
 
-    if (isPathOutsideBase(relativeToIgnore)) {
+    if (!relativeToIgnore || isPathOutsideBase(relativeToIgnore)) {
       continue
     }
 
-    if (isDirectory && relativeToIgnore && !relativeToIgnore.endsWith('/')) {
+    if (isDirectory) {
       relativeToIgnore += '/'
     }
 
     const result = entry.matcher.test(relativeToIgnore)
 
     if (result.ignored) {
-      ignored = true
-      matched = true
+      ignoredBy = result.rule?.mark
     } else if (result.unignored) {
-      ignored = false
-      matched = true
+      ignoredBy = undefined
     }
   }
 
-  return {
-    ignored,
-    matched,
-  }
+  return ignoredBy
 }
 
 /**
@@ -255,8 +200,20 @@ function matchLoadedIgnoreMatchers(
  * @param patterns - Config ignore patterns.
  * @throws When a pattern contains a parent-directory path segment.
  */
-function validateConfigIgnorePatterns(patterns: string[]) {
+function validateConfigIgnorePatterns(
+  patterns: unknown,
+): asserts patterns is string[] {
+  const typeError = 'Invalid ignorePatterns: expected an array of strings.'
+
+  if (!Array.isArray(patterns)) {
+    throw new TypeError(typeError)
+  }
+
   for (const pattern of patterns) {
+    if (typeof pattern !== 'string') {
+      throw new TypeError(typeError)
+    }
+
     const pathPart = pattern.startsWith('!') ? pattern.slice(1) : pattern
     const normalizedPathPart = pathPart.endsWith(String.raw`\ `)
       ? pathPart

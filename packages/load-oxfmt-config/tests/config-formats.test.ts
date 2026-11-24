@@ -221,6 +221,22 @@ describe('loadOxfmtConfig', () => {
       })
     })
 
+    it('keeps CLI JSON parsing separate from strict JSON parsing in the cache', async () => {
+      await withTempDir('oxfmt-config-json-parity-', async cwd => {
+        await writeFile(
+          join(cwd, '.oxfmtrc.json'),
+          '{ // quotes\n"singleQuote": true,\n}',
+        )
+
+        const { config } = await loadOxfmtConfig({ cwd, useCliConfig: true })
+
+        expect(config).toStrictEqual({ singleQuote: true })
+        await expect(loadOxfmtConfig({ cwd })).rejects.toThrow(
+          'Failed to parse oxfmt configuration file',
+        )
+      })
+    })
+
     it('throws for unsupported explicit config extension', async () => {
       await withTempDir('oxfmt-config-explicit-unsupported-', async cwd => {
         const configPath = join(cwd, 'custom.config.yaml')

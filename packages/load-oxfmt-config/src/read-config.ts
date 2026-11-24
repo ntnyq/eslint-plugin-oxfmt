@@ -18,11 +18,12 @@ import type { OxfmtOptions } from './types'
  * @param resolvedPath - Absolute path to config file.
  * @param options - Config loading options.
  * @param options.useCache - Whether to reuse cached config modules.
+ * @param options.useCliConfig - Whether to accept comments and trailing commas in JSON files.
  * @returns Parsed config object.
  */
 export async function readConfigFromFile(
   resolvedPath: string,
-  options: { useCache?: boolean } = {},
+  options: { useCache?: boolean; useCliConfig?: boolean } = {},
 ): Promise<OxfmtOptions> {
   const extension = extname(resolvedPath)
   const useCache = options.useCache !== false
@@ -38,10 +39,13 @@ export async function readConfigFromFile(
     '',
   )
 
-  if (extension === '.jsonc') {
+  if (
+    extension === '.jsonc' ||
+    (options.useCliConfig && extension === '.json')
+  ) {
     const parseErrors: ParseError[] = []
     const parsed = parseJSONC(content, parseErrors, {
-      allowEmptyContent: true,
+      allowEmptyContent: extension === '.jsonc',
       allowTrailingComma: true,
     })
 

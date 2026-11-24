@@ -5,7 +5,6 @@ import { DEFAULT_IGNORED_DIRS, DEFAULT_IGNORED_LOCKFILES } from './constants'
 import { collectGitignorePaths, resolveGitInfoExcludePath } from './git-ignore'
 import {
   matchConfigIgnorePatterns,
-  matchIgnoreFile,
   matchIgnoreFileChain,
 } from './ignore-matchers'
 import { loadOxfmtConfig } from './load-config'
@@ -76,8 +75,6 @@ export async function isOxfmtIgnored(
   if (
     includeConfigIgnorePatterns &&
     configResult.dirname &&
-    configResult.config.ignorePatterns &&
-    configResult.config.ignorePatterns.length > 0 &&
     matchConfigIgnorePatterns(
       filepath,
       configResult.dirname,
@@ -141,6 +138,23 @@ async function resolveDefaultIgnores(
   options: IsOxfmtIgnoredOptions,
   useCache: boolean,
 ): Promise<IsOxfmtIgnoredResult> {
+  const ignorePaths = isString(options.ignorePath)
+    ? [options.ignorePath]
+    : (options.ignorePath ?? [])
+  const explicitIgnoreEntries = ignorePaths.map(ignorePath => {
+    const path = isAbsolute(ignorePath) ? ignorePath : resolve(cwd, ignorePath)
+
+    return {
+      baseDir: dirname(path),
+      paths: [path],
+    }
+  })
+  const explicitIgnoreMatch = explicitIgnoreEntries.length
+    ? await matchIgnoreFileChain(filepath, explicitIgnoreEntries, useCache, {
+        required: true,
+      })
+    : undefined
+
   const defaultIgnoredDirOptions = options.withNodeModules
     ? { withNodeModules: true }
     : {}
@@ -159,87 +173,60 @@ async function resolveDefaultIgnores(
     }
   }
 
-  const normalizedIgnorePaths = isString(options.ignorePath)
-    ? [options.ignorePath]
-    : options.ignorePath
-  const explicitIgnorePaths = normalizedIgnorePaths?.map(path =>
-    resolveIgnoreFilePath(path, cwd),
-  )
-
   const { paths: gitignorePaths, repoRoot } = await collectGitignorePaths(
     filepath,
     useCache,
   )
   const gitignoreEntries = [...gitignorePaths].reverse().map(path => ({
-    path,
+    baseDir: dirname(path),
+    paths: [path],
   }))
-  const gitignoreResult = await matchIgnoreFileChain(
+  const infoExcludePath = repoRoot
+    ? await resolveGitInfoExcludePath(repoRoot, useCache)
+    : undefined
+
+  if (infoExcludePath) {
+    // Both files are rooted at the repository, with .gitignore taking precedence.
+    gitignoreEntries[0]?.paths.unshift(infoExcludePath)
+  }
+
+  const gitignoreMatch = await matchIgnoreFileChain(
     filepath,
     gitignoreEntries,
     useCache,
-    true,
+    { stopAtIgnoredDirectory: true },
   )
 
-  if (gitignoreResult.ignored) {
+  if (gitignoreMatch) {
     return {
       ignored: true,
-      reason: 'gitignore',
+      reason:
+        gitignoreMatch === infoExcludePath ? 'git-info-exclude' : 'gitignore',
     }
   }
 
-  if (repoRoot && !gitignoreResult.matched) {
-    const infoExcludePath = await resolveGitInfoExcludePath(repoRoot, useCache)
-
-    if (
-      infoExcludePath &&
-      (await matchIgnoreFile(filepath, infoExcludePath, useCache, repoRoot))
-    ) {
-      return {
-        ignored: true,
-        reason: 'git-info-exclude',
-      }
+  if (explicitIgnoreMatch) {
+    return {
+      ignored: true,
+      reason: 'ignore-path',
     }
   }
 
-  if (explicitIgnorePaths && explicitIgnorePaths.length > 0) {
-    const explicitIgnoreEntries = explicitIgnorePaths.map(path => ({
-      path,
-    }))
-    const explicitIgnoreResult = await matchIgnoreFileChain(
+  if (
+    explicitIgnoreEntries.length === 0 &&
+    (await matchIgnoreFileChain(
       filepath,
-      explicitIgnoreEntries,
+      [{ baseDir: cwd, paths: [resolve(cwd, '.prettierignore')] }],
       useCache,
-    )
-
-    if (explicitIgnoreResult.ignored) {
-      return {
-        ignored: true,
-        reason: 'ignore-path',
-      }
-    }
-  } else {
-    const prettierignorePath = resolve(cwd, '.prettierignore')
-
-    if (await matchIgnoreFile(filepath, prettierignorePath, useCache)) {
-      return {
-        ignored: true,
-        reason: 'prettierignore',
-      }
+    ))
+  ) {
+    return {
+      ignored: true,
+      reason: 'prettierignore',
     }
   }
 
   return {
     ignored: false,
   }
-}
-
-/**
- * Resolve an ignore file path against cwd when needed.
- *
- * @param path - Absolute or relative path.
- * @param cwd - Current working directory.
- * @returns Absolute ignore file path.
- */
-function resolveIgnoreFilePath(path: string, cwd: string) {
-  return isAbsolute(path) ? path : resolve(cwd, path)
 }
